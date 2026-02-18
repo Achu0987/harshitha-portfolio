@@ -38,7 +38,10 @@ export const ENTRANCE_TEXTURES = [
 export const CORRIDOR_TEXTURES = [
     // Walls/Floor/Ceiling
     '/textures/corridor/wall_texture.webp',
-    '/textures/corridor/floor_wood.webp',
+    '/textures/corridor/kawalekpodlogi.png',
+    '/textures/corridor/texturadoprogow.png',
+    '/textures/corridor/ramka na zdjecie.png',
+    '/textures/corridor/texturadrewnadonozekbiurka.png',
     '/textures/corridor/ceiling_texture.webp',
     '/textures/paper-texture.webp',
     '/textures/corridor/avatar_sketch.webp',

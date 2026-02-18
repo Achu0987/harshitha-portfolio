@@ -78,9 +78,18 @@ const DoorWallSegment = ({ position, baseRotationY, width, corridorHeight, wallT
 const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 100000 }) => {
     const corridorHeight = 3.5;
 
-    // Load floor texture
-    const floorTexture = useTexture('/textures/corridor/floor_wood.webp');
+    // =============================================
+    // USTAWIENIA PODŁOGI (FLOOR SETTINGS)
+    // =============================================
+    // Tekstura kawałka podłogi - ręcznie rysowane deski
+    const floorTexture = useTexture('/textures/corridor/kawalekpodlogi.png');
     floorTexture.wrapS = floorTexture.wrapT = THREE.ClampToEdgeWrapping;
+
+    // Tekstura listwy przypodłogowej (baseboards)
+    // Wymiary obrazka: 1582 x 94 px → aspect ratio 16.83:1
+    const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.png');
+    baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
+    baseboardTexture.colorSpace = THREE.SRGBColorSpace;
 
     // Load wall texture
     const wallTexture = useTexture('/textures/corridor/wall_texture.webp');
@@ -98,6 +107,14 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
 
     // If fully clipped, render nothing
     if (effectiveLength <= 0) return null;
+
+    // =============================================
+    // REGULACJA PRZYCIĘCIA LISTWY PRZY DRZWIACH
+    // =============================================
+    // O ile (w unitach 3D) skrócić listwę z każdej strony przy ramce drzwi.
+    // Zwiększ wartość → większa przerwa między listwą a drzwiami.
+    // Zmniejsz wartość → listwa bliżej drzwi (może najeżdżać na ramkę).
+    const BASEBOARD_DOOR_MARGIN = 0.5;
 
     // Helper to generate wall segments for a side ('left' or 'right')
     const generateWallSegments = (side) => {
@@ -135,7 +152,10 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                     type: 'filler',
                     position: [baseX, 0, segCenterZ],
                     rotation: [0, isLeft ? Math.PI / 2 : -Math.PI / 2, 0],
-                    width: segLength
+                    width: segLength,
+                    isLeft,
+                    // Ten segment kończy się przy drzwiach (od strony niższego Z)
+                    trimLowZ: true
                 });
             }
 
@@ -229,7 +249,10 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                 type: 'filler',
                 position: [baseX, 0, segCenterZ],
                 rotation: [0, isLeft ? Math.PI / 2 : -Math.PI / 2, 0],
-                width: segLength
+                width: segLength,
+                isLeft,
+                // Ten segment zaczyna się zaraz po drzwiach (od strony wyższego Z)
+                trimHighZ: currentZ !== effectiveStart
             });
         }
 
@@ -241,37 +264,59 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
 
     return (
         <group>
-            {/* Floor with wood texture - alternating tiles for seamless pattern */}
-            {/* Every other tile is mirrored (scale X = -1) AND rotated 180° for seamless joining */}
+            {/* =============================================
+                PODŁOGA - Kafelki (FLOOR TILES)
+                =============================================
+                Każdy kafelek jest płaskim plane z teksturą kawalekpodlogi.png
+                Co drugi kafelek jest obrócony o 180° i lustrzanie odbity
+                żeby fajnie się łączyły ze sobą.
+                
+                USTAWIENIA DO RĘCZNEJ REGULACJI:
+                - TILE_LENGTH: długość jednego kafelka (w unitach 3D)
+                - TILE_WIDTH: szerokość (powinna pasować do korytarza = 7)
+                - FLOOR_START_OFFSET: przesunięcie startu podłogi
+            */}
             {(() => {
-                const tileLength = 10; // Each tile is 10 units long
-                const tileWidth = 7;   // Floor width (matching corridor)
+                // ===== REGULACJA KAFELKÓW PODŁOGI =====
+                const TILE_LENGTH = 10;          // Długość jednego kafelka wzdłuż korytarza
+                const CENTER_WIDTH = 5;          // Szerokość środkowego pasa (węższe deski = ładniej)
+                const SIDE_WIDTH = 1;            // Szerokość bocznych pasów po lewej i prawej
+                const FLOOR_START_OFFSET = 2;    // Offset startu (+ = dalej, - = bliżej kamery)
+
+                // Przycięte tekstury do bocznych pasów (ta sama skala co środek, nie rozciągnięte!)
+                // UV repeat = jaki ułamek tekstury pokazać (SIDE_WIDTH / CENTER_WIDTH)
+                const uvFraction = SIDE_WIDTH / CENTER_WIDTH; // np. 1/5 = 0.2 → 20% tekstury
+
+                const leftSideTexture = floorTexture.clone();
+                leftSideTexture.needsUpdate = true;
+                leftSideTexture.repeat.set(1, uvFraction);    // Pełna długość, przycięta szerokość
+                leftSideTexture.offset.set(0, 0);             // Lewa krawędź tekstury
+
+                const rightSideTexture = floorTexture.clone();
+                rightSideTexture.needsUpdate = true;
+                rightSideTexture.repeat.set(1, uvFraction);
+                rightSideTexture.offset.set(0, 1 - uvFraction); // Prawa krawędź tekstury
+
                 const tiles = [];
                 const floorY = -corridorHeight / 2;
-
-                // Use global Z alignment to prevent tiles from overlapping between segments
-                // Tiles are aligned to a global grid starting at Z=0
                 const segmentEndZ = effectiveStart - effectiveLength;
 
-                // First tile position with fine-tuned offset
-                // Adjust FLOOR_START_OFFSET to control where the floor starts (in units, not tiles)
-                const FLOOR_START_OFFSET = 2; // Positive = start further back, Negative = start closer to camera
-                const firstTileIndex = Math.floor(effectiveStart / tileLength);
-                let tileZ = firstTileIndex * tileLength - tileLength / 2 + FLOOR_START_OFFSET;
+                const firstTileIndex = Math.floor(effectiveStart / TILE_LENGTH);
+                let tileZ = firstTileIndex * TILE_LENGTH - TILE_LENGTH / 2 + FLOOR_START_OFFSET;
 
-                while (tileZ + tileLength / 2 > segmentEndZ) {
-                    // Use global tile index for alternating pattern
-                    const globalTileIndex = Math.round(tileZ / tileLength);
+                while (tileZ + TILE_LENGTH / 2 > segmentEndZ) {
+                    const globalTileIndex = Math.round(tileZ / TILE_LENGTH);
                     const isMirrored = Math.abs(globalTileIndex) % 2 === 1;
 
+                    // --- Środkowy pas podłogi ---
                     tiles.push(
                         <mesh
-                            key={`floor-tile-${tileZ.toFixed(1)}`}
+                            key={`floor-center-${tileZ.toFixed(1)}`}
                             position={[0, floorY, tileZ]}
-                            rotation={[-Math.PI / 2, 0, isMirrored ? Math.PI : 0]}
+                            rotation={[-Math.PI / 2, 0, Math.PI / 2 + (isMirrored ? Math.PI : 0)]}
                             scale={[isMirrored ? -1 : 1, 1, 1]}
                         >
-                            <planeGeometry args={[tileWidth, tileLength]} />
+                            <planeGeometry args={[TILE_LENGTH, CENTER_WIDTH]} />
                             <meshStandardMaterial
                                 map={floorTexture}
                                 side={THREE.DoubleSide}
@@ -280,10 +325,48 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
                             />
                         </mesh>
                     );
-                    tileZ -= tileLength;
+
+                    // --- Lewy pas podłogi (przycięta tekstura, nie rozciągnięta!) ---
+                    tiles.push(
+                        <mesh
+                            key={`floor-left-${tileZ.toFixed(1)}`}
+                            position={[-(CENTER_WIDTH / 2 + SIDE_WIDTH / 2), floorY, tileZ]}
+                            rotation={[-Math.PI / 2, 0, Math.PI / 2 + (isMirrored ? Math.PI : 0)]}
+                            scale={[isMirrored ? -1 : 1, 1, 1]}
+                        >
+                            <planeGeometry args={[TILE_LENGTH, SIDE_WIDTH]} />
+                            <meshStandardMaterial
+                                map={leftSideTexture}
+                                side={THREE.DoubleSide}
+                                roughness={1}
+                                metalness={0}
+                            />
+                        </mesh>
+                    );
+
+                    // --- Prawy pas podłogi (przycięta tekstura, nie rozciągnięta!) ---
+                    tiles.push(
+                        <mesh
+                            key={`floor-right-${tileZ.toFixed(1)}`}
+                            position={[(CENTER_WIDTH / 2 + SIDE_WIDTH / 2), floorY, tileZ]}
+                            rotation={[-Math.PI / 2, 0, Math.PI / 2 + (isMirrored ? Math.PI : 0)]}
+                            scale={[isMirrored ? -1 : 1, 1, 1]}
+                        >
+                            <planeGeometry args={[TILE_LENGTH, SIDE_WIDTH]} />
+                            <meshStandardMaterial
+                                map={rightSideTexture}
+                                side={THREE.DoubleSide}
+                                roughness={1}
+                                metalness={0}
+                            />
+                        </mesh>
+                    );
+
+                    tileZ -= TILE_LENGTH;
                 }
                 return tiles;
             })()}
+
 
             {/* Ceiling with texture - alternating tiles for seamless pattern */}
             {(() => {
@@ -332,24 +415,69 @@ const CorridorWalls = ({ zStart = 10, length = 80, doorPositions = [], zClip = 1
             {[...leftSegments, ...rightSegments]
                 .filter(seg => seg.type === 'filler')
                 .map((seg, i) => {
-                    // Static filler segment
+                    // Wall texture clone (same pattern for wall + baseboard)
                     const segTexture = wallTexture.clone();
                     segTexture.needsUpdate = true;
                     segTexture.repeat.set(seg.width / 2, corridorHeight / 2);
 
+                    // Baseboard texture clone
+                    // Texture: 1582x94 px. Natural tile = (1582/94)*0.15 = 2.524 units wide
+                    const bbTexture = baseboardTexture.clone();
+                    bbTexture.needsUpdate = true;
+                    bbTexture.wrapS = bbTexture.wrapT = THREE.RepeatWrapping;
+                    bbTexture.rotation = 0; // CRITICAL: reset rotation (shared texture may have PI/2 from threshold)
+                    bbTexture.offset.set(0, 0);
+                    const NATURAL_TILE_W = (1582 / 94) * 0.15;
+                    bbTexture.repeat.set(seg.width / NATURAL_TILE_W, 1);
+
+                    // =============================================
+                    // PRZYCINANIE LISTWY PRZY DRZWIACH
+                    // =============================================
+                    // Listwa jest węższa o BASEBOARD_DOOR_MARGIN z każdej strony
+                    // gdzie segment sąsiaduje z drzwiami (trimStart / trimEnd).
+                    // Środek listwy jest przesunięty, żeby wyrównać do ściany.
+                    // trimHighZ = przytnij od strony wyższego Z (gdzie zaczyna się wnęka drzwi)
+                    // trimLowZ  = przytnij od strony niższego Z  (gdzie kończy się wnęka drzwi)
+                    const bbMarginHighZ = seg.trimHighZ ? BASEBOARD_DOOR_MARGIN : 0;
+                    const bbMarginLowZ = seg.trimLowZ ? BASEBOARD_DOOR_MARGIN : 0;
+                    const bbWidth = seg.width - bbMarginHighZ - bbMarginLowZ;
+
+                    // Przesunięcie środka listwy wzdłuż osi lokalnej (X w przestrzeni grupy)
+                    // Segment jest obrócony, więc lokalna oś X = wzdłuż ściany.
+                    // Po rotacji +PI/2 (lewa ściana): lokalna oś +X → świat -Z (niższy Z)
+                    // Po rotacji -PI/2 (prawa ściana): lokalna oś +X → świat +Z (wyższy Z)
+                    // Dlatego offset jest odwrócony między lewą a prawą ścianą.
+                    let bbOffsetX;
+                    if (seg.isLeft) {
+                        // +X lokalny = -Z świat = strona lowZ
+                        bbOffsetX = (bbMarginLowZ - bbMarginHighZ) / 2;
+                    } else {
+                        // +X lokalny = +Z świat = strona highZ
+                        bbOffsetX = (bbMarginHighZ - bbMarginLowZ) / 2;
+                    }
+
                     return (
-                        <mesh
-                            key={i}
-                            position={seg.position}
-                            rotation={seg.rotation || [0, seg.rotationY, 0]}
-                        >
-                            <planeGeometry args={[seg.width, corridorHeight]} />
-                            <meshStandardMaterial
-                                map={segTexture}
-                                roughness={1}
-                                metalness={0}
-                            />
-                        </mesh>
+                        <group key={i} position={seg.position} rotation={seg.rotation || [0, seg.rotationY, 0]}>
+                            {/* Main Wall Segment */}
+                            <mesh>
+                                <planeGeometry args={[seg.width, corridorHeight]} />
+                                <meshStandardMaterial
+                                    map={segTexture}
+                                    roughness={1}
+                                    metalness={0}
+                                />
+                            </mesh>
+
+                            {/* Baseboard (Listwa przypodłogowa) - przycięta przy drzwiach */}
+                            <mesh position={[bbOffsetX, -corridorHeight / 2 + 0.075, 0.01]}>
+                                <planeGeometry args={[bbWidth, 0.15]} />
+                                <meshStandardMaterial
+                                    map={bbTexture}
+                                    roughness={0.8}
+                                    side={THREE.DoubleSide}
+                                />
+                            </mesh>
+                        </group>
                     );
                 })}
 

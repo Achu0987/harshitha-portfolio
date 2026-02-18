@@ -181,6 +181,35 @@ const DoorSection = ({
     const frameTexture = useTexture('/textures/corridor/doors/ramkasingledoors.webp');
     const handleTexture = useTexture('/textures/corridor/doors/klamkadodrzwi.webp');
     const doorBackTexture = useTexture('/textures/corridor/doors/backsingledoors.webp');
+    const arrowTexture = useTexture('/textures/corridor/strzalka.png');
+
+    // Baseboard texture for door sections (1582x94 px, aspect 16.83:1)
+    const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.png');
+    baseboardTexture.wrapS = baseboardTexture.wrapT = THREE.RepeatWrapping;
+    baseboardTexture.colorSpace = THREE.SRGBColorSpace;
+
+    // Pre-create baseboard textures via useMemo (same pattern as legTexture above)
+    const doorBoardWidth = (WALL_LENGTH - 1.1) / 2;
+    const NATURAL_TILE_W = (1582 / 94) * 0.15; // = 2.524 units per natural tile
+    const doorBbTexLeft = useMemo(() => {
+        const tex = baseboardTexture.clone();
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        tex.rotation = 0; // Reset rotation (shared texture may have PI/2 from threshold)
+        tex.offset.set(0, 0);
+        tex.needsUpdate = true;
+        tex.repeat.set(doorBoardWidth / NATURAL_TILE_W, 1);
+        return tex;
+    }, [baseboardTexture]);
+
+    const doorBbTexRight = useMemo(() => {
+        const tex = baseboardTexture.clone();
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        tex.rotation = 0; // Reset rotation (shared texture may have PI/2 from threshold)
+        tex.offset.set(0, 0);
+        tex.needsUpdate = true;
+        tex.repeat.set(doorBoardWidth / NATURAL_TILE_W, 1);
+        return tex;
+    }, [baseboardTexture]);
 
     // Door dimensions - based on texture aspect ratio (door texture ~1:2.5)
     const doorWidth = 1.13;
@@ -769,6 +798,101 @@ const DoorSection = ({
                     <meshStandardMaterial map={wallTexture} roughness={1} metalness={0} side={THREE.DoubleSide} />
                 </mesh>
 
+                {/* === ARROW DECORATION === */}
+                {/* Pointing to door. Left arrow. */}
+                {/* ===================================================
+                    REGULACJA STRZAŁKI LEWEJ:
+                    position={[wallOffsetX - 0.9, 0, 0.02]}
+                      - wallOffsetX - 0.9 → odległość od środka drzwi (zwiększ 0.9 = dalej od drzwi)
+                      - Y = 0             → wysokość (0 = środek ściany, + = wyżej, - = niżej)
+                    scale={[0.5, 0.5, 1]} → rozmiar strzałki
+                    =================================================== */}
+                <mesh
+                    position={[wallOffsetX - 1.1, 0, 0.02]}
+                    rotation={[0, 0, 0]}
+                    scale={[0.5, 0.5, 1]}
+                >
+                    <planeGeometry args={[1, 0.5]} />
+                    <meshStandardMaterial
+                        map={arrowTexture}
+                        transparent={true}
+                        alphaTest={0.1}
+                        side={THREE.DoubleSide}
+                        roughness={0.8}
+                    />
+                </mesh>
+
+                {/* === ARROW DECORATION (RIGHT, MIRRORED) === */}
+                {/* ===================================================
+                    REGULACJA STRZAŁKI PRAWEJ:
+                    position={[wallOffsetX + 0.9, -0.3, 0.02]}
+                      - wallOffsetX + 0.9 → odległość od środka drzwi (prawa strona)
+                      - Y = -0.3          → trochę niżej niż lewa strzałka
+                    scale={[-0.5, 0.5, 1]} → ujemny X = lustrzane odbicie
+                    =================================================== */}
+                <mesh
+                    position={[wallOffsetX + 1.1, -0.3, 0.02]}
+                    rotation={[0, 0, 0]}
+                    scale={[-0.5, 0.5, 1]}
+                >
+                    <planeGeometry args={[1, 0.5]} />
+                    <meshStandardMaterial
+                        map={arrowTexture}
+                        transparent={true}
+                        alphaTest={0.1}
+                        side={THREE.DoubleSide}
+                        roughness={0.8}
+                    />
+                </mesh>
+
+                {/* Baseboard (Listwa) Left side of door */}
+                <mesh position={[wallOffsetX - 1.4, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
+                    <planeGeometry args={[doorBoardWidth, 0.15]} />
+                    <meshStandardMaterial
+                        map={doorBbTexLeft}
+                        roughness={0.8}
+                        side={THREE.DoubleSide}
+                    />
+                </mesh>
+
+                {/* Baseboard (Listwa) Right side of door */}
+                <mesh position={[wallOffsetX + 1.4, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
+                    <planeGeometry args={[doorBoardWidth, 0.15]} />
+                    <meshStandardMaterial
+                        map={doorBbTexRight}
+                        roughness={0.8}
+                        side={THREE.DoubleSide}
+                    />
+                </mesh>
+
+                {/* === THRESHOLD STRIPE (Próg przy drzwiach bocznych) === */}
+                {(() => {
+                    // Próg leży na podłodze, prostopadle do ściany bocznej
+                    // Szerokość progu = szerokość otworu drzwiowego (~1.1)
+                    const THRESH_W = 1.1;   // Szerokość (wzdłuż X lokalnego = wzdłuż ściany)
+                    const THRESH_D = 0.15;  // Głębokość (wzdłuż Z lokalnego = w głąb korytarza)
+                    const threshTex = baseboardTexture.clone();
+                    threshTex.needsUpdate = true;
+                    threshTex.wrapS = threshTex.wrapT = THREE.RepeatWrapping;
+                    threshTex.rotation = 0;
+                    threshTex.offset.set(0, 0);
+                    threshTex.repeat.set(THRESH_W / NATURAL_TILE_W, 1);
+                    return (
+                        <mesh
+                            position={[wallOffsetX, -CORRIDOR_HEIGHT / 2 + 0.005, 0.02]}
+                            rotation={[-Math.PI / 2, 0, 0]}
+                        >
+                            <planeGeometry args={[THRESH_W, THRESH_D]} />
+                            <meshStandardMaterial
+                                map={threshTex}
+                                roughness={0.9}
+                                metalness={0}
+                                side={THREE.DoubleSide}
+                            />
+                        </mesh>
+                    );
+                })()}
+
                 {/* Door and frame - centered on wall */}
                 <group position={[wallOffsetX, -0.4, 0]}>
                     {/* === TEXTURED SIGN === */}
@@ -791,8 +915,8 @@ const DoorSection = ({
                     </group>
 
                     {/* === DOOR FRAME (textured) === */}
-                    {/* Moved to Z = 0.02 to sit ON TOP of the wall, hiding the hole edges */}
-                    <mesh position={[0, -0.1, 0.02]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
+                    {/* Moved to Z = 0.04 to sit in front of baseboards (Z=0.02), hiding the hole edges */}
+                    <mesh position={[0, -0.1, 0.04]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
                         <planeGeometry args={[frameWidth, frameHeight]} />
                         <meshStandardMaterial
                             map={frameTexture}

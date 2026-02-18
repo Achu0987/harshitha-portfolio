@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -34,6 +34,10 @@ const SegmentDoors = ({
     const wallTexture = useTexture('/textures/corridor/wall_texture.webp');
 
     wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+
+    // Baseboard texture (1582x94 px)
+    const baseboardTexSrc = useTexture('/textures/corridor/texturadoprogow.png');
+    const NATURAL_TILE_W = (1582 / 94) * 0.15; // ~2.524 units per natural tile
 
     // --- Dimensions from EntranceDoors ---
     // Door dimensions - calculated from texture proportions (332x848 = 1:2.55)
@@ -175,8 +179,8 @@ const SegmentDoors = ({
             </mesh>
 
             {/* === TEXTURED FRAME === */}
-            {/* Moved slightly forward to avoid z-fighting with wall if flush, though wall is 0.12 thick */}
-            <mesh position={[0, frameCenterY, 0.07]}>
+            {/* Moved to Z = 0.09 to sit in front of baseboards (Z=0.07), hiding the hole edges */}
+            <mesh position={[0, frameCenterY, 0.09]}>
                 <planeGeometry args={[frameWidth, frameHeight]} />
                 <meshStandardMaterial
                     map={frameTexture}
@@ -278,16 +282,77 @@ const SegmentDoors = ({
 
             {/* Warm lighting for the door area */}
             <pointLight
-                position={[0, doorBottomY + doorHeight + 1, 1]}
-                intensity={0.8}
+                position={[0, doorBottomY + doorHeight * 0.5, 1]}
+                intensity={0.6}
                 color="#fff8e8"
-                distance={10}
+                distance={6}
+                decay={2}
             />
-            {/* === THRESHOLD STRIPE === */}
-            <mesh position={[0, floorY + 0.01, 0]}>
-                <boxGeometry args={[frameWidth, 0.001, 0.05]} />
-                <meshBasicMaterial color="#000000" />
-            </mesh>
+            {/* === THRESHOLD STRIPE (Próg przy drzwiach) === */}
+            {(() => {
+                // =============================================
+                // REGULACJA PROGU PRZY DRZWIACH KOŃCOWYCH
+                // =============================================
+                // THRESHOLD_DEPTH  → grubość progu (wzdłuż Z korytarza)
+                // THRESHOLD_WIDTH  → szerokość progu (wzdłuż X korytarza)
+                const THRESHOLD_DEPTH = 0.15;
+                const THRESHOLD_WIDTH = frameWidth + 0.1;
+
+                const threshTex = baseboardTexSrc.clone();
+                threshTex.needsUpdate = true;
+                threshTex.wrapS = threshTex.wrapT = THREE.RepeatWrapping;
+                threshTex.rotation = 0; // Brak rotacji - tekstura idzie wzdłuż X
+                threshTex.offset.set(0, 0);
+                // Naturalny kafelek: 1582x94px przy wysokości 0.15 → szerokość ~2.524 units
+                // Dla progu: powtarzamy wzdłuż X (szerokość), 1 raz wzdłuż Z (głębokość)
+                threshTex.repeat.set(THRESHOLD_WIDTH / NATURAL_TILE_W, 1);
+
+                return (
+                    <mesh
+                        position={[0, floorY + 0.005, 0]}
+                        rotation={[-Math.PI / 2, 0, 0]}
+                    >
+                        <planeGeometry args={[THRESHOLD_WIDTH, THRESHOLD_DEPTH]} />
+                        <meshStandardMaterial
+                            map={threshTex}
+                            roughness={0.9}
+                            metalness={0}
+                            side={THREE.DoubleSide}
+                        />
+                    </mesh>
+                );
+            })()}
+            {/* === BASEBOARD (Listwa) LEFT SIDE === */}
+            {(() => {
+                const bbTex = baseboardTexSrc.clone();
+                bbTex.wrapS = bbTex.wrapT = THREE.RepeatWrapping;
+                bbTex.rotation = 0;
+                bbTex.offset.set(0, 0);
+                bbTex.needsUpdate = true;
+                bbTex.repeat.set(sideWallWidth / NATURAL_TILE_W, 1);
+                return (
+                    <mesh position={[-(doorOpeningWidth / 2 + sideWallWidth / 2), floorY + 0.075, wallThickness / 2 + 0.01]}>
+                        <planeGeometry args={[sideWallWidth, 0.15]} />
+                        <meshStandardMaterial map={bbTex} roughness={0.8} side={THREE.DoubleSide} />
+                    </mesh>
+                );
+            })()}
+
+            {/* === BASEBOARD (Listwa) RIGHT SIDE === */}
+            {(() => {
+                const bbTex = baseboardTexSrc.clone();
+                bbTex.wrapS = bbTex.wrapT = THREE.RepeatWrapping;
+                bbTex.rotation = 0;
+                bbTex.offset.set(0, 0);
+                bbTex.needsUpdate = true;
+                bbTex.repeat.set(sideWallWidth / NATURAL_TILE_W, 1);
+                return (
+                    <mesh position={[(doorOpeningWidth / 2 + sideWallWidth / 2), floorY + 0.075, wallThickness / 2 + 0.01]}>
+                        <planeGeometry args={[sideWallWidth, 0.15]} />
+                        <meshStandardMaterial map={bbTex} roughness={0.8} side={THREE.DoubleSide} />
+                    </mesh>
+                );
+            })()}
 
         </group>
     );

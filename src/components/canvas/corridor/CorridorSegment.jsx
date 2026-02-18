@@ -8,6 +8,7 @@ import SegmentDoors from './SegmentDoors';
 import Avatar from './Avatar';
 import HeroText from './HeroText';
 import Doodles from './Doodles';
+import CorridorDecorations from './CorridorDecorations';
 
 /**
  * CorridorSegment Component
@@ -185,10 +186,19 @@ const CorridorSegment = ({
 
             {/* === LIGHTING === */}
             <pointLight
-                position={[0, 1.5, zOffset - 5]}
+                position={[0, 0, zOffset - 5]}
                 intensity={0.6}
                 color="#fffaf0"
-                distance={15}
+                distance={8}
+                decay={2}
+            />
+
+            <CorridorDecorations
+                segmentLength={SEGMENT_LENGTH}
+                zOffset={zOffset}
+                corridorWidth={WALL_X_OUTER * 2}
+                corridorHeight={3.5}
+                zClip={zClip}
             />
 
             {/* === SEGMENT END DOORS (hidden during entrance) === */}

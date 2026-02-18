@@ -1,5 +1,6 @@
 import { useMemo, memo, lazy, Suspense, useEffect } from 'react';
 import { Text } from '@react-three/drei';
+import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Lazy load room components
@@ -25,9 +26,12 @@ const SUBTITLES = {
     "LET'S CONNECT": 'Get in touch with me'
 };
 
+// Naturalny kafelek listwy: 1582x94px przy wysokości 0.15 → ~2.524 units szerokości
+const NATURAL_TILE_W = (1582 / 94) * 0.15;
+
 /**
  * RoomInterior Component
- * 
+ *
  * Memoized room geometry to prevent re-renders and improve performance.
  * Contains corridor + giant room at the end.
  */
@@ -36,21 +40,70 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
     const halfDepth = corridorDepth / 2;
     const roomZ = -corridorDepth - roomDepth / 2;
 
-    // Memoize materials to prevent recreation
-    const materials = useMemo(() => ({
-        corridorWall: new THREE.MeshStandardMaterial({ color: '#f0f0f0', roughness: 0.9, side: THREE.DoubleSide }),
-        corridorFloor: new THREE.MeshStandardMaterial({ color: '#e8e8e8', roughness: 0.95, side: THREE.DoubleSide }),
-        corridorCeiling: new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.9, side: THREE.DoubleSide }),
-        roomFloor: new THREE.MeshStandardMaterial({ color: '#e5e5e5', roughness: 0.95, side: THREE.DoubleSide }),
-        roomCeiling: new THREE.MeshStandardMaterial({ color: '#fafafa', roughness: 0.9, side: THREE.DoubleSide }),
-        roomWall: new THREE.MeshStandardMaterial({ color: '#f0f0f0', roughness: 0.9, side: THREE.DoubleSide }),
-        roomBackWall: new THREE.MeshStandardMaterial({ color: '#f5f5f5', roughness: 0.9, side: THREE.DoubleSide })
-    }), []);
+    // Load corridor textures
+    const floorTexSrc = useTexture('/textures/corridor/kawalekpodlogi.png');
+    const wallTexSrc = useTexture('/textures/corridor/wall_texture.webp');
+    const ceilingTexSrc = useTexture('/textures/corridor/ceiling_texture.webp');
+    const bbTexSrc = useTexture('/textures/corridor/texturadoprogow.png');
+
+    // Memoize textured materials for mini-corridor
+    const materials = useMemo(() => {
+        // Floor
+        const floorTex = floorTexSrc.clone();
+        floorTex.needsUpdate = true;
+        floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+        floorTex.repeat.set(corridorDepth / 2.5, corridorWidth / 2.5);
+
+        // Left wall
+        const wallTexL = wallTexSrc.clone();
+        wallTexL.needsUpdate = true;
+        wallTexL.wrapS = wallTexL.wrapT = THREE.RepeatWrapping;
+        wallTexL.repeat.set(corridorDepth / 2, corridorHeight / 2);
+
+        // Right wall (same settings)
+        const wallTexR = wallTexSrc.clone();
+        wallTexR.needsUpdate = true;
+        wallTexR.wrapS = wallTexR.wrapT = THREE.RepeatWrapping;
+        wallTexR.repeat.set(corridorDepth / 2, corridorHeight / 2);
+
+        // Ceiling
+        const ceilTex = ceilingTexSrc.clone();
+        ceilTex.needsUpdate = true;
+        ceilTex.wrapS = ceilTex.wrapT = THREE.RepeatWrapping;
+        ceilTex.repeat.set(corridorDepth / 2.5, corridorWidth / 2.5);
+
+        // Baseboard left
+        const bbLeft = bbTexSrc.clone();
+        bbLeft.needsUpdate = true;
+        bbLeft.wrapS = bbLeft.wrapT = THREE.RepeatWrapping;
+        bbLeft.repeat.set(corridorDepth / NATURAL_TILE_W, 1);
+
+        // Baseboard right
+        const bbRight = bbTexSrc.clone();
+        bbRight.needsUpdate = true;
+        bbRight.wrapS = bbRight.wrapT = THREE.RepeatWrapping;
+        bbRight.repeat.set(corridorDepth / NATURAL_TILE_W, 1);
+
+        return {
+            corridorFloor: new THREE.MeshStandardMaterial({ map: floorTex, roughness: 1, metalness: 0, side: THREE.DoubleSide }),
+            corridorWallL: new THREE.MeshStandardMaterial({ map: wallTexL, roughness: 0.95, side: THREE.DoubleSide }),
+            corridorWallR: new THREE.MeshStandardMaterial({ map: wallTexR, roughness: 0.95, side: THREE.DoubleSide }),
+            corridorCeiling: new THREE.MeshStandardMaterial({ map: ceilTex, roughness: 0.9, side: THREE.DoubleSide }),
+            bbLeft: new THREE.MeshStandardMaterial({ map: bbLeft, roughness: 0.8, side: THREE.DoubleSide }),
+            bbRight: new THREE.MeshStandardMaterial({ map: bbRight, roughness: 0.8, side: THREE.DoubleSide }),
+            // Room materials (keep flat for rooms that have their own content)
+            roomFloor: new THREE.MeshStandardMaterial({ color: '#e5e5e5', roughness: 0.95, side: THREE.DoubleSide }),
+            roomCeiling: new THREE.MeshStandardMaterial({ color: '#fafafa', roughness: 0.9, side: THREE.DoubleSide }),
+            roomWall: new THREE.MeshStandardMaterial({ color: '#f0f0f0', roughness: 0.9, side: THREE.DoubleSide }),
+            roomBackWall: new THREE.MeshStandardMaterial({ color: '#f5f5f5', roughness: 0.9, side: THREE.DoubleSide }),
+        };
+    }, [floorTexSrc, wallTexSrc, ceilingTexSrc, bbTexSrc]);
 
     // Memoize geometries
     const geometries = useMemo(() => ({
         corridorSideWall: new THREE.PlaneGeometry(corridorDepth, corridorHeight),
         corridorFloorCeiling: new THREE.PlaneGeometry(corridorWidth, corridorDepth),
+        corridorBaseboard: new THREE.PlaneGeometry(corridorDepth, 0.15),
         roomFloorCeiling: new THREE.PlaneGeometry(roomWidth, roomDepth),
         roomSideWall: new THREE.PlaneGeometry(roomDepth, roomHeight),
         roomBackWall: new THREE.PlaneGeometry(roomWidth, roomHeight)
@@ -59,10 +112,8 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
     const isGallery = label === 'THE GALLERY';
 
     // Trigger onReady for generic rooms (which don't have their own component to do it)
-    // The keys matching the specific rooms are: 'THE GALLERY', 'THE STUDIO', 'THE ABOUT', "LET'S CONNECT"
     useEffect(() => {
         if (showRoom && !['THE GALLERY', 'THE STUDIO', 'THE ABOUT', "LET'S CONNECT"].includes(label)) {
-            // It's a generic room, so it's "ready" immediately
             onReady?.();
         }
     }, [showRoom, label, onReady]);
@@ -75,7 +126,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 position={[-corridorWidth / 2, 0, -halfDepth]}
                 rotation={[0, Math.PI / 2, 0]}
                 geometry={geometries.corridorSideWall}
-                material={materials.corridorWall}
+                material={materials.corridorWallL}
             />
 
             {/* Right wall */}
@@ -83,7 +134,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 position={[corridorWidth / 2, 0, -halfDepth]}
                 rotation={[0, -Math.PI / 2, 0]}
                 geometry={geometries.corridorSideWall}
-                material={materials.corridorWall}
+                material={materials.corridorWallR}
             />
 
             {/* Floor */}
@@ -100,6 +151,22 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                 rotation={[Math.PI / 2, 0, 0]}
                 geometry={geometries.corridorFloorCeiling}
                 material={materials.corridorCeiling}
+            />
+
+            {/* Baseboard Left */}
+            <mesh
+                position={[-corridorWidth / 2 + 0.01, -corridorHeight / 2 + 0.075, -halfDepth]}
+                rotation={[0, Math.PI / 2, 0]}
+                geometry={geometries.corridorBaseboard}
+                material={materials.bbLeft}
+            />
+
+            {/* Baseboard Right */}
+            <mesh
+                position={[corridorWidth / 2 - 0.01, -corridorHeight / 2 + 0.075, -halfDepth]}
+                rotation={[0, -Math.PI / 2, 0]}
+                geometry={geometries.corridorBaseboard}
+                material={materials.bbRight}
             />
 
             {/* === ROOM CONTENT === */}
