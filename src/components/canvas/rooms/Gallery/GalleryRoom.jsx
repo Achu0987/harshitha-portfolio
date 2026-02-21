@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useEffect } from 'react';
+import { useRef, useState, useMemo, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Text, useTexture, Float } from '@react-three/drei';
 import * as THREE from 'three';
@@ -9,10 +9,38 @@ import GalleryClouds from './GalleryClouds';
 
 // Define the unique projects and their textures
 const UNIQUE_PROJECTS = [
-    { id: 'bio', title: 'Bio', front: '/textures/gallery/bioprzod.webp', back: '/textures/gallery/biotyl.webp', url: 'https://example.com' },
-    { id: 'monetune', title: 'Monetune', front: '/textures/gallery/monetuneprzod.webp', back: '/textures/gallery/monetunetyl.webp', url: 'https://example.com' },
-    { id: 'timber', title: 'TimberKitty', front: '/textures/gallery/timberkittyprzod.webp', back: '/textures/gallery/timberkittytyl.webp', url: 'https://example.com' },
-    { id: 'young', title: 'YoungMulti', front: '/textures/gallery/youngmultiprzod.webp', back: '/textures/gallery/youngmultityl.webp', url: 'https://example.com' },
+    {
+        id: 'monetune',
+        title: 'MONETUNE',
+        front: '/textures/gallery/monetuneprzod.webp',
+        url: 'https://monetune.pl',
+        description: 'MoneTune is a step-by-step blueprint that teaches beginners how to generate passive income using AI-created music. Without any musical skills, you will learn how to easily produce professional tracks, publish them on platforms like Spotify, and monetize your digital assets.',
+        techStack: ['/textures/gallery/wordpresslogo.webp', '/textures/gallery/elementorlogo.webp', '/textures/gallery/phplogo.webp', '/textures/gallery/csslogo.webp']
+    },
+    {
+        id: 'timber',
+        title: 'TIMBERKITTY',
+        front: '/textures/gallery/timberkittyprzod.webp',
+        url: 'https://timberkitty.netlify.app',
+        description: 'TimberKitty is an addictive, free-to-play browser arcade game built in pure JavaScript. Players control a lumberjack cat to chop wood, save birds, complete daily missions, and compete on global leaderboards.',
+        techStack: ['/textures/gallery/jslogo.webp', '/textures/gallery/htmllogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/firebaselogo.webp']
+    },
+    {
+        id: 'young',
+        title: 'YOUNG MULTI',
+        front: '/textures/gallery/youngmultiprzod.webp',
+        url: 'https://young-multi-strona.netlify.app',
+        description: 'A sleek, modern concept website dedicated to the Polish rapper and creator Young Multi. It serves as a promotional landing page designed to highlight his personal brand, music, and online presence.',
+        techStack: ['/textures/gallery/reactlogo.webp', '/textures/gallery/tailwindlogo.webp', '/textures/gallery/htmllogo.webp', '/textures/gallery/netlifylogo.webp']
+    },
+    {
+        id: 'bio',
+        title: 'BIO',
+        front: '/textures/gallery/bioprzod.webp',
+        url: 'https://tomkingbio.netlify.app',
+        description: 'A fast, modern personal bio page serving as a central hub for my digital footprint. It showcases my latest coding projects, web development services, YouTube videos, and recommended music artists.',
+        techStack: ['/textures/gallery/htmllogo.webp', '/textures/gallery/csslogo.webp', '/textures/gallery/jslogo.webp', '/textures/gallery/netlifylogo.webp']
+    },
 ];
 
 const PROJECT_COUNT = 10; // Keep the count for the infinite scroll feel
@@ -78,6 +106,31 @@ const GalleryRoom = ({ showRoom, onReady }) => {
     const targetScroll = useRef(0);
     const currentScroll = useRef(0);
     const [selectedCard, setSelectedCard] = useState(null);
+    const [globalIsAnimating, setGlobalIsAnimating] = useState(false);
+    const cardRefs = useRef([]);
+
+    const handleCardClick = async (clickedIndex) => {
+        if (globalIsAnimating) return;
+
+        if (selectedCard === clickedIndex) {
+            setGlobalIsAnimating(true);
+            await cardRefs.current[clickedIndex].closeCard();
+            setSelectedCard(null);
+            setGlobalIsAnimating(false);
+        } else if (selectedCard !== null) {
+            setGlobalIsAnimating(true);
+            await cardRefs.current[selectedCard].closeCard();
+            setSelectedCard(null);
+            await cardRefs.current[clickedIndex].openCard();
+            setSelectedCard(clickedIndex);
+            setGlobalIsAnimating(false);
+        } else {
+            setGlobalIsAnimating(true);
+            await cardRefs.current[clickedIndex].openCard();
+            setSelectedCard(clickedIndex);
+            setGlobalIsAnimating(false);
+        }
+    };
 
     // Track if we've signaled ready
     const hasSignaledReady = useRef(false);
@@ -99,12 +152,26 @@ const GalleryRoom = ({ showRoom, onReady }) => {
     const RAILING_HEIGHT = 1.1;
 
     // --- TEXTURES ---
-    // Load all project textures in a flat array [p1_front, p1_back, p2_front, p2_back, ...]
-    const textureUrls = UNIQUE_PROJECTS.flatMap(p => [p.front, p.back]);
+    // Load all project front textures in a flat array
+    const textureUrls = UNIQUE_PROJECTS.map(p => p.front);
     const projectTextures = useTexture(textureUrls);
 
-    // Load the single overlay texture (button "open project")
-    const overlayTexture = useTexture('/textures/gallery/openliveproject.webp');
+    // Load the universal back texture and the button texture
+    const backTextureRaw = useTexture('/textures/gallery/tylkartki.webp');
+    const overlayTextureRaw = useTexture('/textures/gallery/przyciskdotylukartki.webp');
+
+    // Preload tech stack logos to prevent stuttering on first flip
+    const allLogos = [
+        '/textures/gallery/csslogo.webp',
+        '/textures/gallery/elementorlogo.webp',
+        '/textures/gallery/firebaselogo.webp',
+        '/textures/gallery/htmllogo.webp',
+        '/textures/gallery/jslogo.webp',
+        '/textures/gallery/netlifylogo.webp',
+        '/textures/gallery/phplogo.webp',
+        '/textures/gallery/wordpresslogo.webp'
+    ];
+    useTexture(allLogos);
 
     // Construct the full list of projects (repeated) with textures attached
     const projects = useMemo(() => {
@@ -112,34 +179,30 @@ const GalleryRoom = ({ showRoom, onReady }) => {
             const projectIndex = i % UNIQUE_PROJECTS.length;
             const projectData = UNIQUE_PROJECTS[projectIndex];
 
-            // Extract textures from the loaded array
-            const frontTex = projectTextures[projectIndex * 2];
-            const backTex = projectTextures[projectIndex * 2 + 1];
+            // Extract front texture
+            const frontTex = projectTextures[projectIndex];
 
             // Configure textures
             if (frontTex) {
                 frontTex.colorSpace = THREE.SRGBColorSpace;
-                // frontTex.encoding = THREE.sRGBEncoding; // handled by fiber/three automatically usually
+                // frontTex.encoding = THREE.sRGBEncoding;
             }
-            if (backTex) {
-                backTex.colorSpace = THREE.SRGBColorSpace;
-                // backTex.offset.x = 1; // Flip X if back texture is mirrored? Try standard first.
-                // backTex.repeat.x = -1; 
+            if (backTextureRaw) {
+                backTextureRaw.colorSpace = THREE.SRGBColorSpace;
             }
-            // Ensure overlay texture is configured correctly if loaded
-            if (overlayTexture) {
-                overlayTexture.colorSpace = THREE.SRGBColorSpace;
-                overlayTexture.needsUpdate = true;
+            if (overlayTextureRaw) {
+                overlayTextureRaw.colorSpace = THREE.SRGBColorSpace;
             }
 
             return {
                 ...projectData,
                 index: i,
                 frontTexture: frontTex,
-                backTexture: backTex
+                backTexture: backTextureRaw,
+                buttonTexture: overlayTextureRaw
             };
         });
-    }, [projectTextures, overlayTexture]);
+    }, [projectTextures, backTextureRaw, overlayTextureRaw]);
 
     // Function to scroll to a specific project index
     const scrollToIndex = (index, onComplete) => {
@@ -173,14 +236,14 @@ const GalleryRoom = ({ showRoom, onReady }) => {
         const handleWheel = (e) => {
             if (!showRoom) return;
             // BLOCK SCROLL IF CARD IS SELECTED
-            if (selectedCard !== null) return;
+            if (selectedCard !== null || globalIsAnimating) return;
 
             e.preventDefault();
             targetScroll.current += e.deltaY * 0.005;
         };
         window.addEventListener('wheel', handleWheel, { passive: false });
         return () => window.removeEventListener('wheel', handleWheel);
-    }, [showRoom, selectedCard]);
+    }, [showRoom, selectedCard, globalIsAnimating]);
 
     const lastTouchX = useRef(0);
     useEffect(() => {
@@ -188,12 +251,12 @@ const GalleryRoom = ({ showRoom, onReady }) => {
 
         const handleTouchStart = (e) => {
             // BLOCK TOUCH IF CARD IS SELECTED
-            if (selectedCard !== null) return;
+            if (selectedCard !== null || globalIsAnimating) return;
             if (e.touches.length === 1) lastTouchX.current = e.touches[0].clientX;
         };
         const handleTouchMove = (e) => {
             // BLOCK TOUCH MOVE IF CARD IS SELECTED
-            if (selectedCard !== null) return;
+            if (selectedCard !== null || globalIsAnimating) return;
 
             if (e.touches.length === 1) {
                 const deltaX = lastTouchX.current - e.touches[0].clientX;
@@ -207,7 +270,7 @@ const GalleryRoom = ({ showRoom, onReady }) => {
             window.removeEventListener('touchstart', handleTouchStart);
             window.removeEventListener('touchmove', handleTouchMove);
         };
-    }, [showRoom, selectedCard]);
+    }, [showRoom, selectedCard, globalIsAnimating]);
 
     useFrame((state, delta) => {
         currentScroll.current = THREE.MathUtils.lerp(currentScroll.current, targetScroll.current, delta * 5);
@@ -345,8 +408,8 @@ const GalleryRoom = ({ showRoom, onReady }) => {
                         <ProjectCard
                             key={i}
                             index={i}
+                            ref={el => cardRefs.current[i] = el}
                             project={project}
-                            overlayTexture={overlayTexture}
                             clothespinTexture={clothespinTexture}
                             total={PROJECT_COUNT}
                             currentScroll={currentScroll}
@@ -354,10 +417,7 @@ const GalleryRoom = ({ showRoom, onReady }) => {
                             curve={curve}
                             isSelected={selectedCard === i}
                             scrollToIndex={scrollToIndex}
-                            onSelect={(cardData) => {
-                                setSelectedCard(i);
-                            }}
-                            onDeselect={() => setSelectedCard(null)}
+                            onClick={handleCardClick}
                         />
                     ))}
                 </group>
@@ -475,12 +535,16 @@ const FlyingBird = ({ texture }) => {
 };
 
 // Sub-component for individual project cards
-// Sub-component for individual project cards
-const ProjectCard = ({ index, project, overlayTexture, clothespinTexture, currentScroll, materials, curve, isSelected, scrollToIndex, onSelect, onDeselect }) => {
+const ProjectCard = forwardRef(({ index, project, clothespinTexture, currentScroll, materials, curve, isSelected, scrollToIndex, onClick }, ref) => {
     const cardRef = useRef();
     const paperRef = useRef(); // Ref for the moving part (Paper)
     const materialRef = useRef();
+    const textRef = useRef(); // Ref for the text that sticks to the paper
+    const buttonGroupRef = useRef(); // Ref for the interactive back button
+    const detailsGroupRef = useRef(); // Ref for the project details on the back
+    const techStackGroupRef = useRef(); // Ref for the tech stack section on the back
     const [hovered, setHovered] = useState(false);
+    const [btnHovered, setBtnHovered] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);  // True ONLY during flip animation
     const [isScrolling, setIsScrolling] = useState(false);  // True during scroll phase
 
@@ -488,236 +552,285 @@ const ProjectCard = ({ index, project, overlayTexture, clothespinTexture, curren
     const swaySpeed = useRef(Math.random() * 0.2 + 0.3); // Slower sway speed
     const swayOffset = useRef(Math.random() * 100);
 
-    // The actual fly animation (called after scroll centers the card)
-    const startFlyAnimation = () => {
-        // We no longer move cardRef (which holds the pin). We only move paperRef.
-        // But we need to calculate where paperRef should go to reach the 'Camera Target'.
+    useImperativeHandle(ref, () => ({
+        closeCard: () => {
+            return new Promise((resolve) => {
+                setIsAnimating(true);
 
-        // Target World Position (approximate, based on previous logic)
-        const isMobile = window.innerWidth < 768;
-        // USTAWIENIA DOCELOWEJ POZYCJI KARTKI (GDZIE MA WYLADOWAC)
-        const targetX_World = 0;
-        // TUTAJ ZMIEN WYSOKOSC (Im wyzsza liczba tym wyzej karta wyladuje. Np. 0.1 to wyzej niz -0.2)
-        const targetY_World = isMobile ? -0.2 : 0.1;
-        const targetZ_World = isMobile ? 0.5 : 1.5;
+                const timeline = gsap.timeline({
+                    onComplete: () => {
+                        setIsAnimating(false);
+                        resolve();
+                    }
+                });
 
-        // Current Pin Position (Parent)
-        const parentPos = cardRef.current.position;
+                const localBaseY = -1.1;
 
-        // Calculate Target relative to Parent
-        // note: rotation of parent is ignored/assumed negligible for this vector math
-        const targetX = targetX_World - parentPos.x;
-        const targetY = targetY_World - parentPos.y;
-        const targetZ = targetZ_World - parentPos.z;
+                timeline.to(paperRef.current.position, {
+                    y: localBaseY + 0.6,
+                    x: 0,
+                    z: 1,
+                    duration: 0.35,
+                    ease: 'power2.in'
+                });
 
-        const timeline = gsap.timeline({
-            onComplete: () => {
-                setIsAnimating(false);
-                onSelect?.({ index });
-            }
-        });
-
-        // STRAIGHTEN PIN: Animate parent rotation to zero so math works and it lands straight
-        timeline.to(cardRef.current.rotation, {
-            x: 0, y: 0, z: 0,
-            duration: 0.3,
-            ease: 'power2.out'
-        }, 0);
-
-        // Initialize bend
-        if (materialRef.current) materialRef.current.bend = 0;
-
-        // Base local position
-        const localBaseY = -1.1;
-
-        // ===== PHASE 1: Quick tug DOWN + Drag Bend =====
-        // Pull paper down relative to pin
-        timeline.to(paperRef.current.position, {
-            y: localBaseY - 0.5,
-            duration: 0.15,
-            ease: 'power2.out'
-        });
-
-        timeline.to(paperRef.current.rotation, {
-            x: 0.5, // Lean forward slightly
-            z: -0.05,
-            duration: 0.15,
-            ease: 'power2.out'
-        }, '<');
-
-        // BEND: Drag effect
-        if (materialRef.current) {
-            timeline.to(materialRef.current, {
-                bend: 0.8, // Heavy bend from air resistance
-                duration: 0.15,
-                ease: 'power2.out'
-            }, '<');
-        }
-
-        // ===== PHASE 2: Flip Up + Release Bend =====
-        // Flying up and over
-        timeline.to(paperRef.current.position, {
-            // TUTAJ ZMIEN WYSOKOSC "SKOKU" (LUKU)
-            // Zwieksz liczbe (np. + 1.5), zeby kartka leciala wyzszym lukiem NAD barierka
-            y: localBaseY + 1.5, // Bylo + 0.6, teraz wyzej zeby ominac barierke
-            x: targetX * 0.2, // Start moving towards target X
-            z: targetZ * 0.2, // Start moving towards target Z
-            duration: 0.4,
-            ease: 'power1.out'
-        });
-
-        timeline.to(paperRef.current.rotation, {
-            x: Math.PI * 0.8, // Almost flipped
-            z: 0.05,
-            y: -0.02,
-            duration: 0.4,
-            ease: 'power1.inOut'
-        }, '<');
-
-        // BEND: As it slows at top, bend relaxes/reverses
-        if (materialRef.current) {
-            timeline.to(materialRef.current, {
-                bend: -0.3, // Subtle reverse curl at apex
-                duration: 0.4,
-                ease: 'power1.inOut'
-            }, '<');
-        }
-
-        // ===== PHASE 3: Float Down to Target =====
-        timeline.to(paperRef.current.position, {
-            y: targetY,
-            x: targetX,
-            z: targetZ,
-            duration: 0.4,
-            ease: 'power3.out'
-        });
-
-        timeline.to(paperRef.current.rotation, {
-            x: Math.PI, // Flat facing cam
-            y: 0,
-            z: 0,
-            duration: 0.4,
-            ease: 'power3.out'
-        }, '<');
-
-        // BEND: Settle to flat
-        if (materialRef.current) {
-            timeline.to(materialRef.current, {
-                bend: 0,
-                duration: 0.5,
-                ease: 'power2.out' // Smooth flatten
-            }, '<');
-        }
-
-        // Gentle scale
-        timeline.to(paperRef.current.scale, {
-            x: 1.1,
-            y: 1.1,
-            z: 1.1,
-            duration: 0.3,
-            ease: 'sine.out'
-        }, '-=0.4');
-    };
-
-    // Click handler - fly to camera OR return to clothesline
-    const handleClick = (e) => {
-        e.stopPropagation();
-        if (isAnimating) return;
-
-        // ===== RETURN TO CLOTHESLINE (REVERSE of fly animation) =====
-        if (isSelected) {
-            setIsAnimating(true);
-
-            const timeline = gsap.timeline({
-                onComplete: () => {
-                    setIsAnimating(false);
-                    onDeselect?.();
-                }
-            });
-
-            // Initial local Base
-            const localBaseY = -1.1;
-
-            // REVERSE PHASE: Lift and Bend
-            timeline.to(paperRef.current.position, {
-                y: localBaseY + 0.6,
-                x: 0, // Centered locally
-                z: 1, // Slightly forward locally
-                duration: 0.35,
-                ease: 'power2.in'
-            });
-
-            timeline.to(paperRef.current.rotation, {
-                x: 0.5,
-                z: -0.05,
-                y: 0,
-                duration: 0.35,
-                ease: 'power2.in'
-            }, '<');
-
-            // BEND: Drag again as we pull it back
-            if (materialRef.current) {
-                timeline.to(materialRef.current, {
-                    bend: 0.6,
-                    duration: 0.3,
+                timeline.to(paperRef.current.rotation, {
+                    x: 0.5,
+                    z: -0.05,
+                    y: 0,
+                    duration: 0.35,
                     ease: 'power2.in'
                 }, '<');
-            }
 
-            // RESET Scale
-            timeline.to(paperRef.current.scale, {
-                x: 1, y: 1, z: 1,
-                duration: 0.3, ease: 'sine.inOut'
-            }, '<');
+                if (materialRef.current) {
+                    timeline.to(materialRef.current, {
+                        bend: 0.6,
+                        duration: 0.3,
+                        ease: 'power2.in'
+                    }, '<');
+                }
 
-            // SNAP BACK TO HANGING POSITION
-            timeline.to(paperRef.current.position, {
-                y: localBaseY,
-                x: 0,
-                z: 0,
-                duration: 0.25,
-                ease: 'power3.out'
-            });
-
-            timeline.to(paperRef.current.rotation, {
-                x: 0, y: 0, z: 0,
-                duration: 0.25,
-                ease: 'power3.out'
-            }, '<');
-
-            // BEND: SNAP
-            if (materialRef.current) {
-                timeline.to(materialRef.current, {
-                    bend: 0,
-                    duration: 0.3,
-                    ease: 'power2.out'
+                timeline.to(paperRef.current.scale, {
+                    x: 1, y: 1, z: 1,
+                    duration: 0.3, ease: 'sine.inOut'
                 }, '<');
-            }
 
-            return;
+                timeline.to(paperRef.current.position, {
+                    y: localBaseY,
+                    x: 0,
+                    z: 0,
+                    duration: 0.25,
+                    ease: 'power3.out'
+                });
+
+                timeline.to(paperRef.current.rotation, {
+                    x: 0, y: 0, z: 0,
+                    duration: 0.25,
+                    ease: 'power3.out'
+                }, '<');
+
+                if (materialRef.current) {
+                    timeline.to(materialRef.current, {
+                        bend: 0,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    }, '<');
+                }
+            });
+        },
+        openCard: () => {
+            return new Promise((resolve) => {
+                setIsScrolling(true);
+                scrollToIndex(index, () => {
+                    setIsScrolling(false);
+                    setIsAnimating(true);
+
+                    const isMobile = window.innerWidth < 768;
+                    const targetX_World = 0;
+                    const targetY_World = isMobile ? -0.2 : 0.1;
+                    const targetZ_World = isMobile ? 0.5 : 1.5;
+
+                    const parentPos = cardRef.current.position;
+                    const targetX = targetX_World - parentPos.x;
+                    const targetY = targetY_World - parentPos.y;
+                    const targetZ = targetZ_World - parentPos.z;
+
+                    const timeline = gsap.timeline({
+                        onComplete: () => {
+                            setIsAnimating(false);
+                            resolve();
+                        }
+                    });
+
+                    timeline.to(cardRef.current.rotation, {
+                        x: 0, y: 0, z: 0,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    }, 0);
+
+                    if (materialRef.current) materialRef.current.bend = 0;
+
+                    const localBaseY = -1.1;
+
+                    timeline.to(paperRef.current.position, {
+                        y: localBaseY - 0.5,
+                        duration: 0.15,
+                        ease: 'power2.out'
+                    });
+
+                    timeline.to(paperRef.current.rotation, {
+                        x: 0.5,
+                        z: -0.05,
+                        duration: 0.15,
+                        ease: 'power2.out'
+                    }, '<');
+
+                    if (materialRef.current) {
+                        timeline.to(materialRef.current, {
+                            bend: 0.8,
+                            duration: 0.15,
+                            ease: 'power2.out'
+                        }, '<');
+                    }
+
+                    timeline.to(paperRef.current.position, {
+                        y: localBaseY + 1.5,
+                        x: targetX * 0.2,
+                        z: targetZ * 0.2,
+                        duration: 0.4,
+                        ease: 'power1.out'
+                    });
+
+                    timeline.to(paperRef.current.rotation, {
+                        x: Math.PI * 0.8,
+                        z: 0.05,
+                        y: -0.02,
+                        duration: 0.4,
+                        ease: 'power1.inOut'
+                    }, '<');
+
+                    if (materialRef.current) {
+                        timeline.to(materialRef.current, {
+                            bend: -0.3,
+                            duration: 0.4,
+                            ease: 'power1.inOut'
+                        }, '<');
+                    }
+
+                    timeline.to(paperRef.current.position, {
+                        y: targetY,
+                        x: targetX,
+                        z: targetZ,
+                        duration: 0.4,
+                        ease: 'power3.out'
+                    });
+
+                    timeline.to(paperRef.current.rotation, {
+                        x: Math.PI,
+                        y: 0,
+                        z: 0,
+                        duration: 0.4,
+                        ease: 'power3.out'
+                    }, '<');
+
+                    if (materialRef.current) {
+                        timeline.to(materialRef.current, {
+                            bend: 0,
+                            duration: 0.5,
+                            ease: 'power2.out'
+                        }, '<');
+                    }
+
+                    timeline.to(paperRef.current.scale, {
+                        x: 1.1,
+                        y: 1.1,
+                        z: 1.1,
+                        duration: 0.3,
+                        ease: 'sine.out'
+                    }, '-=0.4');
+                });
+            });
         }
+    }));
 
-        // ===== FLY TO CAMERA (if not selected) =====
-        // Start scrolling phase (project still moves with clothesline)
-        setIsScrolling(true);
-
-        // First scroll to center this card, then start fly animation
-        scrollToIndex(index, () => {
-            // Now start the actual flip animation
-            setIsScrolling(false);
-            setIsAnimating(true);
-            startFlyAnimation();
-        });
+    const handleClick = (e) => {
+        e.stopPropagation();
+        if (onClick) onClick(index);
     };
 
     // Cursor change on hover
     useEffect(() => {
-        document.body.style.cursor = hovered && !isSelected ? 'pointer' : 'auto';
+        if (btnHovered && isSelected) {
+            document.body.style.cursor = 'pointer';
+        } else if (hovered && !isSelected) {
+            document.body.style.cursor = 'pointer';
+        } else {
+            document.body.style.cursor = 'auto';
+        }
         return () => { document.body.style.cursor = 'auto'; };
-    }, [hovered, isSelected]);
+    }, [hovered, isSelected, btnHovered]);
 
     useFrame((state) => {
         if (!cardRef.current) return;
+
+        // --- Zrównaj pozycję tekstu Z z animacją zaginania i falowania kartki (PRZÓD) ---
+        if (textRef.current && materialRef.current) {
+            const y = textRef.current.position.y;
+            const uBend = materialRef.current.bend;
+            const uWindStrength = materialRef.current.windStrength || 0;
+            const uTime = state.clock.getElapsedTime();
+
+            const bendAmount = Math.pow(y, 2.0) * uBend;
+            const totalWind = 0.02 + uWindStrength;
+            const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
+
+            textRef.current.position.z = bendAmount + flutter + 0.02;
+
+            // Obrót tekstu by przylegał do krzywizny (pochodna dz/dy)
+            const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
+            textRef.current.rotation.x = Math.atan(dz_dy);
+        }
+
+        // --- Zrównaj pozycję przycisku Z z animacją pleców (TYŁ) ---
+        if (buttonGroupRef.current && materialRef.current) {
+            const y = buttonGroupRef.current.position.y;
+            const uBend = materialRef.current.bend;
+            const uWindStrength = materialRef.current.windStrength || 0;
+            const uTime = state.clock.getElapsedTime();
+
+            const bendAmount = Math.pow(y, 2.0) * uBend;
+            const totalWind = 0.02 + uWindStrength;
+            const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
+
+            // PAMIĘTAJ! Cała płaszczyzna zgina się w przód (+Z względem rodzica).
+            // A że my jesteśmy PO ZEWNĘTRZNEJ stronie (z tyłu pleców), chcemy być ułamek za płaszczyzną, np -0.03
+            // Wcześniej omyłkowo odwróciłem znak całego równania ( -(bendAmount...) ), co odwróciło falowanie. Prawidłowo jest tak:
+            buttonGroupRef.current.position.z = bendAmount + flutter - 0.03;
+
+            // Obrót przycisku by przylegał do krzywizny, będąc po przeciwnej stronie (dodatkowe odwrócenie o Pi)
+            const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
+            buttonGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
+
+            // Hover animacja powiększania dla przycisku (napis się powiększa)
+            const targetScale = btnHovered ? 1.08 : 1;
+            buttonGroupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, 1), 0.15);
+        }
+
+        // --- Zrównaj pozycję górnego opisu (PROJECT DETAILS) ---
+        if (detailsGroupRef.current && materialRef.current) {
+            const y = detailsGroupRef.current.position.y;
+            const uBend = materialRef.current.bend;
+            const uWindStrength = materialRef.current.windStrength || 0;
+            const uTime = state.clock.getElapsedTime();
+
+            const bendAmount = Math.pow(y, 2.0) * uBend;
+            const totalWind = 0.02 + uWindStrength;
+            const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
+
+            // Z tyłu (jak button)
+            detailsGroupRef.current.position.z = bendAmount + flutter - 0.03;
+
+            // Obrót
+            const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
+            detailsGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
+        }
+
+        // --- Zrównaj pozycję sekcji Tech Stack ---
+        if (techStackGroupRef.current && materialRef.current) {
+            const y = techStackGroupRef.current.position.y;
+            const uBend = materialRef.current.bend;
+            const uWindStrength = materialRef.current.windStrength || 0;
+            const uTime = state.clock.getElapsedTime();
+
+            const bendAmount = Math.pow(y, 2.0) * uBend;
+            const totalWind = 0.02 + uWindStrength;
+            const flutter = Math.sin(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
+
+            techStackGroupRef.current.position.z = bendAmount + flutter - 0.03;
+
+            const dz_dy = 2.0 * y * uBend + 2.0 * Math.cos(uTime * 2.0 + y * 2.0) * totalWind * (1.0 + Math.abs(uBend * 3.0));
+            techStackGroupRef.current.rotation.x = Math.PI + Math.atan(dz_dy);
+        }
 
         // Skip position updates ONLY during flip animation, NOT during scroll
         if (isAnimating || isSelected) return;
@@ -776,15 +889,156 @@ const ProjectCard = ({ index, project, overlayTexture, clothespinTexture, curren
                         color="#ffffff"
                         map={project.frontTexture}
                         mapBack={project.backTexture}
-                        mapOverlay={overlayTexture}
                         side={THREE.DoubleSide}
                         roughness={0.6}
                     />
                 </mesh>
+
+                {/* === PRZYCISK: OPEN NA PLECACH KARTKI === */}
+                <group
+                    ref={buttonGroupRef}
+                    position={[0, 0.75, 0]}
+                    rotation={[Math.PI, 0, 0]}
+                >
+                    {/* Warstwa 1: Wizualna ramka przycisku (bez eventów) */}
+                    <mesh>
+                        <planeGeometry args={[1.2, 0.35]} />
+                        <meshBasicMaterial
+                            map={project.buttonTexture}
+                            transparent={true}
+                            alphaTest={0.05}
+                        />
+                    </mesh>
+
+                    {/* Warstwa 2: Napis OPEN PROJECT (bez eventów) */}
+                    <Text
+                        position={[0, 0, 0.01]}
+                        fontSize={0.11}
+                        color={btnHovered ? "#333333" : "#1c1c1c"}
+                        font="/fonts/CabinSketch-Bold.ttf"
+                        anchorX="center"
+                        anchorY="middle"
+                    >
+                        OPEN PROJECT
+                    </Text>
+
+                    {/* Warstwa 3: Niewidoczny hit-area pokrywający cały przycisk - łapie WSZYSTKIE eventy */}
+                    <mesh
+                        position={[0, 0, 0.02]}
+                        onClick={(e) => {
+                            if (isSelected) {
+                                e.stopPropagation();
+                                window.open(project.url, '_blank');
+                            }
+                        }}
+                        onPointerOver={(e) => {
+                            if (isSelected) {
+                                e.stopPropagation();
+                                setBtnHovered(true);
+                            }
+                        }}
+                        onPointerOut={(e) => {
+                            e.stopPropagation();
+                            setBtnHovered(false);
+                        }}
+                    >
+                        <planeGeometry args={[1.2, 0.35]} />
+                        <meshBasicMaterial transparent={true} opacity={0} />
+                    </mesh>
+                </group>
+
+                {/* === TEKST NA PLECACH KARTKI (PROJECT DETAILS) === */}
+                <group
+                    ref={detailsGroupRef}
+                    position={[0, -0.5, 0]} // Miejsce u góry (gdy Y=0.75 to dół, to Y=-0.4 to góra)
+                    rotation={[Math.PI, 0, 0]}
+                >
+                    <Text
+                        position={[0, 0.28, 0.01]} // Względem środka detailsGroupRef, wyżej
+                        fontSize={0.10}
+                        color="#1c1c1c"
+                        font="/fonts/CabinSketch-Bold.ttf"
+                        anchorX="center"
+                        anchorY="middle"
+                    >
+                        PROJECT DETAILS:
+                    </Text>
+
+                    <Text
+                        position={[0, 0.2, 0.01]} // Poniżej nagłówka
+                        fontSize={0.06}
+                        color="#333333"
+                        font="/fonts/CabinSketch-Bold.ttf"
+                        anchorX="center"
+                        anchorY="top"
+                        maxWidth={1.1} // Maksymalna szerokość zanim zacznie łamać linie
+                        lineHeight={1.4}
+                        textAlign="center"
+                    >
+                        {project.description || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco."}
+                    </Text>
+                </group>
+
+                {/* === SEKCJA TECH STACK NA PLECACH KARTKI === */}
+                <group
+                    ref={techStackGroupRef}
+                    position={[0, 0.30, 0]} // Pomiędzy Project Details a przyciskiem Open Project
+                    rotation={[Math.PI, 0, 0]}
+                >
+                    <Text
+                        position={[0, 0.15, 0.01]}
+                        fontSize={0.08}
+                        color="#1c1c1c"
+                        font="/fonts/CabinSketch-Bold.ttf"
+                        anchorX="center"
+                        anchorY="middle"
+                    >
+                        TECH STACK
+                    </Text>
+
+                    {/* Kontener na loga układane poziomo */}
+                    <group position={[0, -0.05, 0.01]}>
+                        {project.techStack && project.techStack.map((logoPath, idx) => {
+                            // Rozstawienie kwadracików (4 sztuki wyśrodkowane)
+                            const spacing = 0.30;
+                            const startX = -((project.techStack.length - 1) * spacing) / 2;
+                            const xPos = startX + (idx * spacing);
+
+                            return (
+                                <TechStackLogo key={idx} path={logoPath} position={[xPos, 0, 0]} />
+                            );
+                        })}
+                    </group>
+                </group>
+
+                {/* 
+                  === TEKST / TYTUŁY PROJEKTÓW ===
+                  Tu możesz łatwo dostosować wygląd każdego napisu.
+                  
+                  position: [X, Y, Z] 
+                  > X to lewo/prawo (0 to środek)
+                  > Y to góra/dół (np. 0.75 to góra kartki, -0.75 dół)
+                  > Z nie ruszać. Skrypt powyżej sam wylicza Z, żeby napis zginał się i przyklejał do fali kartki!
+                  
+                  fontSize: rozmiar fontu (domyślnie 0.15)
+                  color: kolor napisu
+                  font: opcjonalnie dajesz tu inną czcionkę z folderu /public/fonts/
+                */}
+                <Text
+                    ref={textRef}
+                    position={[0, 0.7, 0]} // Tylko dwa pierwsze parametry [X, Y] mają tutaj znaczenie
+                    fontSize={0.20}
+                    color="#1c1c1c"
+                    font="/fonts/CabinSketch-Bold.ttf"
+                    anchorX="center"
+                    anchorY="middle"
+                >
+                    {project.title}
+                </Text>
             </group>
         </group>
     );
-};
+});
 
 
 // Component to handle the cropped right-side houses
@@ -821,6 +1075,21 @@ const RightSideHouses = ({ texture, baseWidth, baseHeight, cropAmount }) => {
                 transparent={true}
                 alphaTest={0.1}
                 side={THREE.DoubleSide}
+            />
+        </mesh>
+    );
+};
+
+// Sub-component for individual tech stack logos
+const TechStackLogo = ({ path, position }) => {
+    const texture = useTexture(path);
+
+    return (
+        <mesh position={position}>
+            <planeGeometry args={[0.17, 0.17]} />
+            <meshBasicMaterial
+                map={texture}
+                transparent={true}
             />
         </mesh>
     );

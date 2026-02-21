@@ -38,6 +38,7 @@ const StudioRoom = ({ showRoom, onReady }) => {
             panRight: isMobile ? 0 : isTablet ? 0.5 : Math.max(0.3, (size.width / 1920) * CAMERA_PAN_RIGHT),
             panDown: isMobile ? 9.7 : 0, // Positive = camera DOWN = monitor at TOP
             yOffset: isMobile ? 2.5 : isTablet ? -3 : CAMERA_Y_OFFSET,
+            towerRadius: isMobile ? 1.5 : (isTablet ? 1.8 : TOWER_RADIUS),
             isMobile, // Pass through boolean
         };
     }, [size.width]);
@@ -114,6 +115,7 @@ const StudioRoom = ({ showRoom, onReady }) => {
         const ringsNeeded = Math.ceil(totalMonitors / MONITORS_PER_RING);
 
         let contentIndex = 0;
+        const currentRadius = responsiveParams.towerRadius;
 
         for (let ring = 0; ring < ringsNeeded && contentIndex < shuffledContent.length; ring++) {
             const angleStep = (Math.PI * 2) / MONITORS_PER_RING;
@@ -124,8 +126,8 @@ const StudioRoom = ({ showRoom, onReady }) => {
                 const platform = PLATFORM_CONFIG[contentItem.platform];
                 const angle = i * angleStep + angleOffset;
 
-                const x = Math.cos(angle) * TOWER_RADIUS;
-                const z = Math.sin(angle) * TOWER_RADIUS;
+                const x = Math.cos(angle) * currentRadius;
+                const z = Math.sin(angle) * currentRadius;
 
                 // Staggered Y - base + random jitter for organic look
                 const baseY = ring * VERTICAL_SPACING;
@@ -173,7 +175,7 @@ const StudioRoom = ({ showRoom, onReady }) => {
         const totalHeight = maxBaseY - minBaseY + VERTICAL_SPACING;
 
         return { items, totalHeight };
-    }, [latestContent.id]);
+    }, [latestContent.id, responsiveParams.towerRadius]);
 
     // Destructure for easier access
     const monitors = monitorData.items;
@@ -462,7 +464,7 @@ const StudioRoom = ({ showRoom, onReady }) => {
             >
                 {/* Invisible Hit Cylinder for easier drag interaction */}
                 <mesh visible={false}>
-                    <cylinderGeometry args={[TOWER_RADIUS + 0.5, TOWER_RADIUS + 0.5, TOWER_HEIGHT * 1.5, 16]} />
+                    <cylinderGeometry args={[responsiveParams.towerRadius + 0.5, responsiveParams.towerRadius + 0.5, TOWER_HEIGHT * 1.5, 16]} />
                     <meshBasicMaterial />
                 </mesh>
 

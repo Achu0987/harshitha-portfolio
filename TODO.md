@@ -51,10 +51,10 @@
 
 ### 5. Poprawić grafiki — czytelność vs detale w tle
 - [ ] About Room: Sprawdzić kontrast tekstów na tle chmur (milestones)
-- [ ] Gallery Room: Upewnić się, że karty projektów są czytelne na tle domków i liny
-- [ ] Studio Room: Sprawdzić czy info na monitorach jest czytelne
+- [X] Gallery Room: Upewnić się, że karty projektów są czytelne na tle domków i liny
+- [X] Studio Room: Sprawdzić czy info na monitorach jest czytelne
 - [ ] Contact Room: Upewnić się, że opcje kontaktowe wyróżniają się
-- [ ] Korytarz: Sygnatura drzwi dobrze widoczna, dekoracje nie przytłaczają
+- [X] Korytarz: Sygnatura drzwi dobrze widoczna, dekoracje nie przytłaczają
 - [ ] Dodać głębię — elementy ważne z większą opacitą, tło z mniejszą
 - **Pliki:** Wszystkie pokoje (About, Studio, Gallery, Contact)
 
