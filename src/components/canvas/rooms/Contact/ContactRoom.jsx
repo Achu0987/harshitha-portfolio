@@ -93,10 +93,6 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
     // Load Statek Texture
     const statekTexture = useTexture("/textures/contact/statek.webp");
 
-    // Load Bottle Textures
-    const bottleBody = useTexture("/textures/contact/czescglownabutelki.webp");
-    const bottleCap = useTexture("/textures/contact/zakretkabutelki.webp");
-    const bottlePaper = useTexture("/textures/contact/papiernabutelke.webp");
 
     // Configure texture repeating (1:1 scale)
     useEffect(() => {
@@ -147,23 +143,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
 
     // Refs for animations
     const waveRefs = useRef([]);
-    const bottleRef = useRef();
-    const bottleCapRef = useRef(); // Separate ref for cap animation
     const statekRef = useRef(); // Ref for ship animation
-
-    // Bottle cap animation state
-    const [isCapAnimating, setIsCapAnimating] = useState(false);
-    const capProgress = useRef(0); // 0 = closed, 1 = fully open
-
-    // Bottle cap closing animation state (after paper is inserted)
-    const [isCapClosing, setIsCapClosing] = useState(false);
-    const capCloseProgress = useRef(0); // 0 = open, 1 = fully closed
-
-    // Writing animation state (after cap is closed)
-    const [isWriting, setIsWriting] = useState(false);
-    const [displayedText, setDisplayedText] = useState('');
-    const [emailUsername, setEmailUsername] = useState(''); // Part before @
-    const writingProgress = useRef(0);
 
     // Target rotation values
     const targetRotX = useRef(0);
@@ -291,53 +271,7 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
             statekRef.current.rotation.z = Math.sin(time * bobSpeed * 1.2) * rollAmplitude;
         }
 
-        // 3. Bottle Cap Animation (lift up)
-        if (isCapAnimating && bottleCapRef.current) {
-            if (capProgress.current < 1) {
-                capProgress.current = Math.min(1, capProgress.current + delta * 0.6);
-            }
-            const t = capProgress.current;
-            const eased = 1 - Math.pow(1 - t, 3);
-            bottleCapRef.current.position.y = eased * 0.5;
-        }
-
-        // 4. Bottle Cap Closing Animation
-        if (isCapClosing && bottleCapRef.current) {
-            if (capCloseProgress.current < 1) {
-                capCloseProgress.current = Math.min(1, capCloseProgress.current + delta * 0.8);
-            }
-            const t = capCloseProgress.current;
-            const eased = 1 - Math.pow(1 - t, 3);
-            bottleCapRef.current.position.y = 0.5 * (1 - eased);
-
-            if (capCloseProgress.current >= 1 && !isWriting && emailUsername) {
-                setIsWriting(true);
-                writingProgress.current = 0;
-            }
-        }
-
-        // 5. Writing Animation
-        if (isWriting && emailUsername) {
-            writingProgress.current += delta * 3;
-            const charsToShow = Math.min(
-                Math.floor(writingProgress.current),
-                emailUsername.length
-            );
-            setDisplayedText(emailUsername.slice(0, charsToShow));
-        }
     });
-
-    const handleFoldComplete = useCallback(() => {
-        console.log('📜 Paper fold complete - starting cap animation');
-        setIsCapAnimating(true);
-        capProgress.current = 0;
-    }, []);
-
-    const handleInsertComplete = useCallback(() => {
-        console.log('🍾 Paper inserted - closing cap');
-        setIsCapClosing(true);
-        capCloseProgress.current = 0;
-    }, []);
 
     const [isMobile, setIsMobile] = useState(false);
 
@@ -473,75 +407,12 @@ const ContactRoom = ({ showRoom, onReady, isExiting }) => {
                     position={[0, 0.07, 2]}
                     onSend={(data) => {
                         console.log('📬 Contact form submitted:', data);
-                        if (data.email) {
-                            const username = data.email.split('@')[0];
-                            setEmailUsername(username);
-                            console.log('📧 Email username for writing:', username);
-                        }
-
                         unlockAchievement('contact_submit');
                     }}
-                    onFoldComplete={handleFoldComplete}
-                    onInsertComplete={handleInsertComplete}
                 />
             </group>
 
-            {/* 🍾 BOTTLE - Assembled from layers */}
-            <group
-                ref={bottleRef}
-                position={[0.8, 0.15, 2.5]}
-                rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
-            >
-                {/* Paper in bottle (behind glass) */}
-                <mesh position={[0, -0.01, 0.02]}>
-                    <planeGeometry args={[1.5, 1.0]} />
-                    <meshStandardMaterial
-                        map={bottlePaper}
-                        transparent
-                        side={THREE.DoubleSide}
-                        roughness={0.8}
-                    />
-                </mesh>
 
-                {/* Bottle body (glass) */}
-                <mesh position={[0, 0, 0]}>
-                    <planeGeometry args={[1.5, 1.0]} />
-                    <meshStandardMaterial
-                        map={bottleBody}
-                        transparent
-                        opacity={0.8}
-                        side={THREE.DoubleSide}
-                        roughness={0.2}
-                        metalness={0.1}
-                    />
-                </mesh>
-
-                {/* Bottle cap */}
-                <mesh ref={bottleCapRef} position={[0, 0, 0.001]}>
-                    <planeGeometry args={[1.5, 1.0]} />
-                    <meshStandardMaterial
-                        map={bottleCap}
-                        transparent
-                        side={THREE.DoubleSide}
-                        roughness={0.4}
-                    />
-                </mesh>
-
-                {/* Animated text on paper in bottle */}
-                {displayedText && (
-                    <Text
-                        position={[0, 0.15, 0.025]}
-                        fontSize={0.08}
-                        color="#1a1a1a"
-                        font="/fonts/CabinSketch-Regular.ttf"
-                        anchorX="center"
-                        anchorY="middle"
-                        maxWidth={0.8}
-                    >
-                        {displayedText}
-                    </Text>
-                )}
-            </group>
         </group>
     );
 };

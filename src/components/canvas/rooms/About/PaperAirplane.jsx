@@ -1,5 +1,6 @@
 import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
+import { Edges } from '@react-three/drei';
 
 /**
  * PaperAirplane Component
@@ -91,20 +92,34 @@ const PaperAirplane = ({ position = [0, 0, 0], rotation = [0, 0, 0], scale = 1, 
     return (
         <group position={position} rotation={rotation} scale={scale}>
             <mesh ref={meshRef} geometry={geometry}>
-                <meshStandardMaterial
+                <meshBasicMaterial
                     color={color}
                     side={THREE.DoubleSide}
-                    roughness={0.7}
-                    metalness={0}
-                    flatShading={true}
+                />
+                <Edges
+                    linewidth={2}
+                    threshold={15}
+                    color="#888888"
                 />
             </mesh>
 
-            {/* Subtle fold line accent */}
-            <mesh position={[0, 0.16, 0]} rotation={[0, 0, 0]}>
-                <boxGeometry args={[0.02, 0.01, 1.8]} />
-                <meshBasicMaterial color="#e0e0e0" />
-            </mesh>
+            {/* Explicitly draw the top ridge line since Edges threshold misses it due to shallow angles */}
+            <line>
+                <bufferGeometry>
+                    <bufferAttribute
+                        attach="attributes-position"
+                        count={4}
+                        itemSize={3}
+                        array={new Float32Array([
+                            0, 0, -1.5,
+                            0, 0.15, -0.5,
+                            0, 0.12, 0.5,
+                            0, 0.1, 0.6
+                        ])}
+                    />
+                </bufferGeometry>
+                <lineBasicMaterial color="#888888" linewidth={2} />
+            </line>
         </group>
     );
 };

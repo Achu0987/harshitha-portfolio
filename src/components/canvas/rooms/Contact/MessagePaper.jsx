@@ -149,7 +149,7 @@ const SmoothButton = ({ texture, onClick, position, size, text, fontPath }) => {
 // Web3Forms API Key
 const WEB3FORMS_KEY = '2ceaee50-a31e-4936-98fc-ca9648b21cdd';
 
-const MessagePaper = ({ position = [0, 0.05, 2], onSend, onFoldComplete, onInsertComplete }) => {
+const MessagePaper = ({ position = [0, 0.05, 2], onSend }) => {
     const groupRef = useRef();
     const paperRef = useRef();
     const backPaperRef = useRef(); // Back side of paper (white)
@@ -168,31 +168,6 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend, onFoldComplete, onInser
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error'
-
-    // Fold Animation State
-    const [isFolding, setIsFolding] = useState(false);
-    const foldProgress = useRef(0); // 0 = flat, 1 = fully folded
-
-    // Roll Animation State (after fold) - sideways fold 1
-    const [isRolling, setIsRolling] = useState(false);
-    const rollProgress = useRef(0); // 0 = flat, 1 = fully folded sideways
-
-    // Third fold state - another sideways fold
-    const [isThirdFold, setIsThirdFold] = useState(false);
-    const thirdFoldProgress = useRef(0);
-
-    // Track if fold completion callback was triggered
-    const foldCompleteTriggered = useRef(false);
-
-    // Paper movement to bottle animation
-    const [isMovingToBottle, setIsMovingToBottle] = useState(false);
-    const moveProgress = useRef(0);
-
-    // Paper inserting into bottle animation (after reaching above bottle)
-    const [isInsertingIntoBottle, setIsInsertingIntoBottle] = useState(false);
-    const insertProgress = useRef(0);
-    const insertStartPosition = useRef({ x: 0, y: 0, z: 0 }); // Store position when insert starts
-    const insertCompleteTriggered = useRef(false); // Track if insert complete callback was triggered
 
     // Email validation helper
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -248,36 +223,17 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend, onFoldComplete, onInser
     }, []);
 
     // Handle send button click - Submit to Web3Forms
-    // ⚠️ TESTING MODE: API disabled, just triggers animation
     const handleButtonClick = useCallback(async () => {
         // Reset previous status
         setSubmitStatus(null);
 
-        // Skip validation for testing
-        // if (!validateForm()) {
-        //     return;
-        // }
+        if (!validateForm()) {
+            return;
+        }
 
         setIsSubmitting(true);
         setErrors({});
 
-        // TESTING: Skip API call, simulate success after short delay
-        setTimeout(() => {
-            setIsSubmitting(false);
-            setSubmitStatus('success');
-            console.log('🧪 TEST MODE: Simulating success (API disabled)');
-
-            // Call onSend with form data (for writing animation)
-            onSend?.({ message, email, subject });
-
-            // Start fold animation after success
-            setTimeout(() => {
-                setIsFolding(true);
-                foldProgress.current = 0;
-            }, 500);
-        }, 300);
-
-        /* REAL API - uncomment when animations are done:
         try {
             const response = await fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
@@ -301,11 +257,10 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend, onFoldComplete, onInser
                 onSend?.({ message, email, subject });
                 console.log('✅ Message sent successfully!');
 
-                // Start fold animation after success
-                setTimeout(() => {
-                    setIsFolding(true);
-                    foldProgress.current = 0;
-                }, 500);
+                // Clear form after success
+                setMessage('');
+                setEmail('');
+                setSubject('');
             } else {
                 throw new Error(result.message || 'Failed to send');
             }
@@ -315,7 +270,6 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend, onFoldComplete, onInser
         } finally {
             setIsSubmitting(false);
         }
-        */
     }, [message, email, subject, onSend, validateForm]);
 
     // Input handlers
@@ -378,291 +332,14 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend, onFoldComplete, onInser
     }, [message]);
 
     // Store original vertex positions for fold animation
-    const originalPositions = useRef(null);
-    const positionsAfterFold1 = useRef(null); // After vertical fold
-    const positionsAfterFold2 = useRef(null); // After first horizontal fold
-
-    // Paper animation (flutter + fold)
+    // Paper animation (flutter)
     useFrame((state, delta) => {
         if (!paperRef.current) return;
 
         const time = state.clock.getElapsedTime();
 
-        // Flutter animation (only when not folding)
-        if (!isFolding) {
-            paperRef.current.rotation.z = Math.sin(time * 0.5) * 0.005;
-        }
-
-        // Fold animation
-        if (isFolding) {
-            const geometry = paperRef.current.geometry;
-            const positions = geometry.attributes.position;
-            const halfHeight = PAPER_HEIGHT / 2;
-
-            // Store original positions on first frame of folding
-            if (!originalPositions.current) {
-                originalPositions.current = new Float32Array(positions.array);
-            }
-
-            // Increase fold progress
-            if (foldProgress.current < 1) {
-                foldProgress.current = Math.min(1, foldProgress.current + delta * 0.8);
-            }
-
-            // For each vertex, calculate position from ORIGINAL
-            for (let i = 0; i < positions.count; i++) {
-                const origY = originalPositions.current[i * 3 + 1]; // Y is at index 1
-                const origZ = originalPositions.current[i * 3 + 2]; // Z is at index 2
-
-                // Only fold the top half (positive Y in local space)
-                if (origY > 0.01) { // Small threshold to avoid center vertices
-                    // Normalized distance from center (0 to 1)
-                    const normalizedDist = origY / halfHeight;
-
-                    // Rotation angle (0 to PI for full fold)
-                    const angle = foldProgress.current * Math.PI;
-
-                    // Rotate this vertex around X axis at Y=0
-                    // New Y = originalY * cos(angle)
-                    const newY = origY * Math.cos(angle);
-
-                    // Z calculation:
-                    // - During fold: arc upward (sin gives nice curve)
-                    // - After fold: stay ABOVE bottom part (add constant lift based on progress)
-                    const arcLift = Math.sin(angle) * 0.02; // Arc during animation (reduced to stay below bottle)
-                    const finalLift = foldProgress.current * 0.02; // Stays above when done
-                    const newZ = origZ + arcLift + finalLift;
-
-                    positions.setY(i, newY);
-                    positions.setZ(i, newZ);
-                }
-            }
-
-            positions.needsUpdate = true;
-            geometry.computeVertexNormals();
-
-            // Sync back paper with front paper
-            if (backPaperRef.current) {
-                const backGeom = backPaperRef.current.geometry;
-                const backPos = backGeom.attributes.position;
-
-                // Copy positions from front to back
-                for (let i = 0; i < positions.count; i++) {
-                    backPos.setX(i, positions.getX(i));
-                    backPos.setY(i, positions.getY(i));
-                    backPos.setZ(i, positions.getZ(i));
-                }
-
-                backPos.needsUpdate = true;
-                backGeom.computeVertexNormals();
-            }
-
-            // Smoothly start shrinking during first fold (so no jump when accordion starts)
-            if (groupRef.current) {
-                // First fold: shrink slightly (from 1.0 to 0.9)
-                const firstFoldShrink = 1 - foldProgress.current * 0.1;
-                groupRef.current.scale.set(firstFoldShrink, firstFoldShrink, firstFoldShrink);
-            }
-
-            // Transition to roll after fold is complete
-            if (foldProgress.current >= 1 && !isRolling) {
-                // Save positions after fold 1
-                if (!positionsAfterFold1.current) {
-                    positionsAfterFold1.current = new Float32Array(positions.array);
-                }
-                setTimeout(() => {
-                    setIsRolling(true);
-                    rollProgress.current = 0;
-                }, 300); // Small delay before rolling
-            }
-        }
-
-        // ACCORDION FOLD animation (after vertical fold is complete)
-        // Smooth fan-fold with proper segment rotation
-        if (isRolling && foldProgress.current >= 1) {
-            const geometry = paperRef.current.geometry;
-            const positions = geometry.attributes.position;
-
-            // Smooth easing for natural motion
-            if (rollProgress.current < 1) {
-                rollProgress.current = Math.min(1, rollProgress.current + delta * 0.4);
-            }
-
-            // Eased progress for smoother animation
-            const t = rollProgress.current;
-            const eased = t < 0.5
-                ? 2 * t * t  // ease in
-                : 1 - Math.pow(-2 * t + 2, 2) / 2; // ease out
-
-            // Accordion parameters
-            const numFolds = 5; // Number of fan segments
-            const segmentWidth = PAPER_WIDTH / numFolds;
-            const maxFoldAngle = Math.PI * 0.85; // How much each fold bends (almost 180°)
-
-            for (let i = 0; i < positions.count; i++) {
-                const origX = originalPositions.current[i * 3];
-                const origZ = originalPositions.current[i * 3 + 2];
-
-                // Normalize X from 0 to 1
-                const normalizedX = (origX + PAPER_WIDTH / 2) / PAPER_WIDTH;
-
-                // Which segment is this vertex in (0, 1, 2, 3)
-                const segmentIndex = Math.min(numFolds - 1, Math.floor(normalizedX * numFolds));
-
-                // Position within segment (0 to 1)
-                const segmentPos = (normalizedX * numFolds) % 1;
-
-                // Calculate cumulative position after folding
-                // Each segment folds alternating direction
-                let newX = -PAPER_WIDTH / 2; // Start from left edge
-                let newZ = 0.03; // Base height
-
-                // Add contribution from each complete segment before this one
-                for (let s = 0; s < segmentIndex; s++) {
-                    const isEven = s % 2 === 0;
-                    const foldDir = isEven ? 1 : -1;
-                    const angle = eased * maxFoldAngle;
-
-                    // Each segment contributes to X and Z based on its fold
-                    newX += segmentWidth * Math.cos(angle * foldDir * (s + 1) * 0.3);
-                    newZ += 0.015 * eased; // Stack height for each layer
-                }
-
-                // Add contribution from current segment (partial)
-                const isEvenSeg = segmentIndex % 2 === 0;
-                const currentAngle = eased * maxFoldAngle;
-
-                // Position along segment
-                const segmentContrib = segmentPos * segmentWidth;
-
-                // Fold direction alternates
-                if (isEvenSeg) {
-                    // Even segments: fold surface curves upward
-                    const bendAmount = Math.sin(segmentPos * Math.PI) * eased * 0.08;
-                    newX += segmentContrib * (1 - eased * 0.7);
-                    newZ += bendAmount + segmentIndex * 0.012 * eased;
-                } else {
-                    // Odd segments: fold surface curves downward slightly  
-                    const bendAmount = Math.sin(segmentPos * Math.PI) * eased * 0.06;
-                    newX += segmentContrib * (1 - eased * 0.7);
-                    newZ += bendAmount + segmentIndex * 0.012 * eased + 0.02 * eased;
-                }
-
-                // Final compression toward center
-                const compressionFactor = 1 - eased * 0.75;
-                const centerOffset = (normalizedX - 0.5) * PAPER_WIDTH * compressionFactor;
-
-                // Blend between accordion shape and centered position
-                const blendFactor = eased * eased; // More compression at end
-                const finalX = newX * (1 - blendFactor * 0.5) + centerOffset * blendFactor * 0.5;
-
-                // Final Z with layering
-                const layerZ = 0.03 + (segmentIndex * 0.01) * eased;
-                const foldZ = Math.sin(segmentPos * Math.PI) * 0.03 * (1 - eased * 0.8);
-                const finalZ = layerZ + foldZ + 0.02;
-
-                positions.setX(i, finalX);
-                positions.setZ(i, finalZ);
-            }
-
-            positions.needsUpdate = true;
-            geometry.computeVertexNormals();
-
-            // Smoothly shrink the paper as it folds into accordion
-            // Starts from 0.9 (where first fold ended) and continues shrinking
-            if (groupRef.current) {
-                // First fold took it to 0.9, now continue from there
-                const startScale = 0.9;
-                const shrinkAmount = startScale - eased * 0.05; // Continue shrinking from 0.9
-                groupRef.current.scale.set(shrinkAmount, shrinkAmount, shrinkAmount);
-            }
-
-            // Trigger callback when accordion fold is complete
-            if (rollProgress.current >= 1 && !foldCompleteTriggered.current) {
-                foldCompleteTriggered.current = true;
-                onFoldComplete?.();
-
-                // Start paper movement after cap has time to open
-                setTimeout(() => {
-                    setIsMovingToBottle(true);
-                    moveProgress.current = 0;
-                }, 1500); // Wait for cap animation
-            }
-        }
-
-        // Paper movement to bottle animation
-        if (isMovingToBottle && groupRef.current) {
-            // Increase progress
-            if (moveProgress.current < 1) {
-                moveProgress.current = Math.min(1, moveProgress.current + delta * 0.5);
-            }
-
-            // Easing
-            const t = moveProgress.current;
-            const eased = t < 0.5
-                ? 2 * t * t
-                : 1 - Math.pow(-2 * t + 2, 2) / 2;
-
-            // Move toward bottle position
-            // Paper starts at [0, 0.07, 2], bottle is at [0.8, 0.12, 2.5]
-            // First move forward (Z), then sideways (X) to bottle
-            const targetX = 1.05;
-            const targetZ = 1.2;
-            const liftY = 0.3; // Lift up while moving
-
-            // Arc movement
-            groupRef.current.position.x = eased * targetX;
-            groupRef.current.position.z = position[2] + eased * (targetZ - position[2]);
-            groupRef.current.position.y = position[1] + Math.sin(eased * Math.PI) * liftY;
-
-            // When movement is complete, start inserting into bottle
-            if (moveProgress.current >= 1 && !isInsertingIntoBottle) {
-                // Save current position before starting insert animation
-                insertStartPosition.current = {
-                    x: groupRef.current.position.x,
-                    y: groupRef.current.position.y,
-                    z: groupRef.current.position.z
-                };
-                setTimeout(() => {
-                    setIsInsertingIntoBottle(true);
-                    insertProgress.current = 0;
-                }, 200); // Small delay before inserting
-            }
-        }
-
-        // Paper inserting into bottle animation (pushing paper BACKWARDS into bottle)
-        if (isInsertingIntoBottle && groupRef.current) {
-            // Increase progress
-            if (insertProgress.current < 1) {
-                insertProgress.current = Math.min(1, insertProgress.current + delta * 0.6);
-            }
-
-            // Smooth easing
-            const t = insertProgress.current;
-            const eased = 1 - Math.pow(1 - t, 3); // ease out cubic
-
-            // Use saved position from when movement ended (no jumping!)
-            const startX = insertStartPosition.current.x;
-            const startY = insertStartPosition.current.y;
-            const startZ = insertStartPosition.current.z;
-
-            // Move BACKWARDS on Z axis (into the bottle which is lying on its side)
-            const insertDepth = 1; // How deep the paper goes into bottle (on Z axis)
-
-            // Keep X and Y constant, move Z backwards (increase Z to go into bottle)
-            groupRef.current.position.x = startX;
-            groupRef.current.position.y = startY;
-            groupRef.current.position.z = startZ + eased * insertDepth; // Move backwards from actual position
-
-            // Scale stays the same (already shrunk from accordion fold)
-
-            // Trigger callback when insert is complete
-            if (insertProgress.current >= 1 && !insertCompleteTriggered.current) {
-                insertCompleteTriggered.current = true;
-                console.log('📜 Paper inserted into bottle - closing cap');
-                onInsertComplete?.();
-            }
-        }
+        // Flutter animation
+        paperRef.current.rotation.z = Math.sin(time * 0.5) * 0.005;
     });
 
     return (
@@ -674,154 +351,141 @@ const MessagePaper = ({ position = [0, 0.05, 2], onSend, onFoldComplete, onInser
                 <input ref={subjectInputRef} type="text" value={subject} onChange={handleSubjectInput} onBlur={handleBlur} aria-label="Subject" style={{ pointerEvents: 'auto' }} />
             </Html>
 
-            {/* Main Paper Mesh - FRONT (with texture before fold, white after) */}
+            {/* Main Paper Mesh - FRONT (with texture) */}
             <mesh ref={paperRef} rotation={[-Math.PI / 2, 0, 0]} onClick={handlePaperClick}>
                 <planeGeometry args={[PAPER_WIDTH, PAPER_HEIGHT, 20, 20]} />
-                {!isRolling ? (
-                    <meshStandardMaterial
-                        map={paperTexture}
-                        transparent
-                        alphaTest={0.5}
-                        side={THREE.FrontSide}
-                        roughness={0.9}
-                    />
-                ) : (
-                    <meshStandardMaterial
-                        color="#f8f8f5"
-                        side={THREE.DoubleSide}
-                        roughness={0.9}
-                    />
-                )}
+                <meshStandardMaterial
+                    map={paperTexture}
+                    transparent
+                    alphaTest={0.5}
+                    side={THREE.FrontSide}
+                    roughness={0.9}
+                />
             </mesh>
 
-            {/* Paper BACK (white) - only visible before rolling */}
-            {!isRolling && (
-                <mesh ref={backPaperRef} rotation={[-Math.PI / 2, 0, 0]}>
-                    <planeGeometry args={[PAPER_WIDTH, PAPER_HEIGHT, 20, 20]} />
-                    <meshStandardMaterial
-                        color="#f5f5f0"
-                        side={THREE.BackSide}
-                        roughness={0.9}
-                    />
-                </mesh>
-            )}
+            {/* Paper BACK (white) */}
+            <mesh ref={backPaperRef} rotation={[-Math.PI / 2, 0, 0]}>
+                <planeGeometry args={[PAPER_WIDTH, PAPER_HEIGHT, 20, 20]} />
+                <meshStandardMaterial
+                    color="#f5f5f0"
+                    side={THREE.BackSide}
+                    roughness={0.9}
+                />
+            </mesh>
 
             {/* === INTERACTIVE FIELDS === */}
-            {/* Hide text fields and button when folding animation is active */}
-            {!isFolding && (
-                <>
-                    <InteractiveTextField
-                        isActive={activeField === 'email'}
-                        value={email}
-                        placeholder="email..."
-                        cursor={cursorVisible ? '|' : ' '}
-                        onClick={() => { setActiveField('email'); setTimeout(() => emailInputRef.current?.focus(), 10); }}
-                        // Layout
-                        position={[-0.5, 0.008, -0.61]}
-                        baseRotation={[-Math.PI / 2, 0, 0.02]}
-                        hitboxPosition={[0, 0.005, -0.61]}
-                        hitboxSize={[PAPER_WIDTH * 0.85, 0.08]}
-                        // Style
-                        fontSize={0.05}
-                        maxWidth={PAPER_WIDTH * 0.8}
-                        fontPath={FONT_PATH}
-                    />
+            <>
+                <InteractiveTextField
+                    isActive={activeField === 'email'}
+                    value={email}
+                    placeholder="email..."
+                    cursor={cursorVisible ? '|' : ' '}
+                    onClick={() => { setActiveField('email'); setTimeout(() => emailInputRef.current?.focus(), 10); }}
+                    // Layout
+                    position={[-0.5, 0.008, -0.61]}
+                    baseRotation={[-Math.PI / 2, 0, 0.02]}
+                    hitboxPosition={[0, 0.005, -0.61]}
+                    hitboxSize={[PAPER_WIDTH * 0.85, 0.08]}
+                    // Style
+                    fontSize={0.05}
+                    maxWidth={PAPER_WIDTH * 0.8}
+                    fontPath={FONT_PATH}
+                />
 
-                    {/* Subject Field */}
-                    <InteractiveTextField
-                        isActive={activeField === 'subject'}
-                        value={subject}
-                        placeholder="subject..."
-                        cursor={cursorVisible ? '|' : ' '}
-                        onClick={() => { setActiveField('subject'); setTimeout(() => subjectInputRef.current?.focus(), 10); }}
-                        // Layout
-                        position={[-0.5, 0.008, -0.46]}
-                        baseRotation={[-Math.PI / 2, 0, 0.02]}
-                        hitboxPosition={[0, 0.005, -0.46]}
-                        hitboxSize={[PAPER_WIDTH * 0.85, 0.08]}
-                        // Style
-                        fontSize={0.05}
-                        maxWidth={PAPER_WIDTH * 0.8}
-                        fontPath={FONT_PATH}
-                    />
+                {/* Subject Field */}
+                <InteractiveTextField
+                    isActive={activeField === 'subject'}
+                    value={subject}
+                    placeholder="subject..."
+                    cursor={cursorVisible ? '|' : ' '}
+                    onClick={() => { setActiveField('subject'); setTimeout(() => subjectInputRef.current?.focus(), 10); }}
+                    // Layout
+                    position={[-0.5, 0.008, -0.46]}
+                    baseRotation={[-Math.PI / 2, 0, 0.02]}
+                    hitboxPosition={[0, 0.005, -0.46]}
+                    hitboxSize={[PAPER_WIDTH * 0.85, 0.08]}
+                    // Style
+                    fontSize={0.05}
+                    maxWidth={PAPER_WIDTH * 0.8}
+                    fontPath={FONT_PATH}
+                />
 
-                    {/* Message Field */}
-                    <InteractiveTextField
-                        isActive={activeField === 'message'}
-                        value={formattedMessage}
-                        placeholder="message..."
-                        cursor={cursorVisible ? '|' : ' '}
-                        onClick={() => { setActiveField('message'); setTimeout(() => hiddenInputRef.current?.focus(), 10); }}
-                        // Layout
-                        position={[-0.46, 0.008, -0.3]}
-                        baseRotation={[-Math.PI / 2, 0, 0.02]}
-                        hitboxPosition={[0, 0.005, 0.1]}
-                        hitboxSize={[PAPER_WIDTH * 0.85, 0.55]}
-                        // Style
+                {/* Message Field */}
+                <InteractiveTextField
+                    isActive={activeField === 'message'}
+                    value={formattedMessage}
+                    placeholder="message..."
+                    cursor={cursorVisible ? '|' : ' '}
+                    onClick={() => { setActiveField('message'); setTimeout(() => hiddenInputRef.current?.focus(), 10); }}
+                    // Layout
+                    position={[-0.46, 0.008, -0.3]}
+                    baseRotation={[-Math.PI / 2, 0, 0.02]}
+                    hitboxPosition={[0, 0.005, 0.1]}
+                    hitboxSize={[PAPER_WIDTH * 0.85, 0.55]}
+                    // Style
+                    fontSize={0.045}
+                    maxWidth={PAPER_WIDTH * 0.75}
+                    fontPath={FONT_PATH}
+                    anchorY="top"
+                    textAlign="left"
+                    lineHeight={1.35}
+                />
+
+                {/* === SEND BUTTON === */}
+                <SmoothButton
+                    texture={buttonTexture}
+                    onClick={handleButtonClick}
+                    position={[0, 0.005, 0.68]}
+                    size={[0.5, 0.13]}
+                    text={isSubmitting ? 'SENDING...' : 'SEND'}
+                    fontPath={FONT_PATH}
+                />
+
+                {/* === VALIDATION ERRORS === */}
+                {Object.keys(errors).length > 0 && (
+                    <Text
+                        position={[0, 0.01, 0.55]}
+                        rotation={[-Math.PI / 2, 0, 0]}
+                        fontSize={0.035}
+                        color="#cc3333"
+                        font={FONT_PATH}
+                        anchorX="center"
+                        anchorY="middle"
+                    >
+                        {errors.email || errors.subject || errors.message || 'Please fill all fields'}
+                    </Text>
+                )}
+
+                {/* === SUCCESS MESSAGE === */}
+                {submitStatus === 'success' && (
+                    <Text
+                        position={[0, 0.02, 0.55]}
+                        rotation={[-Math.PI / 2, 0, 0]}
                         fontSize={0.045}
-                        maxWidth={PAPER_WIDTH * 0.75}
-                        fontPath={FONT_PATH}
-                        anchorY="top"
-                        textAlign="left"
-                        lineHeight={1.35}
-                    />
+                        color="#22aa44"
+                        font={FONT_PATH}
+                        anchorX="center"
+                        anchorY="middle"
+                    >
+                        Message sent! ✓
+                    </Text>
+                )}
 
-                    {/* === SEND BUTTON === */}
-                    <SmoothButton
-                        texture={buttonTexture}
-                        onClick={handleButtonClick}
-                        position={[0, 0.005, 0.68]}
-                        size={[0.5, 0.13]}
-                        text={isSubmitting ? 'SENDING...' : 'SEND'}
-                        fontPath={FONT_PATH}
-                    />
-
-                    {/* === VALIDATION ERRORS === */}
-                    {Object.keys(errors).length > 0 && (
-                        <Text
-                            position={[0, 0.01, 0.55]}
-                            rotation={[-Math.PI / 2, 0, 0]}
-                            fontSize={0.035}
-                            color="#cc3333"
-                            font={FONT_PATH}
-                            anchorX="center"
-                            anchorY="middle"
-                        >
-                            {errors.email || errors.subject || errors.message || 'Please fill all fields'}
-                        </Text>
-                    )}
-
-                    {/* === SUCCESS MESSAGE === */}
-                    {submitStatus === 'success' && (
-                        <Text
-                            position={[0, 0.02, 0.55]}
-                            rotation={[-Math.PI / 2, 0, 0]}
-                            fontSize={0.045}
-                            color="#22aa44"
-                            font={FONT_PATH}
-                            anchorX="center"
-                            anchorY="middle"
-                        >
-                            Message sent! ✓
-                        </Text>
-                    )}
-
-                    {/* === ERROR MESSAGE === */}
-                    {submitStatus === 'error' && (
-                        <Text
-                            position={[0, 0.02, 0.55]}
-                            rotation={[-Math.PI / 2, 0, 0]}
-                            fontSize={0.04}
-                            color="#cc3333"
-                            font={FONT_PATH}
-                            anchorX="center"
-                            anchorY="middle"
-                        >
-                            Failed to send. Try again.
-                        </Text>
-                    )}
-                </>
-            )}
+                {/* === ERROR MESSAGE === */}
+                {submitStatus === 'error' && (
+                    <Text
+                        position={[0, 0.02, 0.55]}
+                        rotation={[-Math.PI / 2, 0, 0]}
+                        fontSize={0.04}
+                        color="#cc3333"
+                        font={FONT_PATH}
+                        anchorX="center"
+                        anchorY="middle"
+                    >
+                        Failed to send. Try again.
+                    </Text>
+                )}
+            </>
         </group>
     );
 };

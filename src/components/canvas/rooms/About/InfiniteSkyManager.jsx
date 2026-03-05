@@ -1117,12 +1117,19 @@ const SkillBalloon = ({ config, revealFactor, spreadFactor, time }) => {
                 popRef.current = 0;
                 textFadeRef.current = 1;
                 respawnOffsetRef.current = -12; // Teleport below to float up again
+
+                // Immediately teleport the mesh to prevent pointer events at the old location
+                if (outerGroupRef.current) {
+                    outerGroupRef.current.position.y -= 12;
+                }
+
                 // Immediately reset opacities to prevent flashing
                 if (balloonRevealRef.current) balloonRevealRef.current.opacity = 1;
                 if (textRef.current) textRef.current.fillOpacity = 0;
                 // Reset reveal state on respawn
                 if (balloonRevealRef.current) balloonRevealRef.current.uProgress = 0;
                 if (paintedMatRef.current) paintedMatRef.current.opacity = 0;
+                if (paintedMeshRef.current) paintedMeshRef.current.visible = false;
             }
         }
 
