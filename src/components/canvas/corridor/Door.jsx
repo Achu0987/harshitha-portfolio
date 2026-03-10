@@ -1,13 +1,15 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Plane, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { PositionalAudio } from '@react-three/drei';
+import '../shaders/RevealMaterial'; // Registers alpha-discard reveal shader
 import { useAudio } from '../../../../context/AudioManager';
+import { isTouchDevice } from '../../../../utils/deviceDetect';
 
 // Global settings for entrance doors audio
-export const ENTRANCE_DOOR_AUDIO_SETTINGS = {
+const ENTRANCE_DOOR_AUDIO_SETTINGS = {
     hoverVolume: 2.0, // Volume for "uchyleniedrzwi" (hovering the door)
     openVolume: 2.0,  // Volume for "otwarciedrzwi" (opening the door fully)
     distance: 3,      // Reference distance for spatial audio before it starts dropping off
@@ -25,8 +27,18 @@ const Door = ({
     icon,
     color = '#f5f0e6',
     onEnter,
-    autoCloseDelay = 3000
+    autoCloseDelay = 3000,
+    type // Assuming 'type' is a new prop for texture selection
 }) => {
+    // Preload textures
+    // Texture Loader Hook MUST be called indiscriminately to keep React Hooks consistent
+    const textureMap = useTexture(`/ textures / corridor / doors / drzwi${type}.webp`);
+    const isTouch = isTouchDevice();
+    const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    const paintedColorMap = useTexture(isTouch ? dummyTex : `/ textures / corridor / doors / drzwi${type} _painted.webp`);
+    // Frame
+    const frameMap = useTexture(`/ textures / corridor / doors / ramkasingledoors.webp`);
+
     const doorRef = useRef();
     const frameRef = useRef();
     const glowRef = useRef();

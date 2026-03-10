@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import gsap from 'gsap';
 import '../shaders/RevealMaterial';
+import { isTouchDevice } from '../../../utils/deviceDetect';
 /**
  * CorridorDecorations - Dekoracje korytarza.
  * 
@@ -116,8 +117,10 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
     const [isHovered, setIsHovered] = useState(false);
     const [isInspected, setIsInspected] = useState(false);
 
-    // Sprawdzamy czy to urządzenie mobilne (wąski ekran) by całkowicie wyłączyć funkcję
-    const isMobile = viewport.width < 5 || viewport.aspect < 0.8;
+    // Sprawdzamy czy to urządzenie dotykowe (telefon/tablet) by całkowicie wyłączyć efekt hover i podnieść wydajność
+    const isTouch = useMemo(() => isTouchDevice(), []);
+    // Zostawiamy też stary mechanizm żeby odłączyć na ekstremalnie wąskich ekranach w ogóle inspected
+    const isMobile = viewport.width < 5 || viewport.aspect < 0.8 || isTouch;
 
     // Kiedy komponent znika, na wszelki wypadek wyłączamy override
     useEffect(() => {
@@ -227,37 +230,47 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
             ref={groupRef}
             position={originalPos}
             rotation={originalRot}
-            onClick={(e) => {
-                e.stopPropagation();
-                if (isMobile) return; // Całkowite wyłączenie na mobile
-                setIsInspected((prev) => {
-                    const next = !prev;
-                    if (setCameraOverride) setCameraOverride(next); // Blokowanie / odblokowanie poruszania kamerą
-                    window.dispatchEvent(new CustomEvent('inspectChange', { detail: next }));
-                    return next;
-                });
-                setIsHovered(false);
-            }}
-            onPointerOver={(e) => {
-                e.stopPropagation();
-                if (!isInspected && !isMobile) setIsHovered(true);
-            }}
-            onPointerOut={(e) => {
-                e.stopPropagation();
-                setIsHovered(false);
-            }}
         >
-            {/* RAMKA PAINTED (behind sketch) */}
-            <mesh ref={framePaintedRef} position={[0, 0, -0.001]} scale={[0.98, 0.98, 1]}>
+            {/* INVISIBLE HITBOX to catch pointer events smoothly and prevent raycaster from jumping between meshes */}
+            <mesh
+                position={[0, 0, 0.05]}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (isMobile) return; // Całkowite wyłączenie na mobile
+                    setIsInspected((prev) => {
+                        const next = !prev;
+                        if (setCameraOverride) setCameraOverride(next); // Blokowanie / odblokowanie poruszania kamerą
+                        window.dispatchEvent(new CustomEvent('inspectChange', { detail: next }));
+                        return next;
+                    });
+                    setIsHovered(false);
+                }}
+                onPointerEnter={(e) => {
+                    e.stopPropagation();
+                    if (!isInspected && !isMobile) setIsHovered(true);
+                }}
+                onPointerLeave={(e) => {
+                    e.stopPropagation();
+                    setIsHovered(false);
+                }}
+            >
                 <planeGeometry args={[frame.width, frame.height]} />
-                <meshStandardMaterial
-                    map={framePaintedTexture}
-                    transparent={true}
-                    alphaTest={0.5}
-                    side={THREE.DoubleSide}
-                    roughness={0.9}
-                />
+                <meshBasicMaterial transparent opacity={0} depthWrite={false} />
             </mesh>
+
+            {/* RAMKA PAINTED (behind sketch) */}
+            {!isTouch && (
+                <mesh ref={framePaintedRef} position={[0, 0, -0.001]} scale={[0.98, 0.98, 1]}>
+                    <planeGeometry args={[frame.width, frame.height]} />
+                    <meshStandardMaterial
+                        map={framePaintedTexture}
+                        transparent={true}
+                        alphaTest={0.5}
+                        side={THREE.DoubleSide}
+                        roughness={0.9}
+                    />
+                </mesh>
+            )}
 
             {/* RAMKA SKETCH OVERLAY (front) */}
             <mesh position={[0, 0, 0]}>
@@ -277,7 +290,7 @@ const InspectableFrame = ({ frame, wallX, frameTexture, framePaintedTexture, CAB
             {frame.image && (
                 <PictureContent
                     imagePath={frame.image}
-                    imagePaintedPath={frame.imagePainted}
+                    imagePaintedPath={!isTouch ? frame.imagePainted : null}
                     width={frame.imageWidth || frame.width * 0.7}
                     height={frame.imageHeight || frame.height * 0.7}
                     isPainted={isHovered || isInspected}

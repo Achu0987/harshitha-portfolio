@@ -8,6 +8,7 @@ import '../shaders/RevealMaterial'; // Registers alpha-discard reveal shader
 import { useScene } from '../../../context/SceneContext';
 import { useAchievements } from '../../../context/AchievementsContext';
 import { useAudio } from '../../../context/AudioManager';
+import { isTouchDevice } from '../../../utils/deviceDetect';
 
 // Constants from CorridorSegment
 const WALL_X_OUTER = 3.5;
@@ -15,7 +16,7 @@ const WALL_X_INNER = 1.7;
 const DOOR_Z_SPAN = 4;
 const CORRIDOR_HEIGHT = 3.5;
 
-export const DOOR_AUDIO_SETTINGS = {
+const DOOR_AUDIO_SETTINGS = {
     hoverVolume: 0.8, // Volume for "uchyleniedrzwi" (hovering the door)
     openVolume: 0.2,  // Volume for "otwarciedrzwi" (opening the door fully)
     closeVolume: 0.2, // Volume when door closes (playing same sound reversed/again)
@@ -209,11 +210,15 @@ const DoorSection = ({
     // Load door textures - use the right texture based on label
     const doorTexturePath = DOOR_TEXTURES[label] || DOOR_TEXTURES['THE GALLERY'];
     const doorTexture = useTexture(doorTexturePath);
+
+    const isTouch = isTouchDevice();
+    const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
     const doorPaintedTexturePath = DOOR_PAINTED_TEXTURES[label] || DOOR_PAINTED_TEXTURES['THE GALLERY'];
-    const doorPaintedTexture = useTexture(doorPaintedTexturePath);
+    const doorPaintedTexture = useTexture(isTouch ? dummyTex : doorPaintedTexturePath);
     const frameTexture = useTexture('/textures/corridor/doors/ramkasingledoors.webp');
     const handleTexture = useTexture('/textures/corridor/doors/klamkadodrzwi.webp');
-    const handlePaintedTexture = useTexture('/textures/corridor/doors/klamkadodrzwi_painted.webp');
+    const handlePaintedTexture = useTexture(isTouch ? dummyTex : '/textures/corridor/doors/klamkadodrzwi_painted.webp');
     const doorBackTexture = useTexture('/textures/corridor/doors/backsingledoors.webp');
     const arrowTexture = useTexture('/textures/corridor/strzalka.png');
 

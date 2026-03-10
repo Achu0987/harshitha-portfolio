@@ -100,6 +100,37 @@
         .description {
             font-size: 13px;
             color: #444;
+            line-height: 1.4;
+
+            .inline-sound-toggle {
+                background: none;
+                border: none;
+                padding: 0;
+                margin-left: 4px;
+                font-family: 'Patrick Hand', cursive, sans-serif;
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                text-decoration: underline;
+                text-decoration-style: dashed;
+                text-underline-offset: 3px;
+                transition: opacity 0.2s ease, transform 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+
+                &.on {
+                    color: #1a1a1a;
+                }
+
+                &.off {
+                    color: #888;
+                }
+
+                &:hover {
+                    opacity: 0.7;
+                    transform: scale(1.05);
+                }
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAudio } from './AudioManager';
+import posthog from 'posthog-js';
 
 const AchievementsContext = createContext();
 
@@ -20,18 +21,19 @@ export const AchievementsProvider = ({ children }) => {
 
     // Load completed achievements from local storage
     const [completed, setCompleted] = useState(() => {
-        // --- COMMENTED OUT FOR TESTING ---
-        // try {
-        //     const saved = localStorage.getItem('itom_achievements');
-        //     const parsed = saved ? JSON.parse(saved) : [];
-        //     completedRef.current = [...parsed];
-        //     return parsed;
-        // } catch (e) {
-        //     return [];
-        // }
-
-        // Return empty array for testing so achievements reset on refresh
-        return [];
+        try {
+            const saved = localStorage.getItem('itom_achievements');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Wrzucamy do pule, ale ignorujemy 'corridor_enter' żeby tooltip wejściowy zawsze się pojawiał
+                const filtered = parsed.filter(id => id !== 'corridor_enter');
+                completedRef.current = [...filtered];
+                return filtered;
+            }
+            return [];
+        } catch (e) {
+            return [];
+        }
     });
 
     // Lazy global AudioContext to avoid creating it on every unlock
@@ -87,7 +89,8 @@ export const AchievementsProvider = ({ children }) => {
 
     // Save to localStorage when completed changes
     useEffect(() => {
-        localStorage.setItem('itom_achievements', JSON.stringify(completed));
+        const toSave = completed.filter(id => id !== 'corridor_enter');
+        localStorage.setItem('itom_achievements', JSON.stringify(toSave));
     }, [completed]);
 
     const showTutorial = useCallback((id) => {
@@ -108,10 +111,20 @@ export const AchievementsProvider = ({ children }) => {
 
             setCompleted(prev => {
                 const updated = [...prev, id];
-                // --- COMMENTED OUT FOR TESTING ---
-                // localStorage.setItem('itom_achievements', JSON.stringify(updated));
+                // Save locally excluding corridor_enter
+                const toSave = updated.filter(item => item !== 'corridor_enter');
+                localStorage.setItem('itom_achievements', JSON.stringify(toSave));
                 return updated;
             });
+
+            // Send event to PostHog
+            const achievementData = ACHIEVEMENTS[id];
+            if (achievementData) {
+                posthog.capture('achievement_unlocked', {
+                    achievement_id: id,
+                    achievement_title: achievementData.title,
+                });
+            }
 
             // Trigger sound effect
             playUnlockChime();

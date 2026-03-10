@@ -98,6 +98,13 @@ const NavigationUI = () => {
 
     useEffect(() => {
         setBgmVol(getMusicVolume());
+
+        const handleMusicVolumeChange = (e) => {
+            setBgmVol(e.detail);
+        };
+        window.addEventListener('musicVolumeChanged', handleMusicVolumeChange);
+
+        return () => window.removeEventListener('musicVolumeChanged', handleMusicVolumeChange);
     }, []);
 
     const handleBgmChange = (val) => {

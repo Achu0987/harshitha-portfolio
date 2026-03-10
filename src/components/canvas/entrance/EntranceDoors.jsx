@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import '../shaders/RevealMaterial'; // Registers alpha-discard reveal shader
 import { playBackgroundMusic } from '../../../utils/audioManager';
 import { useAchievements } from '../../../context/AchievementsContext';
+import { isTouchDevice } from '../../../utils/deviceDetect';
 
 // Use same font as App.jsx preload (Inter) - works reliably
 const FONT_URL = 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff';
@@ -46,15 +47,11 @@ const EntranceDoors = ({
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 1000); // 1000px breakpoint to catch tablets/phones
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        setIsMobile(isTouchDevice() || window.innerWidth < 1000);
     }, []);
 
-    const isMobileDevice = typeof window !== 'undefined' && window.innerWidth < 1000;
+    // Dla hooków tekstur musimy obliczyć to raz na starcie
+    const isMobileDevice = typeof window !== 'undefined' && (isTouchDevice() || window.innerWidth < 1000);
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
     const frameTexture = useTexture('/textures/doors/frame_sketch.webp');
@@ -313,7 +310,7 @@ const EntranceDoors = ({
 
     // Handle hover - doors slightly open to indicate interactivity
     const handlePointerEnter = () => {
-        if (isOpen || isAnimating) return;
+        if (isOpen || isAnimating || isMobile) return;
         setIsHovered(true);
         document.body.style.cursor = "url('/cursors/cursor-pointer.png'), pointer";
 
@@ -389,7 +386,7 @@ const EntranceDoors = ({
     };
 
     const handlePointerLeave = () => {
-        if (isOpen || isAnimating) return;
+        if (isOpen || isAnimating || isMobile) return;
         setIsHovered(false);
         document.body.style.cursor = "url('/cursors/cursor-default.png'), auto";
 

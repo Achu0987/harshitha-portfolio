@@ -50,6 +50,20 @@ export const AudioProvider = ({ children }) => {
 
     const toggleMute = () => setIsMuted(prev => !prev);
 
+    // Enhanced setter that auto-unmutes if user manually drags slider above 0
+    const enhancedSetGlobalVolume = useCallback((vol) => {
+        if (typeof vol === 'function') {
+            setGlobalVolume(prev => {
+                const newVol = vol(prev);
+                if (newVol > 0) setIsMuted(false);
+                return newVol;
+            });
+        } else {
+            setGlobalVolume(vol);
+            if (vol > 0) setIsMuted(false);
+        }
+    }, []);
+
     // Call this on first interaction
     const enableAudio = useCallback(() => {
         if (!audioEnabled) {
@@ -135,7 +149,7 @@ export const AudioProvider = ({ children }) => {
             isMuted,
             toggleMute,
             globalVolume,
-            setGlobalVolume,
+            setGlobalVolume: enhancedSetGlobalVolume,
             play,
             enableAudio,
             audioEnabled

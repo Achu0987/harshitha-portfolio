@@ -4,6 +4,7 @@
 
 let bgMusicAudio = null;
 let isMuted = false;
+let bgMusicStarted = false;
 
 // Initialize background music
 export const initAudio = () => {
@@ -22,6 +23,7 @@ export const initAudio = () => {
 
 export const playBackgroundMusic = () => {
     initAudio();
+    bgMusicStarted = true;
     if (bgMusicAudio && bgMusicAudio.paused) {
         // Only play if not muted and it's currently paused
         bgMusicAudio.play().catch((err) => {
@@ -49,7 +51,19 @@ export const getIsMuted = () => isMuted;
 export const setMusicVolume = (vol) => {
     if (bgMusicAudio) {
         bgMusicAudio.volume = Math.max(0, Math.min(1, vol));
+        // Auto-unmute if user drags slider up
+        if (vol > 0 && isMuted) {
+            isMuted = false;
+            bgMusicAudio.muted = false;
+        }
+
+        // Ensure playback continues if we unmute, ONLY if the music has actually been requested to start
+        if (vol > 0 && bgMusicAudio.paused && bgMusicStarted) {
+            bgMusicAudio.play().catch(e => console.warn(e));
+        }
     }
+    // Dispatch event so UI sliders can stay in sync if changed programmatically
+    window.dispatchEvent(new CustomEvent('musicVolumeChanged', { detail: vol }));
 };
 
 export const getMusicVolume = () => {

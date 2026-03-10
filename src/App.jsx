@@ -12,6 +12,13 @@ import { PerformanceProvider, usePerformance } from './context/PerformanceContex
 import { SceneProvider } from './context/SceneContext';
 import NavigationUI from './components/ui/NavigationUI';
 import GlobalOverlay from './components/ui/GlobalOverlay';
+import posthog from 'posthog-js';
+
+// Initialize PostHog
+posthog.init('phc_WHnLrkRaCRM9jr9EfbjhC09me4DY0vH5Yx2K4rshkdQ', {
+  api_host: 'https://us.i.posthog.com',
+  person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+});
 
 // Lazy load the heavy 3D experience
 const Experience = lazy(() => import('./components/canvas/Experience'));

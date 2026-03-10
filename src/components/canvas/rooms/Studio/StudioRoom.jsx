@@ -10,6 +10,7 @@ import FloatingCodeParticles from './FloatingCodeParticles';
 import { PositionalAudio } from '@react-three/drei';
 import { useAudio } from '../../../../context/AudioManager';
 import '../../shaders/RevealMaterial';
+import { isTouchDevice } from '../../../../utils/deviceDetect';
 
 // ============================================
 // ⚙️ AUDIO SETTINGS - TWEAK HERE
@@ -565,12 +566,16 @@ const MonitorBlock = ({ item, meshRef, isSelected, onClick, disabled }) => {
                 '/textures/studio/phone_front.webp'
     );
 
+    // Dynamic Dummy texture for touch devices 
+    const isTouch = isTouchDevice();
+    const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
     // Determine painted front texture URL
-    const paintedFrontTextureUrl = item.paintedFrontTexture || (
+    const paintedFrontTextureUrl = isTouch ? dummyTex : (item.paintedFrontTexture || (
         isBlogMonitor ? '/textures/studio/monitor_front_painted.webp' :
             isTvMonitor ? '/textures/studio/tv_front_painted.webp' :
                 '/textures/studio/phone_front_painted.webp'
-    );
+    ));
 
     // Load dynamic front texture
     const frontTex = useLoader(TextureLoader, frontTextureUrl);
@@ -582,25 +587,25 @@ const MonitorBlock = ({ item, meshRef, isSelected, onClick, disabled }) => {
     const monitorBottom = useLoader(TextureLoader, '/textures/studio/monitor_bottom.webp');
     const monitorLeft = useLoader(TextureLoader, '/textures/studio/monitor_left.webp');
     const monitorRight = useLoader(TextureLoader, '/textures/studio/monitor_right.webp');
-    const monitorBottomPainted = useLoader(TextureLoader, '/textures/studio/monitor_bottom_painted.webp');
-    const monitorLeftPainted = useLoader(TextureLoader, '/textures/studio/monitor_left_painted.webp');
-    const monitorRightPainted = useLoader(TextureLoader, '/textures/studio/monitor_right_painted.webp');
+    const monitorBottomPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_bottom_painted.webp');
+    const monitorLeftPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_left_painted.webp');
+    const monitorRightPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/monitor_right_painted.webp');
 
     // Load TV textures (YouTube) - shell + painted
     const tvBack = useLoader(TextureLoader, '/textures/studio/tv_back.webp');
     const tvTop = useLoader(TextureLoader, '/textures/studio/tv_top.webp');
     const tvBottom = useLoader(TextureLoader, '/textures/studio/tv_bottom.webp');
     const tvSide = useLoader(TextureLoader, '/textures/studio/tv_side.webp');
-    const tvBackPainted = useLoader(TextureLoader, '/textures/studio/tv_back_painted.webp');
-    const tvTopPainted = useLoader(TextureLoader, '/textures/studio/tv_top_painted.webp');
-    const tvBottomPainted = useLoader(TextureLoader, '/textures/studio/tv_bottom_painted.webp');
-    const tvSidePainted = useLoader(TextureLoader, '/textures/studio/tv_side_painted.webp');
+    const tvBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_back_painted.webp');
+    const tvTopPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_top_painted.webp');
+    const tvBottomPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_bottom_painted.webp');
+    const tvSidePainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/tv_side_painted.webp');
 
     // Load Phone textures (TikTok) - shell + painted
     const phoneBack = useLoader(TextureLoader, '/textures/studio/phone_back.webp');
     const phoneSide = useLoader(TextureLoader, '/textures/studio/phone_side.webp');
-    const phoneBackPainted = useLoader(TextureLoader, '/textures/studio/phone_back_painted.webp');
-    const phoneSidePainted = useLoader(TextureLoader, '/textures/studio/phone_side_painted.webp');
+    const phoneBackPainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/phone_back_painted.webp');
+    const phoneSidePainted = useLoader(TextureLoader, isTouch ? dummyTex : '/textures/studio/phone_side_painted.webp');
 
     // Build texture config for current device type
     // Each entry: { sketch, painted } — if painted is null, that face won't have reveal

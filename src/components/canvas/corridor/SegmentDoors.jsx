@@ -6,7 +6,7 @@ import gsap from 'gsap';
 import { useAudio } from '../../../context/AudioManager';
 
 // Global settings for automatic segment doors audio
-export const SEGMENT_DOOR_AUDIO_SETTINGS = {
+const SEGMENT_DOOR_AUDIO_SETTINGS = {
     openVolume: 0.15, // Volume for "otwarciedrzwi"
     closeVolume: 0.15,// Volume for "zamknieciedrzwi"
     distance: 4,      // Reference distance for spatial audio
