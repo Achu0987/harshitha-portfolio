@@ -3,7 +3,10 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Text, useTexture, Float, PositionalAudio } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { Observer } from 'gsap/all';
 import { useScene } from '../../../../context/SceneContext';
+
+gsap.registerPlugin(Observer);
 import { useAchievements } from '../../../../context/AchievementsContext';
 import PaperMaterial from './PaperMaterial';
 import GalleryClouds from './GalleryClouds';
@@ -256,44 +259,38 @@ const GalleryRoom = ({ showRoom, onReady, isExiting }) => {
     };
 
     // --- INTERACTION ---
-    useEffect(() => {
-        const handleWheel = (e) => {
-            if (!showRoom) return;
-            // BLOCK SCROLL IF CARD IS SELECTED
-            if (selectedCard !== null || globalIsAnimating) return;
-
-            e.preventDefault();
-            targetScroll.current += e.deltaY * 0.005;
-        };
-        window.addEventListener('wheel', handleWheel, { passive: false });
-        return () => window.removeEventListener('wheel', handleWheel);
-    }, [showRoom, selectedCard, globalIsAnimating]);
-
     const lastTouchX = useRef(0);
     useEffect(() => {
-        if (!showRoom) return;
-
-        const handleTouchStart = (e) => {
-            // BLOCK TOUCH IF CARD IS SELECTED
-            if (selectedCard !== null || globalIsAnimating) return;
-            if (e.touches.length === 1) lastTouchX.current = e.touches[0].clientX;
-        };
-        const handleTouchMove = (e) => {
-            // BLOCK TOUCH MOVE IF CARD IS SELECTED
-            if (selectedCard !== null || globalIsAnimating) return;
-
-            if (e.touches.length === 1) {
-                const deltaX = lastTouchX.current - e.touches[0].clientX;
-                lastTouchX.current = e.touches[0].clientX;
-                targetScroll.current += deltaX * 0.008;
+        // Observers enable us to normalize wheel, touch, and pointer events
+        const scrollObserver = Observer.create({
+            target: window,
+            type: "wheel,touch,pointer",
+            wheelSpeed: -1,
+            onWheel: (e) => {
+                if (!showRoom || selectedCard !== null || globalIsAnimating) return;
+                const orig = e.event;
+                orig.preventDefault();
+                targetScroll.current += orig.deltaY * 0.005;
+            },
+            onPress: (e) => {
+                if (!showRoom || selectedCard !== null || globalIsAnimating) return;
+                const orig = e.event;
+                if (orig.touches && orig.touches.length === 1) {
+                    lastTouchX.current = orig.touches[0].clientX;
+                }
+            },
+            onDrag: (e) => {
+                if (!showRoom || selectedCard !== null || globalIsAnimating) return;
+                const orig = e.event;
+                if (orig.touches && orig.touches.length === 1) {
+                    const deltaX = lastTouchX.current - orig.touches[0].clientX;
+                    lastTouchX.current = orig.touches[0].clientX;
+                    targetScroll.current += deltaX * 0.008;
+                }
             }
-        };
-        window.addEventListener('touchstart', handleTouchStart, { passive: true });
-        window.addEventListener('touchmove', handleTouchMove, { passive: true });
-        return () => {
-            window.removeEventListener('touchstart', handleTouchStart);
-            window.removeEventListener('touchmove', handleTouchMove);
-        };
+        });
+
+        return () => scrollObserver.kill();
     }, [showRoom, selectedCard, globalIsAnimating]);
 
     useFrame((state, delta) => {

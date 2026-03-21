@@ -1,6 +1,10 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useScene } from '../../context/SceneContext';
+import gsap from 'gsap';
+import { TextPlugin } from 'gsap/TextPlugin';
 import '../../styles/GlobalOverlay.scss';
+
+gsap.registerPlugin(TextPlugin);
 
 const GlobalOverlay = () => {
     const { overlayContent, closeOverlay } = useScene();
@@ -68,6 +72,23 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
     if (!content) return null;
 
     const label = content.platformConfig?.label || 'Content';
+
+    // GSAP TextPlugin typing effect for description
+    const descriptionRef = useRef(null);
+    useEffect(() => {
+        if (isOpen && content.description && descriptionRef.current && content.layout !== 'certificate_grid') {
+            gsap.killTweensOf(descriptionRef.current);
+            gsap.fromTo(descriptionRef.current,
+                { text: "" },
+                { 
+                    text: content.description, 
+                    duration: Math.min(2.5, content.description.length * 0.015), 
+                    ease: "none", 
+                    delay: 0.3 
+                }
+            );
+        }
+    }, [isOpen, content]);
 
     // Custom scrollbar state
     const scrollContainerRef = useRef(null);
@@ -492,11 +513,14 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                             </div>
 
                             {/* Description */}
-                            <p style={{
+                            <p 
+                                ref={descriptionRef}
+                                style={{
                                 lineHeight: 1.6,
                                 color: '#333',
                                 fontSize: '0.95rem',
                                 margin: 0,
+                                minHeight: '80px', // Prevent layout jump while typing
                                 ...getStaggerStyle(300)
                             }}>
                                 {content.description}

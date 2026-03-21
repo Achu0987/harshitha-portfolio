@@ -1,5 +1,8 @@
 import { useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import gsap from 'gsap';
+import { Observer } from 'gsap/all';
+
+gsap.registerPlugin(Observer);
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useAchievements } from '../context/AchievementsContext';
@@ -249,24 +252,36 @@ const useInfiniteCamera = ({
     // (Removed manual doorHover listener - replaced with auto-glance in useFrame)
 
     useEffect(() => {
-        // Desktop events
-        window.addEventListener('wheel', handleWheel, { passive: false });
+        // Desktop non-scroll events
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('keydown', handleKeyDown);
 
-        // Mobile events
-        window.addEventListener('touchstart', handleTouchStart, { passive: true });
-        window.addEventListener('touchmove', handleTouchMove, { passive: true });
+        // GSAP Observer for unified scroll/touch handling
+        const scrollObserver = Observer.create({
+            target: window,
+            type: "wheel,touch,pointer",
+            onWheel: (e) => {
+                handleWheel(e.event);
+            },
+            onPress: (e) => {
+                if (e.event.touches && e.event.touches.length > 0) {
+                    handleTouchStart(e.event);
+                }
+            },
+            onDrag: (e) => {
+                if (e.event.touches && e.event.touches.length > 0) {
+                    handleTouchMove(e.event);
+                }
+            }
+        });
 
         // Try to enable gyroscope (will work on Android, need permission on iOS)
         requestGyroscopePermission();
 
         return () => {
-            window.removeEventListener('wheel', handleWheel);
+            scrollObserver.kill();
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('touchstart', handleTouchStart);
-            window.removeEventListener('touchmove', handleTouchMove);
             window.removeEventListener('deviceorientation', handleDeviceOrientation);
         };
     }, [handleWheel, handleMouseMove, handleKeyDown, handleTouchStart, handleTouchMove, handleDeviceOrientation, requestGyroscopePermission]);
