@@ -20,22 +20,22 @@ const SETTINGS = {
     particleCount: 1.0, // 100% particles
   },
   [TIERS.MEDIUM]: {
-    dpr: [1, 1.5], // Cap at 1.5x
-    shadows: true, // Keep shadows but maybe lower quality map size (handled in components)
+    dpr: [1, 1.2], // Cap at 1.2x on mobile to save GPU fillrate
+    shadows: false, // Disable shadows for better mobile performance
     antialias: true,
     powerPreference: "default",
     physicsStep: 1 / 60,
     textureQuality: "medium",
-    particleCount: 0.8, // 80% particles
+    particleCount: 0.6, // 60% particles
   },
   [TIERS.LOW]: {
-    dpr: 1, // Fixed 1x pixel density
+    dpr: 0.75, // Fixed 0.75x pixel density for weakest devices
     shadows: false, // Disable shadows completely
-    antialias: false, // Disable AA if possible or rely on fast AA
+    antialias: false, // Disable AA to maximize FPS
     powerPreference: "low-power",
     physicsStep: 1 / 45, // Slower physics updates if needed
     textureQuality: "low",
-    particleCount: 0.4, // 40% particles
+    particleCount: 0.3, // 30% particles
   },
 };
 
@@ -70,12 +70,13 @@ export const PerformanceProvider = ({ children }) => {
       }
 
       // 3. GPU/FPS Estimate (Simplistic)
-      // We can't easily benchmark GPU without rendering, but we can assume
-      // if user is on a mobile device with low cores, it's LOW.
-      // If it's a desktop with <= 4 cores (e.g. old i5/i3 laptop), start at MEDIUM.
-
-      // Override for very weak hardware
+      // Override for very weak hardware or low RAM (<= 4GB)
       if (navigator.deviceMemory && navigator.deviceMemory <= 4) {
+        detectedTier = TIERS.LOW;
+      }
+      
+      // Additional heuristic: small screen on mobile usually means older phone
+      if (isMobile && window.innerWidth < 450) {
         detectedTier = TIERS.LOW;
       }
 

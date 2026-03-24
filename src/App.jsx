@@ -25,13 +25,35 @@ const Experience = lazy(() => import('./components/canvas/Experience'));
 
 import './styles/main.scss';
 
-// --- BATCH ASSET PRELOADING ---
-// Preloads ALL textures (entrance, corridor, UI, and all room textures)
-// Everything loads during the preloader for zero stutter when entering rooms
-import { PRELOAD_ALL, PRELOAD_LOADER } from './config/texturePreloadList';
+// --- CONDITIONAL ASSET PRELOADING ---
+// On high-end devices, preloads everything for zero stutter.
+// On mobile/low-end devices, only preloads core textures to prevent Out Of Memory crashes.
+import { 
+  ENTRANCE_TEXTURES, 
+  CORRIDOR_TEXTURES, 
+  UI_TEXTURES,
+  PRELOAD_ALL, 
+  PRELOAD_LOADER 
+} from './config/texturePreloadList';
 import { TextureLoader } from 'three';
-PRELOAD_ALL.forEach(path => useTexture.preload(path));
-PRELOAD_LOADER.forEach(path => useLoader.preload(TextureLoader, path));
+
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+const isWeakCPU = typeof navigator.hardwareConcurrency !== 'undefined' && navigator.hardwareConcurrency <= 4;
+const isLowRAM = typeof navigator.deviceMemory !== 'undefined' && navigator.deviceMemory <= 4;
+const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 450;
+const isLowEnd = isMobile || isWeakCPU || isLowRAM || isSmallScreen;
+
+if (isLowEnd) {
+  // Only preload the immediate path to prevent memory crashes on phones
+  const CORE_TEXTURES = [...ENTRANCE_TEXTURES, ...CORRIDOR_TEXTURES, ...UI_TEXTURES];
+  CORE_TEXTURES.forEach(path => useTexture.preload(path));
+  console.log('[Preload] Low-end device detected. Preloading CORE textures only.');
+} else {
+  // Preload everything on desktop/high-end
+  PRELOAD_ALL.forEach(path => useTexture.preload(path));
+  PRELOAD_LOADER.forEach(path => useLoader.preload(TextureLoader, path));
+  console.log('[Preload] High-end device detected. Preloading ALL textures.');
+}
 
 const FONT_URL = 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff';
 
