@@ -20,13 +20,19 @@ html {
     @include mobile {
         font-size: 14px;
     }
+
+    @include hide-scrollbar;
+}
+
+::-webkit-scrollbar {
+    display: none;
 }
 
 body {
     font-family: $font-primary;
     background-color: #fafafa;
     color: $color-black;
-    overflow: hidden; // No scroll - 3D handles it
+    // overflow: hidden; removed to allow scrolling on About page
     @include smooth-text;
     @include hide-scrollbar;
 }

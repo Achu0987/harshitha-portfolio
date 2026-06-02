@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { useTexture, Text } from '@react-three/drei';
+import { useTexture, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import gsap from 'gsap';
@@ -331,6 +331,26 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
     const framePaintedTexture = useTexture('/textures/corridor/ramkanazdjecieduza_painted.webp');
     const standingFrameTexture = useTexture('/textures/corridor/ramkanazdjeciemala.webp');
     const treeTexture = useTexture('/textures/corridor/drzewkowdoniczce.webp');
+    const treeUniforms = useMemo(() => ({
+        uMap: { value: treeTexture },
+        uColorTop: { value: new THREE.Color('#658b54') },
+        uColorBottom: { value: new THREE.Color('#8b5a2b') },
+        uSplit: { value: 0.35 }
+    }), [treeTexture]);
+
+    const butterflyRef = useRef();
+    useEffect(() => {
+        if (butterflyRef.current) {
+            gsap.to(butterflyRef.current.position, {
+                y: "+=0.3",
+                x: "+=0.2",
+                duration: 2,
+                yoyo: true,
+                repeat: -1,
+                ease: "sine.inOut"
+            });
+        }
+    }, []);
     const grateTexture = useTexture('/textures/corridor/kratkawentylacyjna.webp');
     const flowerTexture = useTexture('/textures/corridor/kwiatekwdoniczce.webp');
 
@@ -632,19 +652,50 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
 
             {/* === DRZEWKO W DONICZCE (POTTED TREE) === */}
             {/* Kolo drzwi Contact (Right -62). Ustawiamy na -58, ODWROTNIE (Left). */}
-            <mesh
-                position={[-wallX + 0.8, floorY + 1.5, zOffset - 58]} // Left side
-                rotation={[0, Math.PI / 4, 0]} // Obrócone w stronę korytarza (z lewej)
-            >
-                <planeGeometry args={[1.8, 1.8 / 0.602]} />
-                <meshBasicMaterial color="#e0e0e0"
-                    map={treeTexture}
-                    transparent={true}
-                    alphaTest={0.1}
-                    side={THREE.DoubleSide}
-                    roughness={0.8}
-                />
-            </mesh>
+            <group position={[-wallX + 0.8, floorY + 1.5, zOffset - 58]}>
+                <mesh
+                    rotation={[0, Math.PI / 4, 0]} // Obrócone w stronę korytarza (z lewej)
+                >
+                    <planeGeometry args={[1.8, 1.8 / 0.602]} />
+                    <shaderMaterial
+                        transparent={true}
+                        side={THREE.DoubleSide}
+                        uniforms={treeUniforms}
+                        vertexShader={`
+                        varying vec2 vUv;
+                        void main() {
+                            vUv = uv;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `}
+                        fragmentShader={`
+                        uniform sampler2D uMap;
+                        uniform vec3 uColorTop;
+                        uniform vec3 uColorBottom;
+                        uniform float uSplit;
+                        varying vec2 vUv;
+                        
+                        void main() {
+                            vec4 texColor = texture2D(uMap, vUv);
+                            if (texColor.a < 0.1) discard;
+                            float mixFactor = smoothstep(uSplit - 0.05, uSplit + 0.05, vUv.y);
+                            vec3 tintColor = mix(uColorBottom, uColorTop, mixFactor);
+                            gl_FragColor = vec4(texColor.rgb * tintColor, texColor.a);
+                        }
+                    `}
+                    />
+                </mesh>
+                <Text font={CABIN_SKETCH_URL} fontSize={0.16} color="#ffffff" position={[0, -1.1, 0.2]} rotation={[0, Math.PI / 4, 0]} anchorX="center">
+                    GROW
+                </Text>
+
+                {/* Butterfly hovering above tree */}
+                <group ref={butterflyRef} position={[0.2, 1.2, 0.1]} rotation={[0, Math.PI / 4, 0]}>
+                    <Html transform scale={0.7} wrapperClass="no-pointer" style={{ pointerEvents: 'none' }}>
+                        <img src="https://www.fnp.com/assets/images/custom/luxe/Butterfly%20fly%20Desktop%20(signature%20pieces).svg" alt="butterfly" style={{ width: '400px', pointerEvents: 'none' }} />
+                    </Html>
+                </group>
+            </group>
 
             {/* === KRATKI WENTYLACYJNE (VENTILATION GRATES) === */}
             {/* Generujemy kratkę na przeciwległej ścianie dla każdego obrazu */}

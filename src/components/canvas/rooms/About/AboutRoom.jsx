@@ -25,7 +25,7 @@ export const AUDIO_SETTINGS = {
 // Story sections - positions define where each milestone appears
 // Using CHUNK_LENGTH to create looping story (every ~40 units restarts)
 const STORY_MILESTONES = [
-    { id: 'intro', position: [0, 0, -15], type: 'intro', title: 'ITOM', subtitle: '< creative developer />' },
+    { id: 'intro', position: [0, 0, -15], type: 'intro', title: 'HARSHITHA', subtitle: '< creative developer />' },
     { id: 'awards', position: [0, 0, -55], type: 'awards', title: 'AWARDS', subtitle: '1x SOTD Winner • 1x CSS Winner' },
     { id: 'journey', position: [0, 0, -95], type: 'journey', title: 'JOURNEY', subtitle: 'Computer Science @ University of Opole' },
     { id: 'skills', position: [0, 0, -135], type: 'skills', title: 'SKILLS', subtitle: 'React • Three.js • GSAP • Creative Code' },
@@ -127,7 +127,18 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
 
         // Apply velocity to position (momentum)
         scrollPosition.current += scrollVelocity.current * delta * 60;
-        // No clamp - allow flying backward too!
+
+        // Clamp scroll to prevent infinite looping of milestones
+        const MAX_SCROLL = 210; // Thank You milestone is at -215, allow a bit of padding
+        const MIN_SCROLL = -5;  // Prevent flying backward indefinitely
+
+        if (scrollPosition.current > MAX_SCROLL) {
+            scrollPosition.current = MAX_SCROLL;
+            scrollVelocity.current = 0;
+        } else if (scrollPosition.current < MIN_SCROLL) {
+            scrollPosition.current = MIN_SCROLL;
+            scrollVelocity.current = 0;
+        }
 
         // Friction
         scrollVelocity.current *= 0.95;
@@ -242,7 +253,7 @@ const AboutRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     distanceModel="exponential"
                     refDistance={AUDIO_SETTINGS.distance}
                     rolloffFactor={AUDIO_SETTINGS.rolloff}
-                    loop
+                    loop={false}
                     autoplay
                     volume={effectiveVolume}
                 />

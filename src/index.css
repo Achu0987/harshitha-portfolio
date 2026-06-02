@@ -47,6 +47,10 @@ button,
   cursor: pointer;
 }
 
+.no-pointer {
+  pointer-events: none !important;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

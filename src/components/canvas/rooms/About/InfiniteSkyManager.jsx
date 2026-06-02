@@ -140,8 +140,8 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
 };
 
 // Story milestones configuration
-// Each milestone appears once per "story cycle" (4 chunks = 160 units)
-const STORY_CYCLE_LENGTH = 160;
+// Each milestone appears once per "story cycle" (6 chunks = 240 units)
+const STORY_CYCLE_LENGTH = 240;
 
 // === TWARDA LINIA ZANIKANIA DLA MILESTONES (WORLD SPACE) ===
 // Pokój About jest na Z = -25, więc -25 to drzwi pokoju
@@ -228,8 +228,8 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
                         scrollProgressRef={scrollProgressRef}
                     />
 
-                    {/* === AWARDS MILESTONE === */}
-                    <AwardsMilestone
+                    {/* === SERVICES MILESTONE === */}
+                    <ServicesMilestone
                         z={-(cycleIndex * STORY_CYCLE_LENGTH + 55)}
                         scrollProgressRef={scrollProgressRef}
                     />
@@ -246,6 +246,18 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
                         z={-(cycleIndex * STORY_CYCLE_LENGTH + 135)}
                         scrollProgressRef={scrollProgressRef}
                     />
+
+                    {/* === DOORS MILESTONE === */}
+                    <DoorsMilestone
+                        z={-(cycleIndex * STORY_CYCLE_LENGTH + 175)}
+                        scrollProgressRef={scrollProgressRef}
+                    />
+
+                    {/* === THANK YOU MILESTONE === */}
+                    <ThankYouMilestone
+                        z={-(cycleIndex * STORY_CYCLE_LENGTH + 215)}
+                        scrollProgressRef={scrollProgressRef}
+                    />
                 </group>
             ))}
         </group>
@@ -258,7 +270,7 @@ const InfiniteSkyManager = ({ scrollProgressRef }) => {
  */
 const IntroMilestone = ({ z, scrollProgressRef }) => {
     // Load avatar texture
-    const avatarTexture = useLoader(THREE.TextureLoader, '/textures/about/awatarnachmurce.webp');
+    const avatarTexture = useLoader(THREE.TextureLoader, '/textures/about/awatarnachmurce_clear.png');
     const { camera, viewport } = useThree();
     const isTouch = isTouchDevice();
 
@@ -273,10 +285,9 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
     // Base positions
     const baseY = 2;
 
-    // Calculate aspect ratio
-    // LEGACY FIX: Use original dimensions (2816x1536) to prevent stretching
-    const legacyAspectRatio = 2816 / 1536; 
-    const avatarWidth = 6; // Zwiększony rozmiar awatara na chmurce
+    // Use actual dimensions (1024x1024) to prevent stretching
+    const legacyAspectRatio = 1024 / 1024;
+    const avatarWidth = 9; // Increased avatar size
     const avatarHeight = avatarWidth / legacyAspectRatio;
 
     // Animation: floating + spread apart when close
@@ -344,33 +355,33 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
             {/* Main title - Name (spreads left) */}
             <Text
                 ref={titleRef}
-                position={[0, 5, 0.1]}
+                position={[0, 5.8, 0.1]}
                 fontSize={0.8}
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
                 font="/fonts/RubikScribble-Regular.ttf"
             >
-                TOMASZ SZMAJDA
+                Harshitha Ganesan
             </Text>
 
             {/* Subtitle - Brand (spreads right) */}
             <Text
                 ref={brandRef}
-                position={[0, 4.3, 0.1]}
+                position={[0, 4.9, 0.1]}
                 fontSize={0.45}
                 color="#4a4a4a"
                 anchorX="center"
                 anchorY="middle"
                 font="/fonts/CabinSketch-Regular.ttf"
             >
-                (ITOM)
+                (Achuu)
             </Text>
 
             {/* Avatar on cloud - floating + spreads up-left */}
             <mesh ref={avatarRef} position={[0, baseY, 0]}>
                 <planeGeometry args={[avatarWidth, avatarHeight]} />
-                <meshBasicMaterial color="#e0e0e0"
+                <meshBasicMaterial color="#ffffff"
                     map={avatarTexture}
                     transparent
                     side={THREE.DoubleSide}
@@ -381,7 +392,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
             {/* Motto - Line 1 (spreads right) */}
             <Text
                 ref={motto1Ref}
-                position={[0, 0, 0.1]}
+                position={[0, -1.3, 0.1]}
                 fontSize={0.32}
                 color="#555555"
                 anchorX="center"
@@ -389,13 +400,13 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 font="/fonts/CabinSketch-Regular.ttf"
                 fontStyle="italic"
             >
-                "Crafting digital experiences
+                "Creative Software Developer
             </Text>
 
             {/* Motto - Line 2 (spreads left) */}
             <Text
                 ref={motto2Ref}
-                position={[0, -0.5, 0]}
+                position={[0, -1.9, 0]}
                 fontSize={0.32}
                 color="#555555"
                 anchorX="center"
@@ -403,406 +414,147 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 font="/fonts/CabinSketch-Regular.ttf"
                 fontStyle="italic"
             >
-                that push creative boundaries"
+                App Developer (Mobile Apps) "
             </Text>
         </group>
     );
 };
 
 /**
- * MOCK DATA FOR AWARDS
+ * SERVICES Milestone - 2x2 Grid of Floating Cards
  */
-const AWARDS_DATA = {
-    featured: {
-        id: 'award-featured',
-        layout: 'certificate_grid',
-        title: 'Featured Projects Collection',
-        items: [
-            { label: 'Featured - Awwwards', date: 'May 2025', image: '/textures/about/FEATURED.webp', url: 'https://awwwards.com' },
-            { label: 'Featured - CSS Design Awards', date: 'June 2025', image: '/textures/about/FEATURED.webp', url: 'https://cssdesignawards.com' },
-            { label: 'Featured - The FWA', date: 'July 2025', image: '/textures/about/FEATURED.webp', url: 'https://thefwa.com' },
-            { label: 'Featured - Behance', date: 'August 2025', image: '/textures/about/FEATURED.webp', url: 'https://behance.net' },
-        ],
-        platformConfig: {
-            label: 'HONOR',
-            color: '#1a1a1a',
-            icon: '⭐'
-        }
-    },
-    sotd: {
-        id: 'award-sotd',
-        layout: 'certificate_grid',
-        title: 'Site of the Day Awards',
-        items: [
-            { label: 'SOTD - GSAP', date: 'February 13, 2026', image: '/textures/about/SOTDAYYOUNGMULTIGSAP.webp', url: 'https://www.linkedin.com/posts/greensock_site-of-the-day-young-multi-this-immersive-activity-7427567524940017664-zU2n?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE3TV6UBqXoaJXUN5-1s3ij6SQJwTRAcbCM' },
-            { label: 'SOTD - CSS Winner', date: 'January 24, 2026', image: '/textures/about/SOTDAYYOUNGMULTICSSWINNER.webp', url: 'https://www.csswinner.com/details/young-multi-official-experience/19045' },
-            { label: 'SOTD - Orpetron', date: 'January 29, 2026', image: '/textures/about/SOTDAYYOUNGMULTIORPETRON.webp', url: 'https://orpetron.com/sites/young-multi/' },
-            { label: 'SOTD - Design Nominess', date: 'February 17, 2026', image: '/textures/about/SOTDAYYOUNGMULTIDESIGNNOMINESS.webp', url: 'https://www.designnominees.com/sites/young-multi' }
-        ],
-        platformConfig: {
-            label: 'AWARD',
-            color: '#1a1a1a',
-            icon: '🏆'
-        }
-    },
-    sotm: {
-        id: 'award-sotm',
-        layout: 'certificate_grid',
-        title: 'Site of the Month Awards',
-        items: [],
-        platformConfig: {
-            label: 'AWARD',
-            color: '#1a1a1a',
-            icon: '📅'
-        }
-    },
-    soty: {
-        id: 'award-soty',
-        layout: 'certificate_grid',
-        title: 'Site of the Year Awards',
-        items: [],
-        platformConfig: {
-            label: 'PRESTIGE',
-            color: '#1a1a1a',
-            icon: '👑'
-        }
-    }
-};
-
-/**
- * AWARDS Milestone - Floating Cards
- * SOTY (center), SOTD, SOTM, Featured (behind)
- */
-const AwardsMilestone = ({ z, scrollProgressRef }) => {
-    const { camera, viewport } = useThree();
+const ServiceCard = ({ title, icon, x, y, delay, texture, paintedTexture, scrollProgressRef, z, cardWidth, cardHeight }) => {
     const isTouch = isTouchDevice();
-    const { openOverlay } = useScene();
     const groupRef = useRef();
-    const sotyRef = useRef();
-    const sotdRef = useRef();
-    const sotmRef = useRef();
+    const revealRef = useRef();
+    const paintedRef = useRef();
+    const hideDelayRef = useRef();
+    const [hovered, setHovered] = useState(false);
 
-    // Card reveal refs (driven by button hover)
-    const sotdCardRevealRef = useRef();
-    const sotdCardPaintedRef = useRef();
-    const sotdHideDelayRef = useRef();
-    const sotmCardRevealRef = useRef();
-    const sotmCardPaintedRef = useRef();
-    const sotmHideDelayRef = useRef();
-    const sotyCardRevealRef = useRef();
-    const sotyCardPaintedRef = useRef();
-    const sotyHideDelayRef = useRef();
-
-    // Load textures
-    const sotyTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTY.webp');
-    const sotdTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTD.webp');
-    const sotmTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTM.webp');
-    const sotyPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTY.webp' : '/textures/about/SOTY_painted.webp');
-    const sotdPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTD.webp' : '/textures/about/SOTD_painted.webp');
-    const sotmPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTM.webp' : '/textures/about/SOTM_painted.webp');
-    const buttonTexture = useLoader(THREE.TextureLoader, '/textures/about/button.webp');
-    const buttonPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/button.webp' : '/textures/about/button_painted.webp');
-
-    // Color space fix
-    sotyTexture.colorSpace = THREE.SRGBColorSpace;
-    sotdTexture.colorSpace = THREE.SRGBColorSpace;
-    sotmTexture.colorSpace = THREE.SRGBColorSpace;
-    sotyPaintedTexture.colorSpace = THREE.SRGBColorSpace;
-    sotdPaintedTexture.colorSpace = THREE.SRGBColorSpace;
-    sotmPaintedTexture.colorSpace = THREE.SRGBColorSpace;
-    buttonTexture.colorSpace = THREE.SRGBColorSpace;
-    buttonPaintedTexture.colorSpace = THREE.SRGBColorSpace;
-
-    // Calculate aspect ratios
-    // LEGACY FIX: Use original dimensions for cards (2400x1760) and buttons (894x208)
-    const cardLegacyAspect = 2400 / 1760;
-    const buttonLegacyAspect = 894 / 208;
-
-    // Base height for cards
-    const cardHeight = 2.5;
-
-    // Button dimensions
-    const buttonHeight = 0.35;
-    const buttonWidth = buttonHeight * buttonLegacyAspect;
-    const buttonY = -cardHeight / 2 - buttonHeight / 2 + 0.5;
-
-    // Card hover handler factory
-    const makeCardHoverHandler = (revealRef, paintedRef, hideDelayRef) => (isHovered) => {
+    const handlePointerOver = (e) => {
         if (isTouch) return;
-        if (isHovered) {
-            if (revealRef.current) {
-                gsap.to(revealRef.current, {
-                    uProgress: 1.0,
-                    duration: 0.8,
-                    ease: 'power2.out',
-                    overwrite: true
-                });
-            }
-            if (hideDelayRef.current) hideDelayRef.current.kill();
-            if (paintedRef.current) {
-                paintedRef.current.visible = true;
-                if (paintedRef.current.material) paintedRef.current.material.opacity = 1;
-            }
-        } else {
-            if (revealRef.current) {
-                gsap.to(revealRef.current, {
-                    uProgress: 0.0,
-                    duration: 0.5,
-                    ease: 'power2.out',
-                    overwrite: true
-                });
-            }
-            hideDelayRef.current = gsap.delayedCall(0.55, () => {
-                if (paintedRef.current && paintedRef.current.material) {
-                    paintedRef.current.material.opacity = 0;
-                }
-            });
+        e.stopPropagation();
+        setHovered(true);
+        document.body.style.cursor = 'pointer';
+
+        if (revealRef.current) {
+            gsap.to(revealRef.current, { uProgress: 1.0, duration: 0.8, ease: 'power2.out', overwrite: true });
+        }
+        if (hideDelayRef.current) hideDelayRef.current.kill();
+        if (paintedRef.current) {
+            paintedRef.current.visible = true;
+            if (paintedRef.current.material) paintedRef.current.material.opacity = 1;
         }
     };
 
-    useFrame((state) => {
+    const handlePointerOut = (e) => {
+        if (isTouch) return;
+        e.stopPropagation();
+        setHovered(false);
+        document.body.style.cursor = 'auto';
+
+        if (revealRef.current) {
+            gsap.to(revealRef.current, { uProgress: 0.0, duration: 0.5, ease: 'power2.out', overwrite: true });
+        }
+        hideDelayRef.current = gsap.delayedCall(0.55, () => {
+            if (paintedRef.current && paintedRef.current.material) {
+                paintedRef.current.material.opacity = 0;
+            }
+        });
+    };
+
+    useFrame((state, delta) => {
         if (!groupRef.current) return;
 
         const scrollProgress = scrollProgressRef?.current || 0;
-        const worldZ = ROOM_Z + scrollProgress + z;
-        groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
-        if (!groupRef.current.visible) return;
-
         const distanceZ = z + scrollProgress - 55;
 
-        const revealStart = -120;
-        const revealEnd = -50;
-        let revealFactor = 0;
+        // Spread & reveal animation
+        const revealStart = -110 + delay * 10;
+        const revealEnd = -40;
+        let factor = 0;
 
         if (distanceZ > revealStart && distanceZ < revealEnd) {
-            revealFactor = (distanceZ - revealStart) / (revealEnd - revealStart);
-            revealFactor = Math.min(1, Math.max(0, revealFactor));
-            revealFactor = revealFactor * revealFactor;
+            factor = (distanceZ - revealStart) / (revealEnd - revealStart);
+            factor = Math.min(1, Math.max(0, factor));
+            factor = 1 - Math.pow(1 - factor, 3);
         } else if (distanceZ >= revealEnd) {
-            revealFactor = 1;
+            factor = 1;
         }
 
-        const sotyStart = -80;
-        const sotyEnd = -20;
-        let sotyFactor = 0;
+        const time = state.clock.elapsedTime;
+        const floatY = Math.sin(time * 1.5 + delay * 0.5) * 0.08;
+        const floatX = Math.cos(time * 1.2 + delay * 0.5) * 0.04;
 
-        if (distanceZ > sotyStart && distanceZ < sotyEnd) {
-            sotyFactor = (distanceZ - sotyStart) / (sotyEnd - sotyStart);
-            sotyFactor = Math.min(1, Math.max(0, sotyFactor));
-            sotyFactor = 1 - Math.pow(1 - sotyFactor, 2);
-        } else if (distanceZ >= sotyEnd) {
-            sotyFactor = 1;
-        }
+        groupRef.current.position.x = (x * factor) + floatX;
+        groupRef.current.position.y = (y * factor) + floatY;
 
-        const spreadX = 5;
+        // Gentle tilt based on float
+        groupRef.current.rotation.z = Math.sin(time * 1.5 + delay * 0.5) * 0.02;
 
-        if (sotdRef.current) {
-            sotdRef.current.position.x = -revealFactor * spreadX;
-        }
-        if (sotmRef.current) {
-            sotmRef.current.position.x = revealFactor * spreadX;
-        }
+        const targetScale = hovered ? 1.08 : 1.0;
+        groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 8 * delta);
+    });
 
-        if (sotyRef.current) {
-            sotyRef.current.position.y = 0.5 + sotyFactor * 2.5;
-        }
+    return (
+        <group ref={groupRef} position={[0, 0, 0]}>
+            <mesh ref={paintedRef} position={[0, 0, -0.001]} visible={true}>
+                <planeGeometry args={[cardWidth, cardHeight]} />
+                <meshBasicMaterial color="#e0e0e0" map={paintedTexture} transparent opacity={0} side={THREE.DoubleSide} alphaTest={0.5} />
+            </mesh>
+            <mesh onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
+                <planeGeometry args={[cardWidth, cardHeight]} />
+                <revealBasicMaterial ref={revealRef} map={texture} transparent side={THREE.DoubleSide} uProgress={0.0} />
+            </mesh>
+            {/* Content overlay */}
+            <Text position={[0, 0.4, 0.05]} fontSize={0.6} color="#1a1a1a" anchorX="center" anchorY="middle">
+                {icon}
+            </Text>
+            <Text position={[0, -0.2, 0.05]} fontSize={0.28} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/CabinSketch-Bold.ttf" textAlign="center" lineHeight={1.2}>
+                {title}
+            </Text>
+        </group>
+    );
+};
+
+const ServicesMilestone = ({ z, scrollProgressRef }) => {
+    const { camera, viewport } = useThree();
+    const isTouch = isTouchDevice();
+    const groupRef = useRef();
+
+    // Reusing SOTY texture as it looks like a nice sketch card
+    const cardTexture = useLoader(THREE.TextureLoader, '/textures/about/SOTY.webp');
+    const cardPaintedTexture = useLoader(THREE.TextureLoader, isTouch ? '/textures/about/SOTY.webp' : '/textures/about/SOTY_painted.webp');
+
+    cardTexture.colorSpace = THREE.SRGBColorSpace;
+    cardPaintedTexture.colorSpace = THREE.SRGBColorSpace;
+
+    const cardLegacyAspect = 2400 / 1760;
+    const cardHeight = 2.4;
+    const cardWidth = cardHeight * cardLegacyAspect;
+
+    const services = [
+        { title: 'Website\nDevelopment', icon: '💻', x: -cardWidth * 0.58, y: cardHeight * 0.55, delay: 0 },
+        { title: 'Landing Page\nDesign', icon: '🎨', x: cardWidth * 0.63, y: cardHeight * 0.55, delay: 1 },
+        { title: 'E-commerce\nDevelopment', icon: '🛍️', x: -cardWidth * 0.65, y: -cardHeight * 0.65, delay: 2 },
+        { title: 'Mobile App\nDevelopment', icon: '📱', x: cardWidth * 0.68, y: -cardHeight * 0.75, delay: 3 }
+    ];
+
+    useFrame((state) => {
+        if (!groupRef.current) return;
+        const scrollProgress = scrollProgressRef?.current || 0;
+        const worldZ = ROOM_Z + scrollProgress + z;
+        groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
     });
 
     return (
         <group ref={groupRef} position={[0, 2, z]}>
-            {/* Title */}
-            <Text
-                position={[0, 4, 0]}
-                fontSize={1.2}
-                color="#1a1a1a"
-                anchorX="center"
-                anchorY="middle"
-                font="/fonts/RubikScribble-Regular.ttf"
-            >
-                AWARDS
+            <Text position={[0, 4.5, 0.5]} fontSize={1.2} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/RubikScribble-Regular.ttf">
+                SERVICES
             </Text>
-
-            {/* === SOTD (behind SOTY, rendered second) === */}
-            <group ref={sotdRef} position={[0, 0.5, -0.5]}>
-                {/* Painted card (behind) - hidden until button hover */}
-                <mesh ref={sotdCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={sotdPaintedTexture}
-                        transparent
-                        opacity={0}
-                        side={THREE.DoubleSide}
-                        alphaTest={0.5}
-                    />
-                </mesh>
-                {/* Sketch card (front) with reveal */}
-                <mesh>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <revealBasicMaterial
-                        ref={sotdCardRevealRef}
-                        map={sotdTexture}
-                        transparent
-                        side={THREE.DoubleSide}
-                        uProgress={0.0}
-                    />
-                </mesh>
-                {/* BUTTON */}
-                <AwardButton
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        openOverlay(AWARDS_DATA.sotd);
-                    }}
-                    texture={buttonTexture}
-                    paintedTexture={buttonPaintedTexture}
-                    width={buttonWidth}
-                    height={buttonHeight}
-                    position={[0, buttonY, 0.05]}
-                    onHoverChange={makeCardHoverHandler(sotdCardRevealRef, sotdCardPaintedRef, sotdHideDelayRef)}
-                />
-                {/* AWARD LABEL */}
-                <Text
-                    position={[0, 0.95, 0.01]}
-                    fontSize={0.45}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
-                >
-                    SOTD
-                </Text>
-                {/* AWARD COUNT */}
-                <Text
-                    position={[-0.05, 0, 0.01]}
-                    fontSize={0.8}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
-                >
-                    4
-                </Text>
-            </group>
-
-            {/* === SOTM (behind SOTY, rendered third) === */}
-            <group ref={sotmRef} position={[0, 0.5, -0.2]}>
-                {/* Painted card (behind) - hidden until button hover */}
-                <mesh ref={sotmCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={sotmPaintedTexture}
-                        transparent
-                        opacity={0}
-                        side={THREE.DoubleSide}
-                        alphaTest={0.5}
-                    />
-                </mesh>
-                {/* Sketch card (front) with reveal */}
-                <mesh>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <revealBasicMaterial
-                        ref={sotmCardRevealRef}
-                        map={sotmTexture}
-                        transparent
-                        side={THREE.DoubleSide}
-                        uProgress={0.0}
-                    />
-                </mesh>
-                {/* BUTTON */}
-                <AwardButton
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        openOverlay(AWARDS_DATA.sotm);
-                    }}
-                    texture={buttonTexture}
-                    paintedTexture={buttonPaintedTexture}
-                    width={buttonWidth}
-                    height={buttonHeight}
-                    position={[0, buttonY, 0.05]}
-                    onHoverChange={makeCardHoverHandler(sotmCardRevealRef, sotmCardPaintedRef, sotmHideDelayRef)}
-                />
-                {/* AWARD LABEL */}
-                <Text
-                    position={[0, 0.95, 0.01]}
-                    fontSize={0.45}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
-                >
-                    SOTM
-                </Text>
-                {/* AWARD COUNT */}
-                <Text
-                    position={[-0.05, 0, 0.01]}
-                    fontSize={0.8}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
-                >
-                    0
-                </Text>
-            </group>
-
-            {/* === SOTY (front, center, rendered LAST = always on top) === */}
-            <group ref={sotyRef} position={[0, 0.5, 0]}>
-                {/* Painted card (behind) - hidden until button hover */}
-                <mesh ref={sotyCardPaintedRef} position={[0, 0, -0.001]} visible={true}>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={sotyPaintedTexture}
-                        transparent
-                        opacity={0}
-                        side={THREE.DoubleSide}
-                        alphaTest={0.5}
-                    />
-                </mesh>
-                {/* Sketch card (front) with reveal */}
-                <mesh>
-                    <planeGeometry args={[cardHeight * cardLegacyAspect, cardHeight]} />
-                    <revealBasicMaterial
-                        ref={sotyCardRevealRef}
-                        map={sotyTexture}
-                        transparent
-                        side={THREE.DoubleSide}
-                    />
-                </mesh>
-                {/* BUTTON */}
-                <AwardButton
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        openOverlay(AWARDS_DATA.soty);
-                    }}
-                    texture={buttonTexture}
-                    paintedTexture={buttonPaintedTexture}
-                    width={buttonWidth}
-                    height={buttonHeight}
-                    position={[0, buttonY, 0.05]}
-                    onHoverChange={makeCardHoverHandler(sotyCardRevealRef, sotyCardPaintedRef, sotyHideDelayRef)}
-                />
-                {/* AWARD LABEL */}
-                <Text
-                    position={[0, 0.95, 0.01]}
-                    fontSize={0.45}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
-                >
-                    SOTY
-                </Text>
-                {/* AWARD COUNT */}
-                <Text
-                    position={[-0.05, 0, 0.01]}
-                    fontSize={0.8}
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
-                >
-                    0
-                </Text>
-            </group>
+            {services.map((svc, i) => (
+                <ServiceCard key={i} {...svc} texture={cardTexture} paintedTexture={cardPaintedTexture} scrollProgressRef={scrollProgressRef} z={z} cardWidth={cardWidth} cardHeight={cardHeight} />
+            ))}
         </group>
     );
 };
@@ -815,76 +567,34 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
     const { camera, viewport } = useThree();
     const isTouch = isTouchDevice();
     const groupRef = useRef();
-    const uoRef = useRef();
-    const freelanceRef = useRef();
+    const revealFactorRef = useRef(0);
+    const timeRef = useRef(0);
 
-    // Load textures
-    const uoTexture = useLoader(THREE.TextureLoader, '/textures/about/uowyspa.webp');
-    const freelanceTexture = useLoader(THREE.TextureLoader, '/textures/about/freelancewyspa.webp');
+    const texA = useLoader(THREE.TextureLoader, '/textures/about/freelancewyspa.webp');
+    const patchTex = useLoader(THREE.TextureLoader, '/textures/about/button.webp');
+    texA.colorSpace = THREE.SRGBColorSpace;
+    patchTex.colorSpace = THREE.SRGBColorSpace;
 
-    // Texture settings
-    uoTexture.colorSpace = THREE.SRGBColorSpace;
-    freelanceTexture.colorSpace = THREE.SRGBColorSpace;
+    const iH = 3.3; // Slightly smaller to ensure all 4 fit on screen
+    const iW = iH * (2816 / 1536);
 
-    // Calculate aspect ratios to keep images 1:1 (not stretched)
-    // LEGACY FIX: Use original dimensions (2816x1536)
-    const islandLegacyAspect = 2816 / 1536;
-    const uoAspect = islandLegacyAspect;
-    const freelanceAspect = islandLegacyAspect;
-
-    // Base height for islands - width will adjust automatically
-    const islandHeight = 4.5;
+    // Use freelance texture (texA) for all 4 islands
+    // Perfectly aligned rows: Top row at y=2.0, Bottom row at y=-0.8 (shifted up so it doesn't cut off)
+    const islands = [
+        { texture: texA, year: '2023', role: 'Career Start', xPos: -3.4, yPos: 2.0, floatPhase: 0.0, floatSpeed: 0.45, revealDelay: 0.00 },
+        { texture: texA, year: '2024', role: 'Fullstack Developer', xPos: 3.4, yPos: 2.0, floatPhase: 1.5, floatSpeed: 0.50, revealDelay: 0.10 },
+        { texture: texA, year: '2025', role: 'Mobile App Developer', xPos: -3.4, yPos: -0.8, floatPhase: 3.0, floatSpeed: 0.42, revealDelay: 0.20 },
+        { texture: texA, year: '2026', role: 'Designer & Trainer', xPos: 3.4, yPos: -0.8, floatPhase: 4.5, floatSpeed: 0.48, revealDelay: 0.30 },
+    ];
 
     useFrame((state) => {
         if (!groupRef.current) return;
-
-        // === TWARDA LINIA CLIP (RĘCZNE OBLICZENIE WORLD Z) ===
         const scrollProgress = scrollProgressRef?.current || 0;
         const worldZ = ROOM_Z + scrollProgress + z;
         groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
-        if (!groupRef.current.visible) return;
-
-        const time = state.clock.elapsedTime;
-
-        // FIX: Use consistent distance based on scrollProgress + offset
-        const distanceZ = z + scrollProgress - 55;
-
-        // Reveal effect (islands float up from below clouds)
-        // === EDYTUJ TUTAJ (JOURNEY) ===
-        const revealStart = -100; // Wcześniejszy start
-        const revealEnd = -20;
-        let revealFactor = 0;
-
-        if (distanceZ > revealStart && distanceZ < revealEnd) {
-            revealFactor = (distanceZ - revealStart) / (revealEnd - revealStart);
-            revealFactor = Math.min(1, Math.max(0, revealFactor));
-            revealFactor = 1 - Math.pow(1 - revealFactor, 2);
-        } else if (distanceZ >= revealEnd) {
-            revealFactor = 1;
-        }
-
-        // Floating animation (bobbing)
-        // UO Island (Left)
-        if (uoRef.current) {
-            // === EDYTUJ POZYCJE TUTAJ (UO) ===
-            const startY = -2;
-            const endY = 1.5;
-
-            const currentBaseY = startY + revealFactor * (endY - startY);
-            uoRef.current.position.y = currentBaseY + Math.sin(time * 0.5) * 0.2;
-            uoRef.current.rotation.z = Math.sin(time * 0.3) * 0.05;
-        }
-
-        // Freelance Island (Right)
-        if (freelanceRef.current) {
-            // === EDYTUJ POZYCJE TUTAJ (Freelance) ===
-            const startY = -1;
-            const endY = 2.5;
-
-            const currentBaseY = startY + revealFactor * (endY - startY);
-            freelanceRef.current.position.y = currentBaseY + Math.sin(time * 0.4 + 2) * 0.25;
-            freelanceRef.current.rotation.z = Math.sin(time * 0.2 + 1) * -0.05;
-        }
+        timeRef.current = state.clock.elapsedTime;
+        const dist = z + scrollProgress - 55;
+        revealFactorRef.current = Math.min(1, Math.max(0, (dist + 100) / 80));
     });
 
     return (
@@ -913,51 +623,118 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                 My path so far...
             </Text>
 
-            {/* === UO ISLAND (Left) === */}
-            <group ref={uoRef} position={[-3.5, -1, 0]}>
-                <mesh>
-                    <planeGeometry args={[islandHeight * uoAspect, islandHeight]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={uoTexture}
-                        transparent
-                        side={THREE.DoubleSide}
-                    />
-                </mesh>
-                {/* NAPIS NA WYSPIE (UO) - EDYTUJ TUTAJ */}
-                <Text
-                    position={[0.1, -0.85, 0.1]} // POZYCJA (X, Y, Z)
-                    fontSize={0.4}           // WIELKOŚĆ
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
-                >
-                    2025-NOW
-                </Text>
-            </group>
+            {islands.map((isl, i) => (
+                <JourneyIsland
+                    key={`island-${i}`}
+                    texture={isl.texture}
+                    patchTexture={patchTex}
+                    islandW={iW}
+                    islandH={iH}
+                    year={isl.year}
+                    role={isl.role}
+                    xPos={isl.xPos}
+                    yPos={isl.yPos}
+                    floatPhase={isl.floatPhase}
+                    floatSpeed={isl.floatSpeed}
+                    revealDelay={isl.revealDelay}
+                    revealFactorRef={revealFactorRef}
+                    timeRef={timeRef}
+                />
+            ))}
+        </group>
+    );
+};
 
-            {/* === FREELANCE ISLAND (Right) === */}
-            <group ref={freelanceRef} position={[3.5, -2, 0.5]}>
-                <mesh>
-                    <planeGeometry args={[islandHeight * freelanceAspect, islandHeight]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={freelanceTexture}
-                        transparent
-                        side={THREE.DoubleSide}
-                    />
-                </mesh>
-                {/* NAPIS NA WYSPIE (Freelance) - EDYTUJ TUTAJ */}
-                <Text
-                    position={[0, -0.65, 0.1]} // POZYCJA (X, Y, Z)
-                    fontSize={0.5}           // WIELKOŚĆ
-                    color="#1a1a1a"
-                    anchorX="center"
-                    anchorY="middle"
-                    font="/fonts/CabinSketch-Bold.ttf"
-                >
-                    2023-NOW
-                </Text>
-            </group>
+const JourneyIsland = ({
+    texture, patchTexture, islandW, islandH,
+    year, role,
+    xPos, yPos, floatPhase, floatSpeed,
+    revealDelay, revealFactorRef, timeRef,
+}) => {
+    const ref = useRef();
+
+    useFrame((state) => {
+        if (!ref.current) return;
+
+        const revealFactor = revealFactorRef?.current ?? 0;
+        const time = timeRef?.current ?? state.clock.elapsedTime;
+
+        // Staggered slide-up reveal
+        const delayed = Math.min(1, Math.max(0, (revealFactor - revealDelay) / (1 - revealDelay + 0.001)));
+        const eased = 1 - Math.pow(1 - delayed, 3);
+
+        // Slide up from below
+        ref.current.position.y = (yPos - 5) + eased * 5;
+        ref.current.position.x = xPos;
+
+        // Gentle floating bob (after reveal)
+        ref.current.position.y += Math.sin(time * floatSpeed + floatPhase) * 0.15 * eased;
+
+        // Very subtle tilt
+        ref.current.rotation.z = Math.sin(time * floatSpeed * 0.5 + floatPhase) * 0.025 * eased;
+    });
+
+    // The baked text is in the top quarter of the island.
+    // Shifted slightly up and made taller to completely hide the stone text peeking over the top.
+    const patchY = islandH * 0.24;
+    const patchW = islandW * 0.95;
+    const patchH = islandH * 0.38;
+
+    // The hanging wooden sign is near the bottom (freelance texture specific)
+    const yearY = -islandH * 0.145;
+
+    return (
+        <group ref={ref} position={[xPos, yPos - 5, 0]}>
+            {/* Island image */}
+            <mesh position={[0, 0, 0]}>
+                <planeGeometry args={[islandW, islandH]} />
+                <meshBasicMaterial
+                    map={texture}
+                    transparent
+                    side={THREE.DoubleSide}
+                    depthWrite={false}
+                />
+            </mesh>
+
+            {/* --- PAPER PATCH (Covers the baked text beautifully) --- */}
+            <mesh position={[0, patchY, 0.05]}>
+                <planeGeometry args={[patchW, patchH]} />
+                <meshBasicMaterial
+                    map={patchTexture}
+                    transparent
+                    depthWrite={false}
+                />
+            </mesh>
+
+            {/* Role text (on the cloud patch) */}
+            <Text
+                position={[0, patchY, 0.1]}
+                fontSize={0.34}
+                color="#111111"
+                anchorX="center"
+                anchorY="middle"
+                font="/fonts/CabinSketch-Bold.ttf"
+                textAlign="center"
+                maxWidth={patchW * 0.8}
+                lineHeight={1.1}
+                renderOrder={5}
+            >
+                {role}
+            </Text>
+
+            {/* Year text (on the bottom hanging wooden sign) */}
+            <Text
+                position={[0, yearY, 0.1]}
+                fontSize={0.45}
+                color="#1a1a1a"
+                anchorX="center"
+                anchorY="middle"
+                font="/fonts/CabinSketch-Bold.ttf"
+                letterSpacing={0.06}
+                renderOrder={5}
+            >
+                {year}
+            </Text>
         </group>
     );
 };
@@ -1037,7 +814,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
         'GSAPduzybalon.webp': 1.0, // GSAP balloon is square
         'default_small_medium': 631 / 1482 // Common ratio for others
     };
-    
+
     const filename = config.texture.split('/').pop();
     const aspect = legacyAspects[filename] || legacyAspects['default_small_medium'];
     const baseHeight = SIZE_MULTIPLIERS[config.size];
@@ -1426,5 +1203,242 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
 // =========================================
 // NOTE: Use this component inside the loop!
 // =========================================
+
+const DoorsMilestone = ({ z, scrollProgressRef }) => {
+    const { camera, viewport } = useThree();
+    const isTouch = isTouchDevice();
+    const groupRef = useRef();
+
+    useFrame((state) => {
+        if (!groupRef.current) return;
+        const scrollProgress = scrollProgressRef?.current || 0;
+        const worldZ = ROOM_Z + scrollProgress + z;
+        groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
+    });
+
+    const doors = [
+        { label: 'About Us', roomId: 'AboutMain', type: 'about', x: -7.5, y: 0.5, delay: 0 },
+        { label: 'Projects', roomId: 'Gallery', type: 'projekty', x: 0, y: 0.5, delay: 1 },
+        { label: 'Contact', roomId: 'Contact', type: 'kontakt', x: 7.5, y: 0.5, delay: 2 }
+    ];
+
+    return (
+        <group ref={groupRef} position={[0, 0, z]}>
+            <Text position={[0, 5.5, 0.5]} fontSize={1.2} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/RubikScribble-Regular.ttf">
+                EXPLORE
+            </Text>
+            <Text position={[0, 4.5, 0.5]} fontSize={0.35} color="#555555" anchorX="center" anchorY="middle" font="/fonts/CabinSketch-Regular.ttf">
+                Where to next?
+            </Text>
+            {doors.map((door, i) => (
+                <FloatingDoor key={i} {...door} scrollProgressRef={scrollProgressRef} z={z} />
+            ))}
+        </group>
+    );
+};
+
+const FloatingDoor = ({ label, roomId, type, x, y, delay, z, scrollProgressRef }) => {
+    const isTouch = isTouchDevice();
+    const groupRef = useRef();
+    const revealRef = useRef();
+    const paintedRef = useRef();
+    const hideDelayRef = useRef();
+    const [hovered, setHovered] = useState(false);
+
+    // Use proper themed clean door textures instead of the sticker one
+    const texUrl = `/textures/corridor/doors/drzwi${type}.webp`;
+    const paintedTexUrl = isTouch ? texUrl : `/textures/corridor/doors/drzwi${type}_painted.webp`;
+
+    const texture = useLoader(THREE.TextureLoader, texUrl);
+    const paintedTexture = useLoader(THREE.TextureLoader, paintedTexUrl);
+
+    texture.colorSpace = THREE.SRGBColorSpace;
+    paintedTexture.colorSpace = THREE.SRGBColorSpace;
+
+    const { teleportToRoom } = useScene();
+
+    // Increased size while maintaining the 1.2 x 2.2 aspect ratio of the corridor doors
+    const doorWidth = 3.6;
+    const doorHeight = 6.6;
+
+    const handlePointerOver = (e) => {
+        if (isTouch) return;
+        e.stopPropagation();
+        setHovered(true);
+        document.body.style.cursor = 'pointer';
+
+        if (revealRef.current) {
+            gsap.to(revealRef.current, { uProgress: 1.0, duration: 0.8, ease: 'power2.out', overwrite: true });
+        }
+        if (hideDelayRef.current) hideDelayRef.current.kill();
+        if (paintedRef.current) {
+            paintedRef.current.visible = true;
+            if (paintedRef.current.material) paintedRef.current.material.opacity = 1;
+        }
+    };
+
+    const handlePointerOut = (e) => {
+        if (isTouch) return;
+        e.stopPropagation();
+        setHovered(false);
+        document.body.style.cursor = 'auto';
+
+        if (revealRef.current) {
+            gsap.to(revealRef.current, { uProgress: 0.0, duration: 0.5, ease: 'power2.out', overwrite: true });
+        }
+        hideDelayRef.current = gsap.delayedCall(0.55, () => {
+            if (paintedRef.current && paintedRef.current.material) {
+                paintedRef.current.material.opacity = 0;
+            }
+        });
+    };
+
+    const handleClick = (e) => {
+        e.stopPropagation();
+        document.body.style.cursor = 'auto';
+        if (roomId === 'AboutMain') {
+            window.location.href = '/about';
+        } else if (roomId === 'Contact') {
+            window.location.href = '/contact';
+        } else if (roomId === 'Gallery') {
+            window.location.href = '/projects';
+        } else if (roomId) {
+            teleportToRoom(roomId);
+        }
+    };
+
+    useFrame((state, delta) => {
+        if (!groupRef.current) return;
+
+        const scrollProgress = scrollProgressRef?.current || 0;
+        const distanceZ = z + scrollProgress - 55;
+
+        // Spread & reveal animation
+        const revealStart = -130 + delay * 10;
+        const revealEnd = -40;
+        let factor = 0;
+
+        if (distanceZ > revealStart && distanceZ < revealEnd) {
+            factor = (distanceZ - revealStart) / (revealEnd - revealStart);
+            factor = Math.min(1, Math.max(0, factor));
+            factor = 1 - Math.pow(1 - factor, 3);
+        } else if (distanceZ >= revealEnd) {
+            factor = 1;
+        }
+
+        const time = state.clock.elapsedTime;
+        const floatY = Math.sin(time * 1.5 + delay * 0.5) * 0.15;
+        const floatX = Math.cos(time * 1.2 + delay * 0.5) * 0.08;
+
+        const startY = y - 10;
+        const currentY = startY + (y - startY) * factor + floatY;
+
+        groupRef.current.position.x = x + floatX;
+        groupRef.current.position.y = currentY;
+        groupRef.current.rotation.z = Math.sin(time * 1.5 + delay * 0.5) * 0.03;
+
+        const targetScale = hovered ? 1.05 : 1.0;
+        groupRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 8 * delta);
+    });
+
+    return (
+        <group ref={groupRef} position={[x, y - 10, 0]}>
+            <mesh ref={paintedRef} position={[0, 0, -0.001]} visible={true}>
+                <planeGeometry args={[doorWidth, doorHeight]} />
+                <meshBasicMaterial color="#e0e0e0" map={paintedTexture} transparent opacity={0} side={THREE.DoubleSide} alphaTest={0.5} />
+            </mesh>
+            <mesh onPointerOver={handlePointerOver} onPointerOut={handlePointerOut} onClick={handleClick}>
+                <planeGeometry args={[doorWidth, doorHeight]} />
+                <revealBasicMaterial ref={revealRef} map={texture} transparent side={THREE.DoubleSide} uProgress={0.0} alphaTest={0.1} depthWrite={false} />
+            </mesh>
+
+            {/* Label in the center of the door */}
+            <mesh position={[0, 0.1, 0.04]}>
+                <planeGeometry args={[label.length * 0.25 + 0.8, 1.2]} />
+                <meshBasicMaterial color="#f0f0f0" transparent opacity={0.85} />
+            </mesh>
+            <Text position={[0, 0.1, 0.05]} fontSize={0.7} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/CabinSketch-Bold.ttf">
+                {label}
+            </Text>
+        </group>
+    );
+};
+
+const ConfettiParticle = ({ position, color, delay }) => {
+    const meshRef = useRef();
+    useFrame((state) => {
+        if (!meshRef.current) return;
+        const time = state.clock.elapsedTime + delay;
+        meshRef.current.position.y = position[1] + Math.sin(time * 1.5) * 0.8;
+        meshRef.current.position.x = position[0] + Math.cos(time * 1.2) * 0.3;
+        meshRef.current.rotation.x = time * 2.5;
+        meshRef.current.rotation.y = time * 2;
+    });
+    return (
+        <mesh ref={meshRef} position={position}>
+            <boxGeometry args={[0.25, 0.25, 0.05]} />
+            <meshBasicMaterial color={color} />
+        </mesh>
+    );
+};
+
+const ThankYouMilestone = ({ z, scrollProgressRef }) => {
+    const { camera } = useThree();
+    const groupRef = useRef();
+    const textRef = useRef();
+
+    useFrame((state) => {
+        if (!groupRef.current) return;
+        const scrollProgress = scrollProgressRef?.current || 0;
+        const worldZ = ROOM_Z + scrollProgress + z;
+        groupRef.current.visible = worldZ < MILESTONE_CORRIDOR_CLIP_Z;
+
+        // Gentle floating animation
+        const time = state.clock.elapsedTime;
+        if (textRef.current) {
+            textRef.current.position.y = 4 + Math.sin(time * 2) * 0.2;
+            textRef.current.rotation.z = Math.sin(time * 1.5) * 0.02;
+        }
+    });
+
+    // Generate static confetti configuration once
+    const [confetti] = useState(() => {
+        const confettiColors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#9D50BB'];
+        return Array.from({ length: 35 }).map(() => ({
+            position: [
+                (Math.random() - 0.5) * 18,
+                (Math.random() - 0.5) * 10 + 4,
+                (Math.random() - 0.5) * 2
+            ],
+            color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+            delay: Math.random() * 5
+        }));
+    });
+
+    return (
+        <group ref={groupRef} position={[0, 0, z]}>
+            <group ref={textRef}>
+                <Text position={[0, 0, 0.5]} fontSize={2.5} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/RubikScribble-Regular.ttf">
+                    THANK YOU
+                </Text>
+
+                <Text position={[0, -1.8, 0.5]} fontSize={0.6} color="#555555" anchorX="center" anchorY="middle" font="/fonts/CabinSketch-Bold.ttf">
+                    For exploring my journey
+                </Text>
+
+                {/* Decorative background behind text */}
+                <mesh position={[0, -0.4, 0.1]}>
+                    <planeGeometry args={[16, 6]} />
+                    <meshBasicMaterial color="#ffffff" transparent opacity={0.7} />
+                </mesh>
+            </group>
+
+            {/* Confetti Particles */}
+            {confetti.map((props, i) => (
+                <ConfettiParticle key={i} {...props} />
+            ))}
+        </group>
+    );
+};
 
 export default InfiniteSkyManager;

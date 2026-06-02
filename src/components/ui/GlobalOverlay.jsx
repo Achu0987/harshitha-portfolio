@@ -73,17 +73,22 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
 
     const label = content.platformConfig?.label || 'Content';
 
-    // GSAP TextPlugin typing effect for description
+    // GSAP cinematic word-by-word reveal effect
     const descriptionRef = useRef(null);
     useEffect(() => {
         if (isOpen && content.description && descriptionRef.current && content.layout !== 'certificate_grid') {
-            gsap.killTweensOf(descriptionRef.current);
-            gsap.fromTo(descriptionRef.current,
-                { text: "" },
+            const words = descriptionRef.current.children;
+            gsap.killTweensOf(words);
+            gsap.fromTo(words,
+                { opacity: 0, y: 15, filter: 'blur(5px)', scale: 0.95 },
                 { 
-                    text: content.description, 
-                    duration: Math.min(2.5, content.description.length * 0.015), 
-                    ease: "none", 
+                    opacity: 1, 
+                    y: 0,
+                    filter: 'blur(0px)',
+                    scale: 1,
+                    duration: 0.8, 
+                    stagger: 0.04, // words come one by one
+                    ease: "power2.out", 
                     delay: 0.3 
                 }
             );
@@ -523,7 +528,11 @@ const ContentCard = ({ content, isOpen, onClose, isMobile }) => {
                                 minHeight: '80px', // Prevent layout jump while typing
                                 ...getStaggerStyle(300)
                             }}>
-                                {content.description}
+                                {content.description?.split(' ').map((word, i) => (
+                                    <span key={i} style={{ display: 'inline-block', marginRight: '0.25em' }}>
+                                        {word}
+                                    </span>
+                                ))}
                             </p>
 
                             {/* Action Button */}

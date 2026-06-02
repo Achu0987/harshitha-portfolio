@@ -28,11 +28,11 @@ import './styles/main.scss';
 // --- CONDITIONAL ASSET PRELOADING ---
 // On high-end devices, preloads everything for zero stutter.
 // On mobile/low-end devices, only preloads core textures to prevent Out Of Memory crashes.
-import { 
-  ENTRANCE_TEXTURES, 
-  CORRIDOR_TEXTURES, 
+import {
+  ENTRANCE_TEXTURES,
+  CORRIDOR_TEXTURES,
   UI_TEXTURES,
-  PRELOAD_ALL, 
+  PRELOAD_ALL,
   PRELOAD_LOADER,
   ABOUT_TEXTURES,
   IMAGE_ASSETS,
@@ -68,7 +68,7 @@ if (isLowEnd) {
 } else {
   const filteredAll = filterTexturesByDevice(PRELOAD_ALL, supportsHover);
   const filteredLoader = filterTexturesByDevice(PRELOAD_LOADER, supportsHover);
-  
+
   filteredAll.forEach(path => useTexture.preload(path));
   filteredLoader.forEach(path => useLoader.preload(TextureLoader, path));
 }
@@ -92,19 +92,17 @@ const GlobalAudioEnabler = () => {
   return null;
 };
 
-// Scene background using corridor wall texture (static, no animation)
+// Scene background using solid color to match new painted aesthetic
 const PaperSceneBackground = () => {
   const { scene } = useThree();
-  const texture = useTexture('/textures/paper-texture.webp');
 
   useEffect(() => {
-    texture.colorSpace = THREE.SRGBColorSpace;
-    scene.background = texture;
+    scene.background = new THREE.Color("#E8ECEF");
 
     return () => {
       scene.background = null;
     };
-  }, [scene, texture]);
+  }, [scene]);
 
   return null;
 };
@@ -124,6 +122,7 @@ function AppContent() {
   const handleSceneReady = useCallback(() => {
     requestAnimationFrame(() => {
       setSceneReady(true);
+      setIsLoaded(true); // Automatically set isLoaded since Preloader is disabled
     });
   }, []);
 
@@ -136,7 +135,7 @@ function AppContent() {
           <div className="canvas-wrapper">
             <Canvas
               camera={{
-                position: [0, 0.2, 28],
+                position: [0, 0.2, -30],
                 fov: 60,
                 near: 0.1,
                 far: 150
@@ -151,8 +150,8 @@ function AppContent() {
               dpr={settings.dpr}
               shadows={settings.shadows}
             >
-              <color attach="background" args={['#fafafa']} />
-              <fog attach="fog" args={['#fafafa', 15, 50]} />
+              <color attach="background" args={['#E8ECEF']} />
+              <fog attach="fog" args={['#E8ECEF', 15, 50]} />
 
               {/* Scale performance down if fps drops */}
               <PerformanceMonitor
@@ -185,11 +184,12 @@ function AppContent() {
             </>
           )}
 
-          {/* 2D Preloader */}
+          {/* 2D Preloader 
           <Preloader
             ready={sceneReady}
             onComplete={() => setIsLoaded(true)}
           />
+          */}
         </div>
       </SceneProvider>
     </AudioProvider>

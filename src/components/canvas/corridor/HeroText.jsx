@@ -54,12 +54,17 @@ const HeroText = ({ position = [0, 0.3, 0] }) => {
     // Pre-allocate Vector3 to avoid per-frame garbage collection
     const worldPosVec = useRef(new THREE.Vector3());
 
-    // Letter positions for ITOM split effect
+    // Letter positions for HARSHITHA split effect
     const letters = useMemo(() => [
-        { char: 'I', baseX: -0.95, splitDir: -1.6, delay: 0 },
-        { char: 'T', baseX: -0.43, splitDir: -0.6, delay: 0 },
-        { char: 'O', baseX: 0.23, splitDir: 0.6, delay: 0 },
-        { char: 'M', baseX: 0.95, splitDir: 1.8, delay: 0 },
+        { char: 'H', baseX: -2.0, splitDir: -2.5, delay: 0 },
+        { char: 'A', baseX: -1.5, splitDir: -2.0, delay: 0 },
+        { char: 'R', baseX: -1.0, splitDir: -1.5, delay: 0 },
+        { char: 'S', baseX: -0.5, splitDir: -0.8, delay: 0 },
+        { char: 'H', baseX: 0.0, splitDir: 0.0, delay: 0 },
+        { char: 'I', baseX: 0.5, splitDir: 0.8, delay: 0 },
+        { char: 'T', baseX: 1.0, splitDir: 1.5, delay: 0 },
+        { char: 'H', baseX: 1.5, splitDir: 2.0, delay: 0 },
+        { char: 'A', baseX: 2.0, splitDir: 2.5, delay: 0 },
     ], []);
 
     // Tagline words for split effect

@@ -77,6 +77,12 @@ const EntranceDoors = ({
     const windowSketchTexture = useTexture('/textures/entrance/window_sketch.webp');
     const avatarWindowTexture = useTexture('/textures/entrance/avatar_window.webp');
     const treeTexture = useTexture('/textures/entrance/tree_sketch.webp');
+    const treeUniforms = useMemo(() => ({
+        uMap: { value: treeTexture },
+        uColorTop: { value: new THREE.Color('#658b54') },
+        uColorBottom: { value: new THREE.Color('#8b5a2b') },
+        uSplit: { value: 0.35 }
+    }), [treeTexture]);
     const mouseTexture = useTexture('/textures/entrance/mouse_hanging.webp');
     const potTexture = useTexture('/textures/entrance/pot_with_duck.webp');
     const bugTexture = useTexture('/textures/entrance/bug_sketch.webp');
@@ -952,11 +958,33 @@ const EntranceDoors = ({
                 {/* Tree */}
                 <mesh position={[0, 0, 0]}>
                     <planeGeometry args={[6, 8]} />
-                    <meshBasicMaterial color="#e0e0e0"
-                        map={treeTexture}
+                    <shaderMaterial
                         transparent={true}
-                        alphaTest={0.01}
+                        side={THREE.DoubleSide}
                         depthWrite={false}
+                        uniforms={treeUniforms}
+                        vertexShader={`
+                            varying vec2 vUv;
+                            void main() {
+                                vUv = uv;
+                                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                            }
+                        `}
+                        fragmentShader={`
+                            uniform sampler2D uMap;
+                            uniform vec3 uColorTop;
+                            uniform vec3 uColorBottom;
+                            uniform float uSplit;
+                            varying vec2 vUv;
+                            
+                            void main() {
+                                vec4 texColor = texture2D(uMap, vUv);
+                                if (texColor.a < 0.01) discard;
+                                float mixFactor = smoothstep(uSplit - 0.05, uSplit + 0.05, vUv.y);
+                                vec3 tintColor = mix(uColorBottom, uColorTop, mixFactor);
+                                gl_FragColor = vec4(texColor.rgb * tintColor, texColor.a);
+                            }
+                        `}
                     />
                 </mesh>
                 {/* Mouse Hanging - Pivot Group for swinging */}

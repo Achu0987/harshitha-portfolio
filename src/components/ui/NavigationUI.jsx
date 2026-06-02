@@ -12,9 +12,9 @@ import '../../styles/NavigationUI.scss';
 // These positions correspond to the visual elements on the map
 const ROOMS = [
     { id: 'about', label: 'About', x: 43, y: 38 },      // Paper airplane (left side)
-    { id: 'gallery', label: 'Gallery', x: 43, y: 72 },  // City buildings (bottom left)
+    { id: 'gallery', label: 'Projects', x: 43, y: 72 },  // City buildings (bottom left)
     { id: 'contact', label: 'Contact', x: 57, y: 25 },  // Pier/dock (top right)
-    { id: 'studio', label: 'Studio', x: 57, y: 55 },    // Monitors stack (right side)
+    { id: 'studio', label: 'Explore', x: 57, y: 55 },    // Monitors stack (right side)
 ];
 
 // Pin starting position - the dashed circle at the bottom of the tower
@@ -95,8 +95,7 @@ const NavigationUI = () => {
             });
         }
 
-        // Studio (zone: right 15%, bottom 19%, width 25%, height 40%)
-        // -> X: 60% to 85% (since right=15% means left is 100-15-25=60%), Y: 41% to 81% (since bottom=19% means top is 100-19-40=41%)
+        // Studio / Explore (zone: right 15%, bottom 19%, width 25%, height 40%)
         if (paintedMapsRefs.studio.current) {
             gsap.to(paintedMapsRefs.studio.current, {
                 clipPath: (hoveredRoom === 'studio' || currentRoom === 'studio')
@@ -199,14 +198,22 @@ const NavigationUI = () => {
     };
 
     const handleRoomClick = (roomId) => {
-        // Don't teleport to the same room or if already teleporting
-        if (roomId === currentRoom || isTeleporting) return;
-
-        // Close map first, then start teleport
+        // Close map first
         setIsMenuOpen(false);
         setIsAudioMenuOpen(false);
         setIsAchievementsOpen(false);
-        teleportTo(roomId);
+        
+        // Navigate to the respective pages
+        if (roomId === 'about') {
+            window.location.href = '/about';
+        } else if (roomId === 'gallery') {
+            window.location.href = '/projects';
+        } else if (roomId === 'contact') {
+            window.location.href = '/contact';
+        } else if (roomId === 'studio') {
+            // 'Explore' button clicked - do nothing else but close the map
+            // so the user can explore the 3D corridor
+        }
     };
 
     const handleBackClick = () => {
@@ -220,17 +227,68 @@ const NavigationUI = () => {
             {/* Global Achievement Popup */}
             <AchievementPopup />
 
-            {/* Back Button - Only visible in rooms, hides up when clicked */}
-            {hasEntered && isInRoom && (
-                <button
-                    className={`nav-btn back-btn ${isExiting ? 'exiting' : ''}`}
-                    onClick={handleBackClick}
-                    aria-label="Back to corridor"
-                >
-                    <svg viewBox="0 0 24 24" className="icon-back">
-                        <path d="M19 12H5M12 19l-7-7 7-7" />
-                    </svg>
-                </button>
+            {/* Left side controls - Back Button & Socials */}
+            {hasEntered && (
+                <div className={`social-controls ${isMenuOpen || isAudioMenuOpen ? 'menu-open' : ''} ${isUIHidden ? 'ui-hidden' : ''}`}>
+                    {isInRoom && (
+                        <button
+                            className={`nav-btn back-btn ${isExiting ? 'exiting' : ''}`}
+                            onClick={handleBackClick}
+                            aria-label="Back to corridor"
+                        >
+                            <svg viewBox="0 0 24 24" className="icon-back">
+                                <path d="M19 12H5M12 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                    )}
+                    <a
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="nav-btn social-btn"
+                        aria-label="Instagram"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                    <a
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="nav-btn social-btn"
+                        aria-label="LinkedIn"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                            <rect x="2" y="9" width="4" height="12"></rect>
+                            <circle cx="4" cy="4" r="2"></circle>
+                        </svg>
+                    </a>
+                    <a
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="nav-btn social-btn"
+                        aria-label="Twitter"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                        </svg>
+                    </a>
+                </div>
+            )}
+
+            {/* Global Header - Centered Logo */}
+            {hasEntered && (
+                <header className={`global-header ${isUIHidden ? 'ui-hidden' : ''}`}>
+                    <div className="header-logo">
+                        <h1>HARSHITHA</h1>
+                        <span className="subtitle">CREATIVE DEVELOPER</span>
+                    </div>
+                </header>
             )}
 
             {/* Right side controls - Only visible after entering */}
@@ -270,17 +328,17 @@ const NavigationUI = () => {
                             </svg>
                         )}
                     </button>
-                    {/* Achievements Toggle Button */}
+                    {/* Services Toggle Button */}
                     <button
                         className={`nav-btn achievements-btn ${isAchievementsOpen ? 'open' : ''}`}
                         onClick={() => setIsAchievementsOpen(!isAchievementsOpen)}
-                        aria-label="Achievements"
+                        aria-label="Services"
                         aria-expanded={isAchievementsOpen}
                     >
-                        <svg viewBox="0 0 24 24" className="icon-trophy">
-                            <path d="M8 21h8M12 17v4M7 4h10M5 4h14v5a7 7 0 0 1-7 7 7 7 0 0 1-7-7z" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M5 9H3V6h2" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M19 9h2V6h-2" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <svg viewBox="0 0 24 24" className="icon-services" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                            <polyline points="2 17 12 22 22 17"></polyline>
                         </svg>
                     </button>
                 </div>
@@ -339,7 +397,7 @@ const NavigationUI = () => {
                             <img ref={paintedMapsRefs.contact} src="/images/map_contact_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)' }} />
                             <img ref={paintedMapsRefs.studio} src="/images/map_studio_painted.webp" alt="" className="painted-map-layer" style={{ clipPath: 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)' }} />
 
-                            {/* Hover Zones — 4 quadrants covering the map */}
+                            {/* Hover Zones — covering the map */}
                             <button
                                 type="button"
                                 className="map-hover-zone zone-about"
@@ -348,7 +406,7 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('about')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('about')}
-                                aria-label="Teleport to About room"
+                                aria-label="Go to About page"
                             />
                             <button
                                 type="button"
@@ -358,7 +416,7 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('gallery')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('gallery')}
-                                aria-label="Teleport to Gallery room"
+                                aria-label="Go to Projects page"
                             />
                             <button
                                 type="button"
@@ -368,7 +426,7 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('contact')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('contact')}
-                                aria-label="Teleport to Contact room"
+                                aria-label="Go to Contact page"
                             />
                             <button
                                 type="button"
@@ -378,14 +436,14 @@ const NavigationUI = () => {
                                 onFocus={() => setHoveredRoom('studio')}
                                 onBlur={() => setHoveredRoom(null)}
                                 onClick={() => handleRoomClick('studio')}
-                                aria-label="Teleport to Studio room"
+                                aria-label="Explore 3D Corridor"
                             />
 
                             {/* Permanent Map Text Labels */}
                             <div className="map-room-label about">ABOUT</div>
-                            <div className="map-room-label gallery">THE<br />GALLERY</div>
+                            <div className="map-room-label gallery" style={{ letterSpacing: '0.15em' }}>PROJECTS</div>
                             <div className="map-room-label contact">CONTACT</div>
-                            <div className="map-room-label studio">THE<br />STUDIO</div>
+                            <div className="map-room-label studio" style={{ letterSpacing: '0.25em' }}>EXPLORE</div>
 
                             {/* Pin slot markers - 4 locations */}
                             {ROOMS.map((room) => (

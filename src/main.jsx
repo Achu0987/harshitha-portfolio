@@ -1,6 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.jsx'
+import MainPage from './components/about-us/page.jsx'
+import ContactPage from './components/contact/ContactPage.jsx'
+import ProjectsPage from './components/projects/ProjectsPage.jsx'
+import './styles/main.scss'
 
 // --- Console Signature for Awwwards Judges ---
 if (typeof window !== 'undefined') {
@@ -20,6 +25,13 @@ if (typeof window !== 'undefined') {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/about" element={<MainPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/projects" element={<ProjectsPage />} />
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 )

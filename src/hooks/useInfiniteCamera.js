@@ -34,8 +34,8 @@ const useInfiniteCamera = ({
     const { camera } = useThree();
 
     // Camera tracking
-    const targetZ = useRef(28);
-    const currentZ = useRef(28);
+    const targetZ = useRef(-36);
+    const currentZ = useRef(-36);
     const parallax = useRef({ x: 0, y: 0 });
     const targetParallax = useRef({ x: 0, y: 0 });
     const glanceOffset = useRef(0);
@@ -59,6 +59,7 @@ const useInfiniteCamera = ({
     // Smooth blend-in counter (frames remaining to blend from saved rotation)
     const blendInFrames = useRef(0);
     const savedRotation = useRef({ x: 0, y: 0, z: 0 });
+    const isInitiallyAligned = useRef(true); // Default to straight view on About door
 
     // Limits for swipe glance (in radians, ~15 degrees each way)
     const MAX_SWIPE_GLANCE = 0.26;
@@ -124,6 +125,7 @@ const useInfiniteCamera = ({
         e.preventDefault();
         const delta = e.deltaY * scrollSpeed;
         targetZ.current -= delta;
+        isInitiallyAligned.current = false; // Break alignment on scroll
         unlockAchievement('corridor_explore');
     }, [scrollSpeed, unlockAchievement]);
 
@@ -147,6 +149,7 @@ const useInfiniteCamera = ({
         if (delta !== undefined) {
             e.preventDefault();
             targetZ.current -= delta * scrollSpeed;
+            isInitiallyAligned.current = false; // Break alignment on keyboard scroll
             unlockAchievement('corridor_explore');
         }
 
@@ -193,6 +196,7 @@ const useInfiniteCamera = ({
         if (scrollEnabledRef.current) {
             const deltaY = (touchStart.current.y - currentY) * scrollSpeed * 1.5;
             targetZ.current -= deltaY;
+            isInitiallyAligned.current = false; // Break alignment on scroll
             unlockAchievement('corridor_explore');
         }
 
@@ -297,6 +301,15 @@ const useInfiniteCamera = ({
         // This allows the camera to stay exactly where exit animation left it
         if (skipFrameAfterEnable.current) {
             skipFrameAfterEnable.current = false;
+            return;
+        }
+
+        // Initially aligned to About door
+        if (isInitiallyAligned.current) {
+            camera.position.x = 1.2;
+            camera.position.y = 0.2;
+            camera.position.z = -36;
+            camera.rotation.set(0, Math.PI * 0.334, 0);
             return;
         }
 

@@ -112,12 +112,12 @@ const CorridorSegment = ({
             <CorridorWalls
                 zStart={zOffset}
                 length={SEGMENT_LENGTH}
-                doorPositions={doors}
+                doorPositions={doors.filter(door => door.roomId === 'about')}
                 zClip={zClip}
             />
 
             {/* === WELCOME AREA (Start of segment) - MOVED CLOSER === */}
-            <group position={[0, 0, zOffset - 2]}>
+            <group position={[0, 0, zOffset - 2]} visible={false}>
                 {/* ITOM Text - centered (ITOM letters adjusted internally) */}
                 <HeroText position={[0, -0.1, -0.5]} />
 
@@ -142,23 +142,24 @@ const CorridorSegment = ({
             {/* === DOOR SECTIONS (wall + door + label as one unit) === */}
             {/* Hidden during entrance animation for segment -1 */}
             {!hideSegmentDoors && doors.map((door) => (
-                <DoorSection
-                    key={door.id}
-                    position={[
-                        door.x,
-                        0,
-                        zOffset + door.relativeZ + 2
-                    ]}
-                    side={door.side}
-                    label={door.label}
-                    roomId={door.roomId}
-                    icon={door.icon}
-                    color={door.color}
-                    enterDistance={door.enterDistance}
-                    onEnter={() => onDoorEnter?.(door.roomId)}
-                    setCameraOverride={setCameraOverride}
-                    segmentIndex={segmentIndex}
-                />
+                <group key={door.id} visible={door.roomId === 'about'}>
+                    <DoorSection
+                        position={[
+                            door.x,
+                            0,
+                            zOffset + door.relativeZ + 2
+                        ]}
+                        side={door.side}
+                        label={door.label}
+                        roomId={door.roomId}
+                        icon={door.icon}
+                        color={door.color}
+                        enterDistance={door.enterDistance}
+                        onEnter={() => onDoorEnter?.(door.roomId)}
+                        setCameraOverride={setCameraOverride}
+                        segmentIndex={segmentIndex}
+                    />
+                </group>
             ))}
 
             {/* === LIGHTING === */}
@@ -175,10 +176,12 @@ const CorridorSegment = ({
 
             {/* === SEGMENT END DOORS (hidden during entrance) === */}
             {!hideSegmentDoors && (
-                <SegmentDoors
-                    position={[0, 0, zOffset - SEGMENT_LENGTH + 5]}
-                    corridorHeight={3.5}
-                />
+                <group visible={false}>
+                    <SegmentDoors
+                        position={[0, 0, zOffset - SEGMENT_LENGTH + 5]}
+                        corridorHeight={3.5}
+                    />
+                </group>
             )}
         </group>
     );

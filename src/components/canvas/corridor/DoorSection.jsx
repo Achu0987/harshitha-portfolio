@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Text, useTexture, PositionalAudio } from '@react-three/drei';
+import { Text, useTexture, PositionalAudio, Float, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import RoomInterior from './RoomInterior';
@@ -84,6 +84,21 @@ const DoorSection = ({
     const handlePaintedRef = useRef(); // Painted handle mesh visibility
     const doorPaintedRef = useRef(); // Painted door mesh visibility
     const handleHideDelayRef = useRef(); // Track pending gsap.delayedCall for handle visibility
+
+    const butterflyRef = useRef();
+    useEffect(() => {
+        if (butterflyRef.current) {
+            gsap.to(butterflyRef.current.position, {
+                y: "+=0.3",
+                x: "+=0.2",
+                duration: 2,
+                yoyo: true,
+                repeat: -1,
+                ease: "sine.inOut"
+            });
+        }
+    }, []);
+
     const [isHovered, setIsHovered] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
@@ -117,6 +132,7 @@ const DoorSection = ({
     const hoverAudioRef = useRef();
     const openAudioRef = useRef();
     const closeAudioRef = useRef();
+    const techStackRef = useRef();
 
     // Map label to ID for teleport matching
     const doorId = useMemo(() => {
@@ -221,6 +237,13 @@ const DoorSection = ({
     const handlePaintedTexture = useTexture(isTouch ? dummyTex : '/textures/corridor/doors/klamkadodrzwi_painted.webp');
     const doorBackTexture = useTexture('/textures/corridor/doors/backsingledoors.webp');
     const arrowTexture = useTexture('/textures/corridor/strzalka.webp');
+    const treeTexture = useTexture('/textures/corridor/drzewkowdoniczce.webp');
+    const treeUniforms = useMemo(() => ({
+        uMap: { value: treeTexture },
+        uColorTop: { value: new THREE.Color('#658b54') },
+        uColorBottom: { value: new THREE.Color('#8b5a2b') },
+        uSplit: { value: 0.35 }
+    }), [treeTexture]);
 
     // Baseboard texture for door sections (1582x94 px, aspect 16.83:1)
     const baseboardTexture = useTexture('/textures/corridor/texturadoprogow.webp');
@@ -270,11 +293,12 @@ const DoorSection = ({
         const wallShape = new THREE.Shape();
         const halfW = WALL_LENGTH / 2;
         const halfH = CORRIDOR_HEIGHT / 2;
+        const extendedTopH = halfH + 10.0; // Extend wall upwards to cover background gap
 
         wallShape.moveTo(-halfW, -halfH);
         wallShape.lineTo(halfW, -halfH);
-        wallShape.lineTo(halfW, halfH);
-        wallShape.lineTo(-halfW, halfH);
+        wallShape.lineTo(halfW, extendedTopH);
+        wallShape.lineTo(-halfW, extendedTopH);
         wallShape.lineTo(-halfW, -halfH);
 
         // Create hole for door
@@ -316,12 +340,6 @@ const DoorSection = ({
         // === SHADER COMPILE (first 2 frames only) ===
         if (compileFramesRef.current < 2) {
             compileFramesRef.current++;
-            if (compileFramesRef.current === 2) {
-                if (!isHovered && !isOpen) {
-                    if (doorPaintedRef.current) doorPaintedRef.current.visible = false;
-                    if (handlePaintedRef.current) handlePaintedRef.current.visible = false;
-                }
-            }
         }
 
         // === TILT ANIMATION ===
@@ -383,7 +401,10 @@ const DoorSection = ({
         };
     }, []);
 
+
+
     const handleClick = useCallback((e) => {
+        console.log(`[DoorSection] Clicked on ${label}! isOpen=${isOpen}, isAnimating=${isAnimating}`);
         // e might be null or synthetic from teleport
         e?.stopPropagation?.();
         const isTeleport = e?.isTeleport || false;
@@ -781,29 +802,7 @@ const DoorSection = ({
             });
         }
 
-        // Reverse brush-stroke reveal (un-paint the door)
-        if (doorMaterialRef.current) {
-            gsap.to(doorMaterialRef.current, {
-                uProgress: 0.0,
-                duration: 0.6,
-                ease: 'power2.out',
-                overwrite: true
-            });
-        }
-        if (handleMaterialRef.current) {
-            gsap.to(handleMaterialRef.current, {
-                uProgress: 0.0,
-                duration: 0.6,
-                ease: 'power2.out',
-                overwrite: true
-            });
-        }
-        // Hide painted layers after animation
-        if (handleHideDelayRef.current) handleHideDelayRef.current.kill();
-        handleHideDelayRef.current = gsap.delayedCall(0.65, () => {
-            if (handlePaintedRef.current) handlePaintedRef.current.visible = false;
-            if (doorPaintedRef.current) doorPaintedRef.current.visible = false;
-        });
+        // Door remains painted
 
         gsap.to(doorRef.current.rotation, {
             y: 0,
@@ -820,6 +819,7 @@ const DoorSection = ({
 
     // Handle hover effects
     const handlePointerEnter = () => {
+        console.log(`[DoorSection] Hover entered on ${label}!`);
         if (isOpen || isAnimating) return;
         setIsHovered(true);
         document.body.style.cursor = "pointer";
@@ -827,7 +827,7 @@ const DoorSection = ({
         if (hoverAudioRef.current && !isHovered) {
             const vol = isMuted ? 0 : DOOR_AUDIO_SETTINGS.hoverVolume * globalVolume;
             hoverAudioRef.current.setVolume(vol);
-            
+
             // Only play if AudioContext is already running to avoid console warnings
             // Browsers block audio until a user click, and hover is not always enough.
             if (hoverAudioRef.current.isPlaying) hoverAudioRef.current.stop();
@@ -904,29 +904,7 @@ const DoorSection = ({
             });
         }
 
-        // Reverse brush-stroke reveal
-        if (doorMaterialRef.current) {
-            gsap.to(doorMaterialRef.current, {
-                uProgress: 0.0,
-                duration: 0.5,
-                ease: 'power2.out',
-                overwrite: true
-            });
-        }
-        if (handleMaterialRef.current) {
-            gsap.to(handleMaterialRef.current, {
-                uProgress: 0.0,
-                duration: 0.5,
-                ease: 'power2.out',
-                overwrite: true
-            });
-        }
-
-        // Hide painted layers after reverse animation completes
-        handleHideDelayRef.current = gsap.delayedCall(0.55, () => {
-            if (handlePaintedRef.current) handlePaintedRef.current.visible = false;
-            if (doorPaintedRef.current) doorPaintedRef.current.visible = false;
-        });
+        // Door remains painted
     };
 
     // Door pivot position - hinges on the side
@@ -950,7 +928,7 @@ const DoorSection = ({
             <group ref={groupRef}>
                 {/* Wall segment with door hole */}
                 <mesh position={[wallOffsetX, 0, 0]} geometry={wallWithHoleGeometry}>
-                    <meshBasicMaterial color="#e0e0e0" map={wallTexture} roughness={1} metalness={0} side={THREE.DoubleSide} />
+                    <meshBasicMaterial color="#E8ECEF" map={wallTexture} roughness={1} metalness={0} side={THREE.DoubleSide} />
                 </mesh>
 
                 {/* === ARROW DECORATION === */}
@@ -968,7 +946,7 @@ const DoorSection = ({
                     scale={[0.5, 0.5, 1]}
                 >
                     <planeGeometry args={[1, 0.5]} />
-                    <meshBasicMaterial color="#e0e0e0"
+                    <meshBasicMaterial color="#9ba4b5"
                         map={arrowTexture}
                         transparent={true}
                         alphaTest={0.1}
@@ -991,7 +969,7 @@ const DoorSection = ({
                     scale={[-0.5, 0.5, 1]}
                 >
                     <planeGeometry args={[1, 0.5]} />
-                    <meshBasicMaterial color="#e0e0e0"
+                    <meshBasicMaterial color="#9ba4b5"
                         map={arrowTexture}
                         transparent={true}
                         alphaTest={0.1}
@@ -1000,10 +978,109 @@ const DoorSection = ({
                     />
                 </mesh>
 
+                {/* === PORTFOLIO TECH STACK GRAFFITI === */}
+                {label === 'THE ABOUT' && (
+                    <group position={[wallOffsetX, 0, 0.03]} ref={techStackRef}>
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.16} color="#222222" position={[-1.3, 0.8, 0]} rotation={[0, 0, 0.08]}>
+                            JavaScript
+                        </Text>
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.14} color="#444444" position={[-1.6, 0.4, 0]} rotation={[0, 0, -0.05]}>
+                            React
+                        </Text>
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.14} color="#333333" position={[-1.2, -0.4, 0]} rotation={[0, 0, 0.1]}>
+                            Node.js
+                        </Text>
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.12} color="#555555" position={[-1.5, -0.9, 0]} rotation={[0, 0, -0.04]}>
+                            TailwindCSS
+                        </Text>
+
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.16} color="#222222" position={[1.4, 0.7, 0]} rotation={[0, 0, -0.06]}>
+                            TypeScript
+                        </Text>
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.14} color="#444444" position={[1.7, 0.2, 0]} rotation={[0, 0, 0.05]}>
+                            Three.js
+                        </Text>
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.15} color="#333333" position={[1.3, -0.7, 0]} rotation={[0, 0, -0.09]}>
+                            Next.js
+                        </Text>
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.12} color="#555555" position={[1.5, 1.1, 0]} rotation={[0, 0, 0.04]}>
+                            HTML / CSS
+                        </Text>
+
+                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.12} color="#444444" position={[0, 1.55, 0]} rotation={[0, 0, 0.02]}>
+                            FULL STACK DEVELOPER
+                        </Text>
+
+                        {/* LEFT SIDE: POTTED TREE WITH ANIMATED QUOTE IN THE POT */}
+                        <Float
+                            speed={1.5}
+                            rotationIntensity={0.05} // Very subtle rotation
+                            floatIntensity={0.05} // Very subtle floating
+                            floatingRange={[0, 0.04]} // Only float upwards so it never clips through the floor
+                            position={[-2.5, -0.4, 0.7]} // X=-2.5 moves left. Y=-0.4 moves it further up. Z=0.7 pushes forward to guarantee it avoids wall clipping!
+                        >
+                            <mesh>
+                                <planeGeometry args={[1.4, 1.4 / 0.602]} /> {/* Scaled back up */}
+                                <shaderMaterial
+                                    transparent={true}
+                                    side={THREE.DoubleSide}
+                                    uniforms={treeUniforms}
+                                    vertexShader={`
+                                        varying vec2 vUv;
+                                        void main() {
+                                            vUv = uv;
+                                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                                        }
+                                    `}
+                                    fragmentShader={`
+                                        uniform sampler2D uMap;
+                                        uniform vec3 uColorTop;
+                                        uniform vec3 uColorBottom;
+                                        uniform float uSplit;
+                                        varying vec2 vUv;
+                                        
+                                        void main() {
+                                            vec4 texColor = texture2D(uMap, vUv);
+                                            if (texColor.a < 0.1) discard;
+                                            float mixFactor = smoothstep(uSplit - 0.05, uSplit + 0.05, vUv.y);
+                                            vec3 tintColor = mix(uColorBottom, uColorTop, mixFactor);
+                                            gl_FragColor = vec4(texColor.rgb * tintColor, texColor.a);
+                                        }
+                                    `}
+                                />
+                            </mesh>
+
+                            {/* Quote Text perfectly center-aligned and straightened inside the pot */}
+                            <group position={[-0.04, -0.87, 0.02]}>
+                                <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.11} color="#f5f5f5" position={[0, 0.16, 0]} anchorX="center" rotation={[0, 0, 0]}>
+                                    {"Turning"}
+                                </Text>
+                                <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.17} color="#ffffff" position={[0, 0.04, 0]} anchorX="center" rotation={[0, 0, 0]}>
+                                    {"IDEAS"}
+                                </Text>
+                                <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.09} color="#e0e0e0" position={[0, -0.06, 0]} anchorX="center" rotation={[0, 0, 0]}>
+                                    {"into"}
+                                </Text>
+                                <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.16} color="#ffffff" position={[0.04, -0.17, 0]} anchorX="center" rotation={[0, 0, 0]}>
+                                    {"REALITY"}
+                                </Text>
+                            </group>
+
+                            {/* Butterfly SVG 
+                            <group ref={butterflyRef} position={[0.4, 0.7, 0.1]}>
+                                <Html transform scale={0.7} wrapperClass="no-pointer">
+                                    <img src="https://www.fnp.com/assets/images/custom/luxe/Butterfly%20fly%20Desktop%20(signature%20pieces).svg" alt="butterfly" style={{ width: '400px' }} />
+                                </Html>
+                            </group>
+                            */}
+                        </Float>
+                    </group>
+                )}
+
                 {/* Baseboard (Listwa) Left side of door */}
                 <mesh position={[wallOffsetX - 1.4, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
                     <planeGeometry args={[doorBoardWidth, 0.15]} />
-                    <meshBasicMaterial color="#e0e0e0"
+                    <meshBasicMaterial color="#4a4036"
                         map={doorBbTexLeft}
                         roughness={0.8}
                         side={THREE.DoubleSide}
@@ -1013,7 +1090,7 @@ const DoorSection = ({
                 {/* Baseboard (Listwa) Right side of door */}
                 <mesh position={[wallOffsetX + 1.4, -CORRIDOR_HEIGHT / 2 + 0.075, 0.02]}>
                     <planeGeometry args={[doorBoardWidth, 0.15]} />
-                    <meshBasicMaterial color="#e0e0e0"
+                    <meshBasicMaterial color="#4a4036"
                         map={doorBbTexRight}
                         roughness={0.8}
                         side={THREE.DoubleSide}
@@ -1038,7 +1115,7 @@ const DoorSection = ({
                             rotation={[-Math.PI / 2, 0, 0]}
                         >
                             <planeGeometry args={[THRESH_W, THRESH_D]} />
-                            <meshBasicMaterial color="#e0e0e0"
+                            <meshBasicMaterial color="#c8b7a6"
                                 map={threshTex}
                                 roughness={0.9}
                                 metalness={0}
@@ -1060,7 +1137,7 @@ const DoorSection = ({
                         <mesh>
                             {/* Adjusted size for the signs - assuming rectangular aspect ratio */}
                             <planeGeometry args={[1.3, 0.65]} />
-                            <meshBasicMaterial color="#e0e0e0"
+                            <meshBasicMaterial color="#b08d6a"
                                 map={signTexture}
                                 transparent={true}
                                 alphaTest={0.1}
@@ -1120,13 +1197,13 @@ const DoorSection = ({
                         {label === 'THE ABOUT' && (
                             <Text
                                 font="/fonts/CabinSketch-Bold.ttf"
-                                fontSize={0.30}
+                                fontSize={0.22}
                                 color="#111111"
                                 anchorX="center"
                                 anchorY="middle"
                                 position={[0, 0, 0.01]}
                             >
-                                ABOUT
+                                PORTFOLIO
                             </Text>
                         )}
                         {label === "LET'S CONNECT" && (
@@ -1147,7 +1224,7 @@ const DoorSection = ({
                     {/* Moved to Z = 0.04 to sit in front of baseboards (Z=0.02), hiding the hole edges */}
                     <mesh position={[0, -0.1, 0.04]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
                         <planeGeometry args={[frameWidth, frameHeight]} />
-                        <meshBasicMaterial color="#e0e0e0"
+                        <meshBasicMaterial color="#8b5a2b"
                             map={frameTexture}
                             transparent={true}
                             alphaTest={0.1}
@@ -1205,9 +1282,22 @@ const DoorSection = ({
                                 transparent={true}
                                 alphaTest={0.1}
                                 roughness={0.8}
-                                uProgress={0.0}
+                                uProgress={1.0}
                             />
                         </mesh>
+
+                        {/* WELCOME Text perfectly centered in bottom panel */}
+                        {label === 'THE ABOUT' && (
+                            <Text
+                                font="/fonts/CabinSketch-Bold.ttf"
+                                fontSize={0.10}
+                                color="#222222"
+                                position={[doorMeshX, -0.85, 0.005]} // Moved down to Y=-0.85 to be perfectly centered vertically
+                                rotation={[0, 0, -0.01]}
+                            >
+                                W E L C O M E
+                            </Text>
+                        )}
 
                         {/* Door Back Texture */}
                         <mesh
@@ -1224,6 +1314,7 @@ const DoorSection = ({
                                 side={THREE.DoubleSide}
                             />
                         </mesh>
+
 
                         {/* Handle Layer - pivot at screw position */}
                         <group ref={handleRef} position={[doorMeshX + (side === 'left' ? 0.45 : -0.45), -0.29, 0.03]}>
@@ -1246,7 +1337,7 @@ const DoorSection = ({
                                     transparent={true}
                                     alphaTest={0.1}
                                     depthWrite={false}
-                                    uProgress={0.0}
+                                    uProgress={1.0}
                                 />
                             </mesh>
                         </group>

@@ -38,7 +38,7 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
         scrollSpeed: 0.025,
         parallaxIntensity: 0.4,
         smoothing: 0.06,
-        scrollEnabled: hasEntered && !isTeleporting && !isInRoom,
+        scrollEnabled: false, // User requested to disable scrolling completely
         parallaxEnabled: hasEntered && !isTeleporting && !isInRoom
     });
 
@@ -62,13 +62,15 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
     // Optimization: Low tier has simpler lighting
     const isLowTier = performanceTier === 'LOW';
 
+    // Signal scene ready immediately to bypass artificial warmup delay
+    useEffect(() => {
+        if (onSceneReady) {
+            onSceneReady();
+        }
+    }, [onSceneReady]);
+
     return (
         <>
-            {/* === ROOM WARM-UP (pre-renders all rooms off-screen during preloader) === */}
-            {/* RoomWarmup mounts all 4 rooms 500 units below, compiles shaders via gl.compile(), 
-                then self-destructs and signals onSceneReady. This ensures both corridor segments
-                AND room shaders are pre-compiled before the user starts interacting. */}
-            <RoomWarmup onWarmupComplete={onSceneReady} isLowTier={isLowTier} />
 
             {/* === GLOBAL LIGHTING === */}
             {/* <ambientLight intensity={isLowTier ? 2.5 : 2.2} /> */}
