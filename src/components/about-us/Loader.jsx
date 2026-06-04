@@ -55,21 +55,26 @@ export default function Loader({ onComplete }) {
       transition={exiting ? { duration: 0.9, ease: [0.76, 0, 0.24, 1] } : { duration: 0 }}
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: '#060606',
+        background: '#E8ECEF',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         overflow: 'hidden', userSelect: 'none',
         fontFamily: '"Inter","Helvetica Neue",Arial,sans-serif',
       }}
     >
+      {/* Light Theme Background Grid & Orbs */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, backgroundImage: 'linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px)', backgroundSize: '50px 50px', maskImage: 'radial-gradient(circle at center, black 40%, transparent 80%)' }}></div>
+      <div style={{ position: 'absolute', top: '-200px', left: '-200px', width: '600px', height: '600px', background: '#4f46e5', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.3, pointerEvents: 'none', zIndex: 0 }}></div>
+      <div style={{ position: 'absolute', bottom: '-200px', right: '-200px', width: '600px', height: '600px', background: '#9333ea', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.3, pointerEvents: 'none', zIndex: 0 }}></div>
+
       {/* ─── Top progress bar ─── */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0,
-        height: 1.5, background: 'rgba(255,255,255,0.06)',
+        height: 1.5, background: 'rgba(0,0,0,0.1)',
       }}>
         <motion.div style={{
           height: '100%',
-          background: 'linear-gradient(90deg, #a855f7, #ffffff 50%, #06b6d4)',
+          background: 'linear-gradient(90deg, #a855f7, #111827 50%, #06b6d4)',
           transformOrigin: 'left',
           scaleX: progress / 100,
         }} />
@@ -80,24 +85,24 @@ export default function Loader({ onComplete }) {
         <motion.p
           initial={{ y: '110%' }} animate={{ y: '0%' }}
           transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          style={{ margin: 0, fontSize: 9, letterSpacing: '0.45em', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase' }}
+          style={{ margin: 0, fontSize: 9, letterSpacing: '0.45em', color: 'rgba(0,0,0,0.5)', textTransform: 'uppercase', fontWeight: 600 }}
         >
           About Us
         </motion.p>
       </div>
 
-      {/* ─── Live dot + 2025 top-right ─── */}
+      {/* ─── Live dot + 2026 top-right ─── */}
       <div style={{ position: 'absolute', top: 28, right: 40, display: 'flex', alignItems: 'center', gap: 8 }}>
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0.6, 1] }}
           transition={{ delay: 0.5, duration: 1.2 }}
-          style={{ width: 5, height: 5, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }}
+          style={{ width: 5, height: 5, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px rgba(34, 197, 94, 0.5)' }}
         />
         <div style={{ overflow: 'hidden' }}>
           <motion.p
             initial={{ y: '110%' }} animate={{ y: '0%' }}
             transition={{ duration: 0.55, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
-            style={{ margin: 0, fontSize: 9, letterSpacing: '0.45em', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase' }}
+            style={{ margin: 0, fontSize: 9, letterSpacing: '0.45em', color: 'rgba(0,0,0,0.5)', textTransform: 'uppercase', fontWeight: 600 }}
           >
             2026
           </motion.p>
@@ -130,7 +135,7 @@ export default function Loader({ onComplete }) {
             transition={{ duration: 1.8, delay: 0.5 }}
             style={{
               position: 'absolute', inset: '-50px -70px',
-              background: 'radial-gradient(ellipse at 50% 55%, rgba(168,85,247,0.32) 0%, rgba(6,182,212,0.18) 45%, transparent 68%)',
+              background: 'radial-gradient(ellipse at 50% 55%, rgba(168,85,247,0.15) 0%, rgba(6,182,212,0.1) 45%, transparent 68%)',
               filter: 'blur(36px)',
               zIndex: 0, pointerEvents: 'none',
             }}
@@ -141,13 +146,13 @@ export default function Loader({ onComplete }) {
             <ScanLine go={go} />
           </div>
 
-          {/* Edge vignette — kills white PNG background, blends to dark */}
+          {/* Edge vignette — blends to #E8ECEF background */}
           <div style={{
             position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
             background: `
-              radial-gradient(ellipse at 50% 50%, transparent 35%, #060606 100%),
-              linear-gradient(to bottom, #060606 0%, transparent 12%, transparent 82%, #060606 100%),
-              linear-gradient(to right, #060606 0%, transparent 12%, transparent 88%, #060606 100%)
+              radial-gradient(ellipse at 50% 50%, transparent 35%, #E8ECEF 100%),
+              linear-gradient(to bottom, #E8ECEF 0%, transparent 12%, transparent 82%, #E8ECEF 100%),
+              linear-gradient(to right, #E8ECEF 0%, transparent 12%, transparent 88%, #E8ECEF 100%)
             `,
           }} />
 
@@ -160,8 +165,8 @@ export default function Loader({ onComplete }) {
             transition={{ duration: 1.0, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
             style={{
               width: '100%', display: 'block', position: 'relative', zIndex: 1,
-              mixBlendMode: 'luminosity',
-              filter: 'contrast(1.1) brightness(0.9) saturate(1.6)',
+              mixBlendMode: 'normal', // Normal works better on light background
+              filter: 'contrast(1.1) brightness(0.95)',
             }}
           />
 
@@ -172,8 +177,7 @@ export default function Loader({ onComplete }) {
             style={{
               position: 'absolute', bottom: 20, left: 4, zIndex: 5,
               fontSize: 9, letterSpacing: '0.4em', textTransform: 'uppercase',
-              color: 'rgba(251,191,36,0.8)', fontFamily: 'monospace',
-              textShadow: '0 0 10px rgba(251,191,36,0.45)',
+              color: '#d97706', fontFamily: 'monospace', fontWeight: 600,
             }}
           >
             Human
@@ -186,8 +190,7 @@ export default function Loader({ onComplete }) {
             style={{
               position: 'absolute', bottom: 20, right: 4, zIndex: 5,
               fontSize: 9, letterSpacing: '0.4em', textTransform: 'uppercase',
-              color: 'rgba(6,182,212,0.8)', fontFamily: 'monospace',
-              textShadow: '0 0 10px rgba(6,182,212,0.45)',
+              color: '#0284c7', fontFamily: 'monospace', fontWeight: 600,
             }}
           >
             AI
@@ -213,7 +216,7 @@ export default function Loader({ onComplete }) {
               fontWeight: 800,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: '#ffffff',
+              color: '#111827',
               fontFamily: '"Inter", sans-serif',
             }}
           >
@@ -221,15 +224,16 @@ export default function Loader({ onComplete }) {
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
-            animate={go ? { opacity: 0.4, y: 0 } : {}}
+            animate={go ? { opacity: 0.6, y: 0 } : {}}
             transition={{ duration: 0.85, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
             style={{
               margin: 0,
               fontSize: '9px',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
-              color: '#ffffff',
+              color: '#4b5563',
               fontFamily: 'monospace',
+              fontWeight: 600,
             }}
           >
             About Us ✦ 2026
@@ -243,8 +247,9 @@ export default function Loader({ onComplete }) {
         transition={{ delay: 0.4 }}
         style={{
           position: 'absolute', bottom: 30, right: 40,
-          fontSize: 10, letterSpacing: '0.15em', color: 'rgba(255,255,255,0.22)',
+          fontSize: 10, letterSpacing: '0.15em', color: 'rgba(0,0,0,0.5)',
           fontVariantNumeric: 'tabular-nums', fontFamily: 'monospace',
+          fontWeight: 600,
         }}
       >
         {String(Math.round(progress)).padStart(3, '0')}%
@@ -255,7 +260,7 @@ export default function Loader({ onComplete }) {
         <motion.p
           initial={{ y: '110%' }} animate={{ y: '0%' }}
           transition={{ duration: 0.55, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          style={{ margin: 0, fontSize: 9, letterSpacing: '0.3em', color: 'rgba(255,255,255,0.16)', textTransform: 'uppercase' }}
+          style={{ margin: 0, fontSize: 9, letterSpacing: '0.3em', color: 'rgba(0,0,0,0.4)', textTransform: 'uppercase', fontWeight: 600 }}
         >
           Loading experience
         </motion.p>

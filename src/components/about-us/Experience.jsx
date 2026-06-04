@@ -21,8 +21,10 @@ import {
   Terminal as TerminalIcon,
   FileCode as FileCodeIcon,
   CheckCircle2 as CheckCircleIcon,
-  ArrowRight as ArrowRightIcon
+  ArrowRight as ArrowRightIcon,
+  ArrowLeft as ArrowLeftIcon
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const SECTIONS = [
   {
@@ -31,23 +33,44 @@ const SECTIONS = [
   },
   {
     url: '/icon-set-one-v4-optimize.glb',
-    text: "Web Development\nArchitecting fast, scalable, and responsive web applications.",
+    content: (
+      <>
+        Web Development Architecting fast, scalable, and responsive <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff5f00] to-[#ff8c00]">web applications.</span>
+      </>
+    ),
   },
   {
     url: '/icon-set-two-v3-optimize.glb',
-    text: "Mobile App Development\nEngineering fluid, premium mobile apps for iOS and Android.",
+    content: (
+      <>
+        Mobile App Development<br />
+        Engineering fluid, premium mobile apps for<br />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff5f00] to-[#ff8c00]">iOS and Android.</span>
+      </>
+    ),
   },
   {
     url: '/icon-set-three-v2-optimize.glb',
-    text: "UI/UX Design\nCrafting intuitive interfaces where aesthetics meet seamless usability.",
+    content: (
+      <>
+        UI/UX Design
+        Crafting intuitive interfaces<br />
+        where aesthetics meet<br />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff5f00] to-[#ff8c00]">seamless usability.</span>
+      </>
+    ),
   },
   {
     url: '/icon-set-four-v2-optimize.glb',
-    text: "Tech Training & Mentorship\nEmpowering the next generation of developers with hands-on skills.",
+    content: (
+      <>
+        Tech Training & Mentorship Empowering the next generation of developers with <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff5f00] to-[#ff8c00]">hands-on skills.</span>
+      </>
+    ),
   },
   {
     content: (
-      <>Merging expert coding with AI-driven workflows.<br />I don't just use tools—I <span className="font-semibold text-[#ff8c00]">build solutions.</span></>
+      <>Merging expert coding with AI-driven workflows.<br />I don't just use tools — I <span className="font-semibold text-[#ff8c00]">build solutions.</span></>
     ),
     isFinal: true
   },
@@ -164,26 +187,26 @@ function InteractiveDashboardOverlay({ progress }) {
   return (
     <motion.div
       style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
-      className="absolute inset-0 z-20 flex flex-col justify-center items-center px-6 md:px-24 py-16 overflow-hidden pointer-events-none"
+      className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
       {/* Background cyber grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:40px_40px] opacity-40 z-0"></div>
+      {/* Background cyber grid removed for light theme */}
 
       {/* Title */}
-      <div className="relative z-10 text-center mb-10 flex flex-col items-center max-w-3xl gap-3">
+      <div className="relative z-10 text-center mb-2 md:mb-10 flex flex-col items-center max-w-3xl gap-2 md:gap-3">
         <div className="px-4 py-1.5 border border-[#ff5f00]/40 rounded-full bg-[#ff5f00]/5 text-[#ff5f00] text-[11px] font-semibold tracking-[3px] uppercase animate-pulse">
           AI Design Agent // Active
         </div>
-        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-white">
+        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-black">
           Designing the Web, <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#ff5f00] to-[#ff8c00]">Powered by AI.</span>
         </h2>
       </div>
 
       {/* Main dashboard container - INCREASED width and vertical spacing */}
-      <div className="relative z-10 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#0d0d0d]/80 backdrop-blur-xl p-5 md:p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col md:flex-row gap-5 items-stretch pointer-events-auto">
+      <div className="relative z-10 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#0d0d0d]/80 backdrop-blur-xl p-3 sm:p-5 md:p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col md:flex-row gap-3 md:gap-5 items-stretch pointer-events-auto transform scale-[0.85] sm:scale-100 origin-top">
 
         {/* Left Side: Real-time Terminal Logs - flex-[0.8] to give Right Side (Website mockup) even more space! */}
-        <div className="flex-[0.8] flex flex-col gap-4 bg-black/60 rounded-xl p-4 border border-white/5 font-mono text-[12px] min-h-[380px]">
+        <div className="flex-[0.8] flex flex-col gap-4 bg-black/60 rounded-xl p-4 border border-white/5 font-mono text-[12px] min-h-[160px] md:min-h-[380px]">
           <div className="flex justify-between items-center pb-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#ff5f00] animate-ping"></span>
@@ -205,7 +228,7 @@ function InteractiveDashboardOverlay({ progress }) {
         </div>
 
         {/* Right Side: Visual Website Layout Mockup - wider flex-[1.9] and min-h-[380px] */}
-        <div className="flex-[1.9] relative rounded-xl border border-white/5 bg-black/40 overflow-hidden min-h-[380px] flex flex-col">
+        <div className="flex-[1.9] relative rounded-xl border border-white/5 bg-black/40 overflow-hidden min-h-[320px] md:min-h-[380px] flex flex-col">
           {/* Glowing laser sweeping line linked to scroll! */}
           <motion.div
             style={{ top: laserTop, opacity: laserOpacity }}
@@ -229,7 +252,7 @@ function InteractiveDashboardOverlay({ progress }) {
           </div>
 
           {/* Browser Mockup Content - Increased min-h-[380px] and vertical gaps */}
-          <div className="flex-1 p-6 flex flex-col gap-6 relative z-10 min-h-[380px] justify-between">
+          <div className="flex-1 p-4 md:p-6 flex flex-col gap-4 md:gap-6 relative z-10 min-h-[320px] md:min-h-[380px] justify-between">
 
             {/* Header bar area */}
             <div className="relative h-10 w-full">
@@ -268,7 +291,7 @@ function InteractiveDashboardOverlay({ progress }) {
             </div>
 
             {/* Hero container area - Increased height to h-32 */}
-            <div className="relative h-32 w-full mt-1">
+            <div className="relative h-24 md:h-32 w-full mt-1">
               {/* Wireframe Hero with HTML Tags and Measurements */}
               <motion.div
                 style={{ opacity: heroWireframeOpacity, x: heroX, scale: heroScale }}
@@ -313,7 +336,7 @@ function InteractiveDashboardOverlay({ progress }) {
             </div>
 
             {/* Grid features area - Increased height to h-24 */}
-            <div className="relative h-24 w-full">
+            <div className="relative h-20 md:h-24 w-full">
               {/* Wireframe Grid with Blueprint Measurement Indicators */}
               <motion.div
                 style={{ opacity: gridWireframeOpacity, y: gridY, scale: gridScale }}
@@ -450,26 +473,26 @@ function InteractiveMobileOverlay({ progress }) {
   return (
     <motion.div
       style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
-      className="absolute inset-0 z-20 flex flex-col justify-center items-center px-6 md:px-24 py-16 overflow-hidden pointer-events-none"
+      className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
       {/* Background cyber grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:40px_40px] opacity-40 z-0"></div>
+      {/* Background cyber grid removed for light theme */}
 
       {/* Title */}
-      <div className="relative z-10 text-center mb-6 flex flex-col items-center max-w-3xl gap-3">
+      <div className="relative z-10 text-center mb-2 md:mb-6 flex flex-col items-center max-w-3xl gap-2 md:gap-3">
         <div className="px-4 py-1.5 border border-[#ff8c00]/40 rounded-full bg-[#ff8c00]/5 text-[#ff8c00] text-[11px] font-semibold tracking-[3px] uppercase animate-pulse">
           AI App Compiler // Active
         </div>
-        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-white">
+        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-black">
           Compiling Mobile Design, <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#ff5f00] to-[#ff8c00]">Into Smooth React Native.</span>
         </h2>
       </div>
 
       {/* Main dashboard container */}
-      <div className="relative z-10 w-full max-w-5xl rounded-2xl border border-white/10 bg-[#0d0d0d]/80 backdrop-blur-xl p-5 md:p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col md:flex-row gap-6 items-center justify-center pointer-events-auto">
+      <div className="relative z-10 w-full max-w-5xl rounded-2xl border border-white/10 bg-[#0d0d0d]/80 backdrop-blur-xl p-3 sm:p-5 md:p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col md:flex-row gap-4 md:gap-6 items-center justify-center pointer-events-auto transform scale-[0.85] sm:scale-100 origin-top">
 
         {/* Left Side: Real-time Terminal Logs */}
-        <div className="flex-1 w-full md:w-auto self-stretch flex flex-col gap-4 bg-black/60 rounded-xl p-4 border border-white/5 font-mono text-[12px] min-h-[300px] md:min-h-[460px]">
+        <div className="flex-1 w-full md:w-auto self-stretch flex flex-col gap-4 bg-black/60 rounded-xl p-4 border border-white/5 font-mono text-[12px] min-h-[160px] md:min-h-[460px]">
           <div className="flex justify-between items-center pb-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#ff8c00] animate-ping"></span>
@@ -491,7 +514,7 @@ function InteractiveMobileOverlay({ progress }) {
         </div>
 
         {/* Right Side: Visual Mobile Layout Mockup */}
-        <div className="relative w-[300px] md:w-[320px] h-[460px] md:h-[500px] rounded-[36px] border-[6px] border-white/15 bg-black/80 overflow-hidden flex flex-col shadow-[0_0_40px_rgba(255,140,0,0.15)]">
+        <div className="relative w-[280px] md:w-[320px] h-[440px] md:h-[500px] rounded-[36px] border-[6px] border-white/15 bg-black/80 overflow-hidden flex flex-col shadow-[0_0_40px_rgba(255,140,0,0.15)]">
           {/* Status Bar */}
           <div className="px-5 pt-3 pb-1 flex justify-between items-center text-[9px] text-white/50 z-20 font-mono">
             <span>10:14 AM</span>
@@ -523,7 +546,7 @@ function InteractiveMobileOverlay({ progress }) {
             </div>
 
             {/* Dynamic Card Area (Snapping Hero widget) */}
-            <div className="relative flex-1 min-h-[140px] flex items-center justify-center mt-2 mb-3">
+            <div className="relative flex-1 min-h-[100px] md:min-h-[140px] flex items-center justify-center mt-2 mb-3">
               {/* Wireframe Hero Widget */}
               <motion.div
                 style={{ opacity: cardWireframeOpacity, x: cardX, scale: cardScale }}
@@ -560,7 +583,7 @@ function InteractiveMobileOverlay({ progress }) {
             </div>
 
             {/* List Activity Widget (Snapping Vertical Scrollable Cards) */}
-            <div className="relative h-[150px] flex items-center justify-center mb-2">
+            <div className="relative h-[110px] md:h-[150px] flex items-center justify-center mb-2">
               {/* Wireframe List */}
               <motion.div
                 style={{ opacity: listWireframeOpacity, y: listY, scale: listScale }}
@@ -722,22 +745,22 @@ function InteractiveHandoffOverlay({ progress }) {
   return (
     <motion.div
       style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
-      className="absolute inset-0 z-20 flex flex-col justify-center items-center px-6 md:px-24 py-16 overflow-hidden pointer-events-none"
+      className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:40px_40px] opacity-40 z-0"></div>
+      {/* Background cyber grid removed for light theme */}
 
-      <div className="relative z-10 text-center mb-6 flex flex-col items-center max-w-3xl gap-3">
+      <div className="relative z-10 text-center mb-2 md:mb-6 flex flex-col items-center max-w-3xl gap-2 md:gap-3">
         <div className="px-4 py-1.5 border border-[#ff5f00]/40 rounded-full bg-[#ff5f00]/5 text-[#ff5f00] text-[11px] font-semibold tracking-[3px] uppercase animate-pulse">
           Figma To React // Handoff Workspace
         </div>
-        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-white">
+        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-black">
           Compiling Vector Mockups, <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#ff5f00] to-[#ff8c00]">Into Production React Nodes.</span>
         </h2>
       </div>
 
-      <div className="relative z-10 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#080808]/90 backdrop-blur-xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col lg:flex-row gap-6 items-center justify-between pointer-events-auto">
+      <div className="relative z-10 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#080808]/90 backdrop-blur-xl p-3 sm:p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col lg:flex-row gap-4 md:gap-6 items-center justify-between pointer-events-auto transform scale-[0.85] sm:scale-100 origin-top">
 
-        <div className="w-full lg:w-[48%] h-[380px] md:h-[460px] rounded-xl border border-white/10 bg-black/60 relative overflow-hidden p-4 flex flex-col justify-between">
+        <div className="w-full lg:w-[48%] h-[260px] md:h-[460px] rounded-xl border border-white/10 bg-black/60 relative overflow-hidden p-4 flex flex-col justify-between">
           <div className="flex justify-between items-center pb-2 border-b border-white/5">
             <div className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 bg-[#f24e1e] rounded-sm"></div>
@@ -841,7 +864,7 @@ function InteractiveHandoffOverlay({ progress }) {
 
         <motion.div
           style={{ opacity: idePanelOpacity }}
-          className="w-full lg:w-[44%] h-[380px] md:h-[460px] rounded-xl border border-white/10 bg-[#050505]/95 shadow-2xl overflow-hidden flex flex-col justify-between"
+          className="w-full lg:w-[44%] h-[320px] md:h-[460px] rounded-xl border border-white/10 bg-[#050505]/95 shadow-2xl overflow-hidden flex flex-col justify-between"
         >
           <div className="flex items-center bg-black/60 px-3 border-b border-white/5">
             <div className="flex gap-1.5 mr-4">
@@ -935,23 +958,23 @@ function InteractiveCanvaOverlay({ progress }) {
   return (
     <motion.div
       style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
-      className="absolute inset-0 z-20 flex flex-col justify-center items-center px-6 md:px-24 py-16 overflow-hidden pointer-events-none"
+      className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,196,204,0.05)_0%,transparent_70%)] z-0"></div>
 
-      <div className="relative z-10 text-center mb-6 flex flex-col items-center max-w-3xl gap-3">
+      <div className="relative z-10 text-center mb-2 md:mb-6 flex flex-col items-center max-w-3xl gap-2 md:gap-3">
         <div className="px-4 py-1.5 border border-[#00C4CC]/40 rounded-full bg-[#00C4CC]/5 text-[#00C4CC] text-[11px] font-semibold tracking-[3px] uppercase animate-pulse">
           Creative Design // Canva Studio
         </div>
-        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-white">
+        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-black">
           Crafting Stunning Visuals, <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#00C4CC] to-[#7D2AE8]">With Pixel-Perfect Precision.</span>
         </h2>
       </div>
 
-      <div className="relative z-10 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#080808]/90 backdrop-blur-xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col lg:flex-row gap-6 items-center justify-between pointer-events-auto">
+      <div className="relative z-10 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#080808]/90 backdrop-blur-xl p-3 sm:p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col lg:flex-row gap-4 md:gap-6 items-center justify-between pointer-events-auto transform scale-[0.85] sm:scale-100 origin-top">
 
         {/* Left Side: Canva Editor */}
-        <div className="w-full lg:w-[48%] h-[380px] md:h-[460px] rounded-xl border border-white/10 bg-[#111] relative overflow-hidden flex flex-col">
+        <div className="w-full lg:w-[48%] h-[260px] md:h-[460px] rounded-xl border border-white/10 bg-[#111] relative overflow-hidden flex flex-col">
           <div className="flex justify-between items-center px-4 py-3 bg-[#1a1a1a] border-b border-white/5">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-gradient-to-tr from-[#00C4CC] to-[#7D2AE8] rounded-full"></div>
@@ -991,7 +1014,7 @@ function InteractiveCanvaOverlay({ progress }) {
         {/* Right Side: Brand Kit / Assets (NO CODE) */}
         <motion.div
           style={{ opacity: rightPanelOpacity }}
-          className="w-full lg:w-[44%] h-[380px] md:h-[460px] rounded-xl border border-white/10 bg-[#111] shadow-2xl overflow-hidden flex flex-col"
+          className="w-full lg:w-[44%] h-[320px] md:h-[460px] rounded-xl border border-white/10 bg-[#111] shadow-2xl overflow-hidden flex flex-col"
         >
           <div className="flex items-center bg-[#1a1a1a] px-4 py-3 border-b border-white/5">
             <span className="text-[11px] text-white/70 font-medium tracking-wide">Brand Kit & Assets</span>
@@ -1057,23 +1080,23 @@ function InteractiveTrainerOverlay({ progress }) {
   return (
     <motion.div
       style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
-      className="absolute inset-0 z-20 flex flex-col justify-center items-center px-6 md:px-24 py-16 overflow-hidden pointer-events-none"
+      className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(236,72,153,0.05)_0%,transparent_70%)] z-0"></div>
 
-      <div className="relative z-10 text-center mb-6 flex flex-col items-center max-w-3xl gap-3">
+      <div className="relative z-10 text-center mb-2 md:mb-6 flex flex-col items-center max-w-3xl gap-2 md:gap-3">
         <div className="px-4 py-1.5 border border-pink-500/40 rounded-full bg-pink-500/5 text-pink-400 text-[11px] font-semibold tracking-[3px] uppercase animate-pulse">
           Mentorship // Masterclass
         </div>
-        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-white">
+        <h2 className="text-[28px] md:text-[48px] font-light leading-[1.1] tracking-[-1px] text-black">
           Empowering Next-Gen Creators, <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-[#7D2AE8]">Through Live Mentorship.</span>
         </h2>
       </div>
 
-      <div className="relative z-10 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#080808]/90 backdrop-blur-xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col lg:flex-row gap-6 items-center justify-between pointer-events-auto">
+      <div className="relative z-10 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#080808]/90 backdrop-blur-xl p-3 sm:p-6 shadow-[0_0_60px_rgba(0,0,0,0.9)] flex flex-col lg:flex-row gap-4 md:gap-6 items-center justify-between pointer-events-auto transform scale-[0.85] sm:scale-100 origin-top">
 
         {/* Left Side: Live Screen Share */}
-        <div className="w-full lg:w-[60%] h-[380px] md:h-[460px] rounded-xl border border-white/10 bg-[#111] overflow-hidden flex flex-col">
+        <div className="w-full lg:w-[60%] h-[260px] md:h-[460px] rounded-xl border border-white/10 bg-[#111] overflow-hidden flex flex-col">
           <div className="flex items-center justify-between bg-[#1a1a1a] px-4 py-3 border-b border-white/5">
             <span className="text-[11px] text-white/70 font-medium tracking-wide">Live Presentation Screen</span>
             <div className="flex items-center gap-2 px-2 py-1 bg-red-500/10 border border-red-500/20 rounded">
@@ -1106,7 +1129,7 @@ function InteractiveTrainerOverlay({ progress }) {
         </div>
 
         {/* Right Side: Live Chat / Q&A */}
-        <div className="w-full lg:w-[38%] h-[380px] md:h-[460px] rounded-xl border border-white/10 bg-[#111] overflow-hidden flex flex-col">
+        <div className="w-full lg:w-[38%] h-[320px] md:h-[460px] rounded-xl border border-white/10 bg-[#111] overflow-hidden flex flex-col">
           <div className="flex items-center bg-[#1a1a1a] px-4 py-3 border-b border-white/5">
             <span className="text-[11px] text-white/70 font-medium tracking-wide">Student Q&A</span>
           </div>
@@ -1167,25 +1190,25 @@ function InteractiveEndingOverlay({ progress }) {
   return (
     <motion.div
       style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
-      className="absolute inset-0 z-30 flex flex-col justify-center items-center px-6 py-16 overflow-hidden"
+      className="absolute inset-0 z-30 flex flex-col justify-center items-center px-4 md:px-6 py-4 md:py-16 overflow-hidden"
     >
-      <motion.div style={{ y: yPos, scale }} className="relative z-10 w-full max-w-4xl flex flex-col items-center justify-center gap-8 text-center">
+      <motion.div style={{ y: yPos, scale }} className="relative z-10 w-full max-w-4xl flex flex-col items-center justify-center gap-4 md:gap-8 text-center">
 
         {/* Glow behind */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-gradient-to-r from-[#ff5f00]/30 via-[#00C4CC]/30 to-[#7D2AE8]/30 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="flex items-center gap-3 px-6 py-2 border border-white/20 rounded-full bg-white/5 backdrop-blur-lg shadow-[0_0_20px_rgba(255,255,255,0.1)]">
           <StarIcon size={14} className="text-[#ff5f00] animate-pulse" />
-          <span className="text-[12px] md:text-[14px] text-white font-medium tracking-widest uppercase">Portfolio Journey Complete</span>
+          <span className="text-[12px] md:text-[14px] text-black font-medium tracking-widest uppercase">Portfolio Journey Complete</span>
           <StarIcon size={14} className="text-[#ff5f00] animate-pulse" />
         </div>
 
-        <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter leading-tight drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+        <h1 className="text-5xl md:text-8xl font-black text-black tracking-tighter leading-tight drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
           Let's Build Something <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff5f00] via-[#ff8c00] to-[#00C4CC]">Extraordinary.</span>
         </h1>
 
-        <p className="text-lg md:text-2xl text-white/60 max-w-2xl font-light">
+        <p className="text-lg md:text-2xl text-black/60 max-w-2xl font-light">
           Whether it's an immersive 3D experience, a high-converting landing page, or a complete digital ecosystem—I'm ready to bring your vision to life.
         </p>
 
@@ -1195,7 +1218,7 @@ function InteractiveEndingOverlay({ progress }) {
             <ArrowRightIcon size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
 
-          <button className="px-10 py-5 bg-transparent text-white border-2 border-white/20 rounded-full font-bold text-[16px] md:text-[18px] transition-all hover:bg-white/10 hover:border-white/40 flex items-center gap-3">
+          <button className="px-10 py-5 bg-transparent text-black border-2 border-white/20 rounded-full font-bold text-[16px] md:text-[18px] transition-all hover:bg-white/10 hover:border-white/40 flex items-center gap-3">
             Download Resume
           </button>
         </div>
@@ -1265,7 +1288,7 @@ function FaceModel({ smoothProgress }) {
       });
 
       const targetX = state.viewport.width < 5 ? 0 : state.viewport.width * 0.22; // Closer to center for bold focal anchor
-      const targetY = state.viewport.width < 5 ? 1 : 0.0;
+      const targetY = state.viewport.width < 5 ? 0.6 : 0.0; // Place face in upper half
 
       ref.current.position.x = targetX;
       ref.current.position.y = targetY + Math.sin(state.clock.getElapsedTime()) * 0.04;
@@ -1277,7 +1300,7 @@ function FaceModel({ smoothProgress }) {
       // Scale grows from fadeStart to the end of section 5
       const scrollRangeProgress = Math.max(0, Math.min(1, (progress - fadeStart) / (endRange - fadeStart)));
       const scaleFactor = THREE.MathUtils.lerp(0.4, 1.4, scrollRangeProgress);
-      const baseScale = state.viewport.width < 5 ? 0.8 : 0.7;
+      const baseScale = state.viewport.width < 5 ? 0.55 : 0.7; // Ensure it's large enough to be impressive but fits nicely
       ref.current.scale.setScalar(baseScale * scaleFactor);
     }
   });
@@ -1372,19 +1395,13 @@ export default function Experience() {
   const remainingSize = (1 - heroSize) / (SECTIONS.length - 1);
 
   return (
-    <div ref={containerRef} className="relative w-full bg-black font-outfit">
+    <div ref={containerRef} className="relative w-full bg-[#E8ECEF] font-outfit">
       <div className="h-[2800vh] w-full">
         <div className="sticky top-0 h-screen w-full overflow-hidden">
-          <motion.div
-            style={{
-              opacity: useTransform(
-                smoothProgress,
-                [heroSize + 5.5 * remainingSize, heroSize + 6.0 * remainingSize],
-                [1, 0]
-              )
-            }}
-            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(20,20,20,1)_0%,_rgba(0,0,0,1)_100%)] z-[-2]"
-          />
+          {/* Light Theme Background Grid & Orbs */}
+          <div className="absolute inset-0 pointer-events-none z-[-2]" style={{ backgroundImage: 'linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px)', backgroundSize: '50px 50px', maskImage: 'radial-gradient(circle at center, black 40%, transparent 80%)' }}></div>
+          <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-[#4f46e5] rounded-full blur-[120px] opacity-30 pointer-events-none z-[-2]"></div>
+          <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] bg-[#9333ea] rounded-full blur-[120px] opacity-30 pointer-events-none z-[-2]"></div>
           <VideoBackground smoothProgress={smoothProgress} />
           <motion.div
             style={{
@@ -1444,13 +1461,13 @@ function SectionText({ section, index, progress, scrollY }) {
   const y = useTransform(progress, [start, end], [20, -20]);
 
   return (
-    <motion.div style={{ opacity, y }} className={`absolute inset-0 flex flex-col justify-center px-10 md:px-24 pointer-events-none z-10 ${section.isFinal ? 'items-start text-left pb-[5vh]' : 'items-center text-center'}`}>
-      <div className={`flex flex-col gap-8 max-w-3xl ${section.isFinal ? 'items-start' : 'items-center'}`}>
-        <h1 className={`font-light leading-[1.1] text-white ${section.isFinal ? 'text-[32px] md:text-[56px] tracking-[-1px] drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]' : 'text-[32px] md:text-[64px] tracking-[-1px] md:tracking-[-2px] drop-shadow-[0_0_20px_rgba(0,0,0,1)] whitespace-pre-line'}`}>
+    <motion.div style={{ opacity, y }} className={`absolute inset-0 flex flex-col px-6 sm:px-12 md:px-24 pointer-events-none z-10 ${section.isFinal ? 'justify-end pb-[15vh] md:justify-center md:pb-[5vh] items-center text-center md:items-start md:text-left' : 'justify-center items-center text-center'}`}>
+      <div className={`flex flex-col gap-6 md:gap-8 max-w-3xl ${section.isFinal ? 'md:items-start items-center' : 'items-center'}`}>
+        <h1 className={`leading-[1.15] font-['Inter'] font-black pb-2 px-2 md:px-0 ${section.isFinal ? 'text-white drop-shadow-[0_0_15px_rgba(0,0,0,0.8)] text-[22px] md:text-[60px] tracking-[-0.5px]' : 'text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-gray-800 to-gray-500 text-[24px] md:text-[62px] tracking-[-1px] whitespace-pre-line'}`}>
           {section.content || text}
         </h1>
         {hasButton && (
-          <button className="px-10 py-4 bg-white text-black rounded-full font-semibold text-[16px] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.8)] shadow-[0_0_20px_rgba(255,255,255,0.5)] pointer-events-auto cursor-pointer mt-4">
+          <button className={`px-10 py-4 rounded-full font-semibold text-[16px] transition-all hover:scale-105 pointer-events-auto cursor-pointer mt-4 ${section.isFinal ? 'bg-white text-black hover:shadow-[0_0_30px_rgba(255,255,255,0.8)] shadow-[0_0_20px_rgba(255,255,255,0.5)]' : 'bg-gray-900 text-white hover:shadow-[0_0_30px_rgba(0,0,0,0.2)] shadow-[0_0_20px_rgba(0,0,0,0.1)]'}`}>
             {section.buttonText || "Let's Connect"}
           </button>
         )}
@@ -1463,18 +1480,21 @@ function UIOverlay({ scrollYProgress, scrollY }) {
   const dotTop = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   return (
     <div className="absolute inset-0 pointer-events-none z-20">
-      <nav className="absolute top-0 left-0 right-0 px-[60px] py-[40px] flex justify-between items-center pointer-events-auto">
-        <div className="text-[14px] font-medium tracking-[2px] text-white/70 uppercase">MAIN</div>
-        <button className="px-[24px] py-[8px] border border-[#ff8c00]/40 rounded-[12px] bg-[#ff8c00]/5 text-[#ff8c00] text-[14px] cursor-pointer transition-all duration-300 backdrop-blur-[5px] hover:bg-[#ff8c00]/15 hover:border-[#ff8c00]/80">About Us</button>
+      <nav className="absolute top-0 left-0 right-0 px-6 md:px-[60px] py-6 md:py-[40px] flex justify-between items-center pointer-events-auto">
+        <Link to="/" className="text-[12px] md:text-[14px] font-bold tracking-[1.5px] md:tracking-[2px] text-gray-800 uppercase font-['Inter'] flex items-center gap-1 md:gap-2 hover:text-[#ff5f00] transition-colors cursor-pointer bg-white/70 md:bg-transparent backdrop-blur-md md:backdrop-blur-none px-3 py-1.5 md:p-0 rounded-full shadow-sm md:shadow-none">
+          <ArrowLeftIcon size={16} />
+          Back to Home
+        </Link>
+        <button className="hidden md:block px-[24px] py-[8px] border border-gray-300 rounded-[12px] bg-white text-gray-800 font-bold text-[14px] cursor-pointer transition-all duration-300 hover:bg-gray-50 hover:shadow-lg font-['Inter']">About Us</button>
       </nav>
-      <div className="absolute left-[60px] top-[100px] bottom-[100px] w-[1px] bg-white/10 flex flex-col justify-between items-center">
-        <motion.div style={{ top: dotTop }} className="w-[8px] h-[8px] bg-[#ff5f00] rounded-full absolute left-[-3.5px] shadow-[0_0_10px_#ff5f00] animate-pulse" />
-        {Array.from({ length: SECTIONS.length }).map((_, i) => <div key={i} className="w-[6px] h-[1px] bg-white/20" />)}
+      <div className="absolute flex left-4 md:left-[60px] top-[80px] md:top-[100px] bottom-[80px] md:bottom-[100px] w-[1px] bg-gray-300 flex-col justify-between items-center opacity-40 md:opacity-100">
+        <motion.div style={{ top: dotTop }} className="w-[6px] h-[6px] md:w-[8px] md:h-[8px] bg-[#ff5f00] rounded-full absolute left-[-2.5px] md:left-[-3.5px] shadow-[0_0_10px_rgba(255,95,0,0.5)] animate-pulse" />
+        {Array.from({ length: SECTIONS.length }).map((_, i) => <div key={i} className="w-[4px] md:w-[6px] h-[1px] bg-gray-400" />)}
       </div>
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-[100] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-repeat" />
       <motion.footer style={{ opacity: useTransform(scrollY, [0, 100], [1, 0]) }} className="absolute bottom-[40px] left-0 right-0 text-center flex flex-col items-center gap-4">
-        <div className="text-[12px] font-medium text-white/40 tracking-[3px] uppercase">Scroll</div>
-        <div className="w-[1px] h-[60px] bg-gradient-to-b from-white/40 to-transparent" />
+        <div className="text-[12px] font-bold text-gray-500 tracking-[3px] uppercase font-['Inter']">Scroll</div>
+        <div className="w-[1px] h-[60px] bg-gradient-to-b from-gray-500 to-transparent" />
       </motion.footer>
     </div>
   );

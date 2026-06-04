@@ -31,5 +31,5 @@ while (svg.firstChild) {
 // Add back only the butterfly
 svg.appendChild(butterfly);
 
-fs.writeFileSync('c:\\harshitha\\harshitha-port\\portfolio-itom\\public\\images\\butterfly.svg', svg.outerHTML);
+fs.writeFileSync('c:\\harshitha\\harshitha-port\\harshitha-portfolio\\public\\images\\butterfly.svg', svg.outerHTML);
 console.log('Saved to public/images/butterfly.svg');

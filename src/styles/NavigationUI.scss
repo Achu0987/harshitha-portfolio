@@ -125,9 +125,10 @@
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
     animation: slideDownEntrance 0.4s ease-out;
 
-    &.ui-hidden {
+    &.ui-hidden, &.menu-open {
         transform: translate(-50%, -120%);
         opacity: 0;
+        pointer-events: none;
     }
 
     .header-logo {
@@ -201,7 +202,7 @@
 // === LEFT SIDE SOCIAL CONTROLS ===
 .social-controls {
     position: fixed;
-    top: 0; // Starts from top edge
+    top: 24px; // Starts from top edge on desktop
     left: 24px;
     display: flex;
     gap: 12px;
@@ -228,6 +229,18 @@
         opacity: 0;
         pointer-events: none;
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    }
+}
+
+@keyframes slideUpEntranceMobile {
+    from {
+        opacity: 0;
+        transform: translateY(150%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -782,22 +795,71 @@
 // === RESPONSIVE ===
 @media (max-width: 768px) {
     .nav-btn {
-        width: 45px;
-        height: 50px;
+        width: 40px;
+        height: 45px;
+        padding-top: 6px;
+        
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    .global-header {
+        top: 24px;
+        left: 16px;
+        width: auto;
+        display: flex;
+        justify-content: flex-start;
+        transform: translateY(0);
+        
+        &.ui-hidden {
+            transform: translateY(-120%);
+        }
+        
+        .header-logo {
+            align-items: center;
+            text-align: center;
+            h1 {
+                font-size: 1.4rem;
+                letter-spacing: 1.5px;
+            }
+            .subtitle {
+                font-size: 0.65rem;
+                letter-spacing: 2px;
+                margin-top: 2px;
+            }
+        }
     }
 
     .nav-controls {
+        top: 16px;
         right: 16px;
         gap: 8px;
     }
 
     .social-controls {
-        left: 16px;
+        top: auto;
+        bottom: 24px;
+        left: 0;
+        width: 100%;
+        justify-content: center;
+        transform: none;
         gap: 8px;
+        animation: slideUpEntranceMobile 0.5s ease-out;
+
+        &.menu-open {
+            transform: translateY(150%);
+        }
+
+        &.ui-hidden {
+            transform: translateY(150%);
+        }
     }
 
     .audio-panel {
-        right: 16px;
+        right: 12px;
+        top: 60px; // ensure it doesn't overlap header
     }
 
     .map-panel {
@@ -816,14 +878,14 @@
 
     .entrance-hint {
         gap: 8px;
-        bottom: 24px;
+        bottom: 80px; // moved up to make room for bottom dock
         padding: 12px 20px;
         font-size: 13px;
     }
 
     .corridor-hint {
         gap: 8px;
-        bottom: 24px;
+        bottom: 80px;
         padding: 12px 20px;
         font-size: 13px;
     }

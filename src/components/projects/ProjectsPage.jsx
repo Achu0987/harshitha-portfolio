@@ -1,146 +1,111 @@
-import React, { useEffect, useState } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Rocket, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Code2 } from 'lucide-react';
 import './ProjectsPage.scss';
 
-const FloatingParticle = ({ delay, duration, x, y, size, color }) => {
-  return (
-    <motion.div
-      className="absolute rounded-full pointer-events-none"
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: color,
-        filter: 'blur(2px)',
-        boxShadow: `0 0 ${size * 2}px ${color}`
-      }}
-      initial={{ x: x, y: y, opacity: 0, scale: 0 }}
-      animate={{
-        y: [y, y - 150, y - 300],
-        x: [x, x + Math.random() * 100 - 50, x + Math.random() * 100 - 50],
-        opacity: [0, 0.8, 0],
-        scale: [0, 1.5, 0]
-      }}
-      transition={{
-        duration: duration,
-        repeat: Infinity,
-        delay: delay,
-        ease: "easeInOut"
-      }}
-    />
-  );
-};
-
 const ProjectsPage = () => {
-  const [particles, setParticles] = useState([]);
-
-  useEffect(() => {
-    // Generate random particles
-    const newParticles = Array.from({ length: 30 }).map((_, i) => ({
-      id: i,
-      x: typeof window !== 'undefined' ? Math.random() * window.innerWidth : 500,
-      y: typeof window !== 'undefined' ? window.innerHeight + 100 : 800,
-      size: Math.random() * 6 + 2,
-      duration: Math.random() * 5 + 5,
-      delay: Math.random() * 5,
-      color: ['#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4'][Math.floor(Math.random() * 4)]
-    }));
-    setParticles(newParticles);
-  }, []);
-
   return (
-    <div className="projects-page-wrapper">
+    <div className="projects-page-wrapper min-h-screen bg-[#E8ECEF] relative overflow-hidden font-['Inter'] flex flex-col items-center justify-center">
       <div className="bg-grid"></div>
       <div className="glow-orb top-left"></div>
       <div className="glow-orb bottom-right"></div>
-      <div className="glow-orb center-ambient"></div>
 
-      {/* Floating Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {particles.map(p => (
-          <FloatingParticle key={p.id} {...p} />
-        ))}
-      </div>
-
-      <div className="nav-bar relative z-50">
-        <Link to="/" className="back-link group">
-          <ArrowLeft size={20} className="icon group-hover:-translate-x-1 transition-transform" />
+      {/* Top Left Navigation */}
+      <div className="absolute top-0 left-0 w-full p-8 md:p-12 z-50">
+        <Link to="/" className="inline-flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-all uppercase tracking-[0.2em] text-xs font-bold group">
+          <div className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center group-hover:bg-gray-900 group-hover:border-gray-900 group-hover:text-white transition-all duration-300 shadow-sm">
+            <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+          </div>
           <span>Back to Home</span>
         </Link>
       </div>
 
-      <div className="projects-container min-h-screen flex items-center justify-center relative z-10 px-6">
+      <div className="w-full max-w-4xl px-6 relative z-10 flex flex-col items-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center w-full max-w-4xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center text-center w-full"
         >
-          {/* Glass Card Container */}
-          <div className="coming-soon-card relative p-12 md:p-20 rounded-[3rem] overflow-hidden">
-            {/* Inner animated borders / glows */}
-            <div className="absolute inset-0 border-[2px] border-white/5 rounded-[3rem]"></div>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute -inset-[100%] bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(168,85,247,0.3)_360deg)] opacity-50"
-            ></motion.div>
+          {/* Status Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-white backdrop-blur-md shadow-sm mb-10"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Work in Progress</span>
+          </motion.div>
 
-            <div className="relative z-10 flex flex-col items-center">
-
-              <motion.div
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(139,92,246,0.3)]"
-              >
-                <Rocket className="text-purple-400 w-10 h-10 animate-bounce" />
-              </motion.div>
-
-              <div className="glitch-wrapper mb-6">
-                <h1 className="glitch-text text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-purple-200 to-gray-500 uppercase" data-text="COMING SOON">
-                  COMING SOON
-                </h1>
-              </div>
-
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                className="flex items-center justify-center gap-3 mt-6"
-              >
-                <Sparkles className="text-pink-400 w-6 h-6" />
-                <p className="text-xl md:text-2xl text-gray-300 font-light tracking-wide">
-                  Brewing something <span className="font-semibold text-white">masterpiecs ...</span>
-                </p>
-                <Sparkles className="text-blue-400 w-6 h-6" />
-              </motion.div>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.9, duration: 1 }}
-                className="mt-8 text-gray-500 max-w-lg mx-auto text-sm md:text-base leading-relaxed"
-              >
-                I'm currently crafting my latest projects to showcase here.
-                Great things take time. Check back soon to see the magic unfold.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2, duration: 0.8 }}
-                className="mt-12"
-              >
-                <Link to="/" className="return-btn group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-black font-bold rounded-full overflow-hidden transition-transform hover:scale-105 active:scale-95">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                  <span className="relative z-10 tracking-widest text-sm">RETURN TO HOME</span>
-                </Link>
-              </motion.div>
-
+          {/* Floating Icon Container */}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5, type: "spring", stiffness: 200 }}
+            className="relative mb-10"
+          >
+            <div className="absolute inset-0 bg-blue-500 blur-[40px] opacity-10 rounded-full"></div>
+            <div className="w-24 h-24 rounded-3xl bg-white flex items-center justify-center shadow-[0_20px_40px_-15px_rgba(0,0,0,0.08)] border border-white/50 relative z-10">
+              <Code2 className="text-gray-800 w-10 h-10" strokeWidth={1.5} />
             </div>
+          </motion.div>
+
+          {/* Sleek Headline Reveal */}
+          <div className="overflow-hidden mb-6">
+            <motion.h1 
+              initial={{ y: 100 }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="text-6xl md:text-8xl font-black tracking-tighter text-gray-900 pb-2"
+            >
+              COMING <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">SOON</span>
+            </motion.h1>
           </div>
+
+          {/* Subheadline */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="flex items-center justify-center gap-3 mb-6"
+          >
+            <p className="text-xl md:text-2xl text-gray-500 font-light tracking-wide">
+              Brewing something <span className="font-semibold text-gray-900">masterpieces ...</span>
+            </p>
+          </motion.div>
+
+          {/* Refined Description Text */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 1 }}
+            className="text-gray-500 max-w-md mx-auto text-base leading-relaxed mb-12"
+          >
+            I'm currently crafting my latest projects with attention to every pixel. 
+            Great things take time. Check back soon to see the magic unfold.
+          </motion.p>
+
+          {/* Premium Action Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.6 }}
+          >
+            <Link 
+              to="/" 
+              className="group relative inline-flex items-center gap-4 px-8 py-4 bg-gray-900 text-white rounded-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(17,24,39,0.4)] active:scale-95"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-800 to-gray-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <span className="relative z-10 tracking-[0.2em] text-xs font-bold uppercase">Return to Home</span>
+              <ArrowRight size={16} className="relative z-10 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
+
         </motion.div>
       </div>
     </div>

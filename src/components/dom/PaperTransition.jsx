@@ -92,76 +92,15 @@ const PaperTransition = () => {
         }
 
         if (teleportPhase === 'closing') {
-            // Show container
-            gsap.set(containerRef.current, { opacity: 1, display: 'block' });
-
-            // Start with halves apart (like at end of preloader)
-            gsap.set(leftHalfRef.current, { xPercent: -100, rotation: -2 });
-            gsap.set(rightHalfRef.current, { xPercent: 100, rotation: 2 });
-
-            // Animate halves together
-            timelineRef.current = gsap.timeline({
-                onComplete: () => {
-                    startTeleportTransition(); // Move to 'teleporting' phase
-                }
-            });
-
-            // Play paper sound
-            play('tear', { volume: 0.6 });
-
-            timelineRef.current.to(leftHalfRef.current, {
-                xPercent: 0,
-                rotation: 0,
-                duration: 0.8,
-                ease: "power2.inOut"
-            }, 'close');
-
-            timelineRef.current.to(rightHalfRef.current, {
-                xPercent: 0,
-                rotation: 0,
-                duration: 0.8,
-                ease: "power2.inOut"
-            }, 'close');
+            startTeleportTransition();
         }
 
         if (teleportPhase === 'teleporting') {
-            // Paper is closed, TeleportRoom is loading the destination
-            // TeleportRoom will call openTeleportTransition() when room is ready
-            // No action needed here - just wait
+            // waiting
         }
 
         if (teleportPhase === 'opening') {
-            // Tear the paper apart
-            timelineRef.current = gsap.timeline({
-                onComplete: () => {
-                    finishPaperOpen(); // Just clear the phase - teleport logic already done
-                }
-            });
-
-            play('tear', { volume: 0.8 });
-
-            timelineRef.current.to(leftHalfRef.current, {
-                xPercent: -100,
-                rotation: -2,
-                duration: 1.2,
-                ease: "power3.inOut"
-            }, 'tear');
-
-            timelineRef.current.to(rightHalfRef.current, {
-                xPercent: 100,
-                rotation: 2,
-                duration: 1.2,
-                ease: "power3.inOut"
-            }, 'tear');
-
-            // Fade out container at end
-            timelineRef.current.to(containerRef.current, {
-                opacity: 0,
-                duration: 0.3,
-                onComplete: () => {
-                    gsap.set(containerRef.current, { display: 'none' });
-                }
-            }, '-=0.3');
+            finishPaperOpen();
         }
 
         return () => {

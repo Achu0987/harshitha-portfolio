@@ -92,19 +92,159 @@ const GlobalAudioEnabler = () => {
   return null;
 };
 
-// Scene background using solid color to match new painted aesthetic
-const PaperSceneBackground = () => {
-  const { scene } = useThree();
+// Lag-Free Ultra-Premium Artistic Loader
+const PremiumLoader = ({ isLoaded }) => {
+  const [progress, setProgress] = useState(0);
+  const [shouldRender, setShouldRender] = useState(true);
 
   useEffect(() => {
-    scene.background = new THREE.Color("#E8ECEF");
+    let currentProgress = 0;
+    const origOnProgress = THREE.DefaultLoadingManager.onProgress;
+    THREE.DefaultLoadingManager.onProgress = (url, loaded, total) => {
+      currentProgress = Math.round((loaded / total) * 100);
+      setProgress(currentProgress);
+      if (origOnProgress) origOnProgress(url, loaded, total);
+    };
+
+    const fallbackTimer = setTimeout(() => {
+      if (currentProgress === 0) setProgress(100);
+    }, 3000);
 
     return () => {
-      scene.background = null;
+      THREE.DefaultLoadingManager.onProgress = origOnProgress;
+      clearTimeout(fallbackTimer);
     };
-  }, [scene]);
+  }, []);
 
-  return null;
+  useEffect(() => {
+    if (isLoaded) {
+      setTimeout(() => setShouldRender(false), 1200); // Wait for the fade out
+    }
+  }, [isLoaded]);
+
+  if (!shouldRender) return null;
+
+  return (
+    <>
+      <link href="https://fonts.googleapis.com/css2?family=Rubik+Scribble&display=swap" rel="stylesheet" />
+      <style>
+        {`
+          @keyframes spinSlow {
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+          }
+          .ultra-loader {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #E8ECEF; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+            pointer-events: none; overflow: hidden;
+            opacity: 1; transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1);
+            will-change: opacity, transform;
+          }
+          .ultra-loader.exit {
+            opacity: 0;
+            transform: scale(1.05);
+            transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1), transform 1s ease-out;
+          }
+        `}
+      </style>
+      <div className={`ultra-loader ${isLoaded ? 'exit' : ''}`}>
+
+        {/* Dynamic Background Glow - Optimized native radial-gradient without blur filter */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          width: '70vw', height: '70vw',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 30%, rgba(232,236,239,0) 70%)',
+          borderRadius: '50%', zIndex: 0
+        }} />
+
+        {/* Geometric Drafting Circles (Hardware Accelerated) */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          width: 'min(700px, 90vw)', height: 'min(700px, 90vw)',
+          border: '1px solid rgba(0,0,0,0.02)', borderRadius: '50%',
+          zIndex: 0, display: 'flex', justifyContent: 'center', alignItems: 'center',
+          willChange: 'transform'
+        }}>
+          <div style={{
+            position: 'absolute', top: '8%', left: '8%', right: '8%', bottom: '8%',
+            border: '1px dashed rgba(0,0,0,0.05)', borderRadius: '50%',
+            animation: 'spinSlow 30s linear infinite',
+            willChange: 'transform'
+          }} />
+          <div style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '1px', height: '120%', background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0) 100%)' }} />
+          <div style={{ position: 'absolute', top: '50%', left: '-10%', transform: 'translateY(-50%)', width: '120%', height: '1px', background: 'linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0) 100%)' }} />
+        </div>
+
+        {/* CSS Wipe Text Animation with Rubik Scribble */}
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2 }}>
+
+          {/* Faint Background Text */}
+          <h1 style={{
+            fontFamily: '"Rubik Scribble", system-ui',
+            fontSize: 'clamp(38px, 12vw, 120px)',
+            fontWeight: 400,
+            letterSpacing: 'clamp(1px, 0.5vw, 8px)',
+            color: 'rgba(0,0,0,0.06)',
+            margin: 0,
+            paddingLeft: 'clamp(1px, 0.5vw, 8px)',
+            textAlign: 'center',
+            width: '100vw'
+          }}>
+            HARSHITHA
+          </h1>
+
+          {/* Foreground Solid Wipe Text */}
+          <h1 style={{
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+            fontFamily: '"Rubik Scribble", system-ui',
+            fontSize: 'clamp(38px, 12vw, 120px)',
+            fontWeight: 400,
+            letterSpacing: 'clamp(1px, 0.5vw, 8px)',
+            color: '#1a1a1a',
+            margin: 0,
+            paddingLeft: 'clamp(1px, 0.5vw, 8px)',
+            textAlign: 'center',
+            clipPath: `polygon(0 0, ${progress}% 0, ${progress}% 100%, 0 100%)`,
+            transition: 'clip-path 0.2s linear',
+            willChange: 'clip-path'
+          }}>
+            HARSHITHA
+          </h1>
+        </div>
+
+        {/* Minimal Progress Details */}
+        <div style={{
+          marginTop: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2
+        }}>
+          <div style={{
+            fontFamily: '"Inter", sans-serif', color: '#1a1a1a', fontSize: '0.75rem', letterSpacing: '6px',
+            fontWeight: 600, textTransform: 'uppercase', opacity: 0.6
+          }}>
+            Crafting Experience
+          </div>
+
+          {/* Elegant Growing Line */}
+          <div style={{
+            width: '2px', height: '50px', background: 'rgba(0,0,0,0.05)', margin: '25px 0',
+            position: 'relative', overflow: 'hidden', borderRadius: '2px'
+          }}>
+            <div style={{
+              position: 'absolute', top: 0, left: 0, width: '100%',
+              background: 'linear-gradient(to bottom, #1a1a1a, #444)', height: `${progress}%`,
+              transition: 'height 0.2s linear',
+              willChange: 'height'
+            }} />
+          </div>
+
+          <div style={{
+            fontFamily: '"Inter", sans-serif', fontWeight: 800, fontSize: '1.2rem', letterSpacing: '2px', color: '#1a1a1a'
+          }}>
+            {progress < 10 ? `0${progress}` : progress}%
+          </div>
+        </div>
+      </div>
+    </>
+  );
 };
 
 function AppContent() {
@@ -131,6 +271,7 @@ function AppContent() {
       <SceneProvider>
         <GlobalAudioEnabler />
         <div className="app">
+          <PremiumLoader isLoaded={isLoaded} />
           {/* Full screen 3D Canvas */}
           <div className="canvas-wrapper">
             <Canvas

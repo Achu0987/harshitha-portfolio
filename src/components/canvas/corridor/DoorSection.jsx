@@ -227,14 +227,14 @@ const DoorSection = ({
     const doorTexturePath = DOOR_TEXTURES[label] || DOOR_TEXTURES['THE GALLERY'];
     const doorTexture = useTexture(doorTexturePath);
 
-    const isTouch = isTouchDevice();
+    const isMobileDevice = typeof window !== 'undefined' && (isTouchDevice() || window.innerWidth < 1000);
     const dummyTex = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
     const doorPaintedTexturePath = DOOR_PAINTED_TEXTURES[label] || DOOR_PAINTED_TEXTURES['THE GALLERY'];
-    const doorPaintedTexture = useTexture(isTouch ? dummyTex : doorPaintedTexturePath);
+    const doorPaintedTexture = useTexture(doorPaintedTexturePath);
     const frameTexture = useTexture('/textures/corridor/doors/ramkasingledoors.webp');
     const handleTexture = useTexture('/textures/corridor/doors/klamkadodrzwi.webp');
-    const handlePaintedTexture = useTexture(isTouch ? dummyTex : '/textures/corridor/doors/klamkadodrzwi_painted.webp');
+    const handlePaintedTexture = useTexture('/textures/corridor/doors/klamkadodrzwi_painted.webp');
     const doorBackTexture = useTexture('/textures/corridor/doors/backsingledoors.webp');
     const arrowTexture = useTexture('/textures/corridor/strzalka.webp');
     const treeTexture = useTexture('/textures/corridor/drzewkowdoniczce.webp');
@@ -1271,20 +1271,22 @@ const DoorSection = ({
                         </mesh>
 
                         {/* Sketch overlay (front) - brush-stroke discard reveals painted beneath */}
-                        <mesh
-                            position={[doorMeshX, -0.2, 0]}
-                            scale={[(side === 'right' && label !== 'THE STUDIO') ? -1 : 1, 1, 1]}
-                        >
-                            <planeGeometry args={[doorWidth, doorHeight]} />
-                            <revealMaterial color="#e0e0e0"
-                                ref={doorMaterialRef}
-                                map={doorTexture}
-                                transparent={true}
-                                alphaTest={0.1}
-                                roughness={0.8}
-                                uProgress={1.0}
-                            />
-                        </mesh>
+                        {!isMobileDevice && (
+                            <mesh
+                                position={[doorMeshX, -0.2, 0]}
+                                scale={[(side === 'right' && label !== 'THE STUDIO') ? -1 : 1, 1, 1]}
+                            >
+                                <planeGeometry args={[doorWidth, doorHeight]} />
+                                <revealMaterial color="#e0e0e0"
+                                    ref={doorMaterialRef}
+                                    map={doorTexture}
+                                    transparent={true}
+                                    alphaTest={0.1}
+                                    roughness={0.8}
+                                    uProgress={1.0}
+                                />
+                            </mesh>
+                        )}
 
                         {/* WELCOME Text perfectly centered in bottom panel */}
                         {label === 'THE ABOUT' && (
@@ -1329,17 +1331,19 @@ const DoorSection = ({
                                 />
                             </mesh>
                             {/* Sketch handle overlay (front) */}
-                            <mesh position={[side === 'left' ? -0.50 : 0.50, 0.14, 0]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
-                                <planeGeometry args={[doorWidth, doorHeight]} />
-                                <revealMaterial color="#e0e0e0"
-                                    ref={handleMaterialRef}
-                                    map={handleTexture}
-                                    transparent={true}
-                                    alphaTest={0.1}
-                                    depthWrite={false}
-                                    uProgress={1.0}
-                                />
-                            </mesh>
+                            {!isMobileDevice && (
+                                <mesh position={[side === 'left' ? -0.50 : 0.50, 0.14, 0]} scale={[side === 'right' ? -1 : 1, 1, 1]}>
+                                    <planeGeometry args={[doorWidth, doorHeight]} />
+                                    <revealMaterial color="#e0e0e0"
+                                        ref={handleMaterialRef}
+                                        map={handleTexture}
+                                        transparent={true}
+                                        alphaTest={0.1}
+                                        depthWrite={false}
+                                        uProgress={1.0}
+                                    />
+                                </mesh>
+                            )}
                         </group>
                     </group>
                 </group>

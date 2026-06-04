@@ -1217,9 +1217,9 @@ const DoorsMilestone = ({ z, scrollProgressRef }) => {
     });
 
     const doors = [
-        { label: 'About Us', roomId: 'AboutMain', type: 'about', x: -7.5, y: 0.5, delay: 0 },
+        { label: 'About Us', roomId: 'AboutMain', type: 'about', x: isTouch ? -4.5 : -7.5, y: 0.5, delay: 0 },
         { label: 'Projects', roomId: 'Gallery', type: 'projekty', x: 0, y: 0.5, delay: 1 },
-        { label: 'Contact', roomId: 'Contact', type: 'kontakt', x: 7.5, y: 0.5, delay: 2 }
+        { label: 'Contact', roomId: 'Contact', type: 'kontakt', x: isTouch ? 4.5 : 7.5, y: 0.5, delay: 2 }
     ];
 
     return (

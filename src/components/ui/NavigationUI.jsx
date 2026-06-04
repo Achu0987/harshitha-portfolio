@@ -202,7 +202,7 @@ const NavigationUI = () => {
         setIsMenuOpen(false);
         setIsAudioMenuOpen(false);
         setIsAchievementsOpen(false);
-        
+
         // Navigate to the respective pages
         if (roomId === 'about') {
             window.location.href = '/about';
@@ -242,7 +242,7 @@ const NavigationUI = () => {
                         </button>
                     )}
                     <a
-                        href="#"
+                        href="https://www.instagram.com/achu_queen_123/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="nav-btn social-btn"
@@ -255,7 +255,7 @@ const NavigationUI = () => {
                         </svg>
                     </a>
                     <a
-                        href="#"
+                        href="https://www.linkedin.com/in/harshitha-ganesan/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="nav-btn social-btn"
@@ -268,14 +268,15 @@ const NavigationUI = () => {
                         </svg>
                     </a>
                     <a
-                        href="#"
+                        href="https://wa.me/+917010156378"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="nav-btn social-btn"
-                        aria-label="Twitter"
+                        aria-label="WhatsApp"
                     >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                            <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
+                            <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" />
                         </svg>
                     </a>
                 </div>
@@ -283,7 +284,7 @@ const NavigationUI = () => {
 
             {/* Global Header - Centered Logo */}
             {hasEntered && (
-                <header className={`global-header ${isUIHidden ? 'ui-hidden' : ''}`}>
+                <header className={`global-header ${isMenuOpen || isAudioMenuOpen ? 'menu-open' : ''} ${isUIHidden ? 'ui-hidden' : ''}`}>
                     <div className="header-logo">
                         <h1>HARSHITHA</h1>
                         <span className="subtitle">CREATIVE DEVELOPER</span>
