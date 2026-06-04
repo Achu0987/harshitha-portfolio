@@ -8,8 +8,6 @@ const ProjectsPage = () => {
   return (
     <div className="projects-page-wrapper min-h-screen bg-[#E8ECEF] relative overflow-hidden font-['Inter'] flex flex-col items-center justify-center">
       <div className="bg-grid"></div>
-      <div className="glow-orb top-left"></div>
-      <div className="glow-orb bottom-right"></div>
 
       {/* Top Left Navigation */}
       <div className="absolute top-0 left-0 w-full p-8 md:p-12 z-50">

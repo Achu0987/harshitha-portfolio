@@ -14,8 +14,8 @@ function ScanLine({ go }) {
       transition={{ duration: 1.8, delay: 0.4, ease: 'linear' }}
       style={{
         position: 'absolute', left: 0, right: 0, height: 2, zIndex: 5,
-        background: 'linear-gradient(90deg, transparent, #a855f7 30%, #06b6d4 70%, transparent)',
-        boxShadow: '0 0 20px #a855f7, 0 0 40px #06b6d4',
+        background: 'linear-gradient(90deg, transparent, #3b82f6 30%, #06b6d4 70%, transparent)',
+        boxShadow: '0 0 20px #3b82f6, 0 0 40px #06b6d4',
         pointerEvents: 'none',
       }}
     />
@@ -62,10 +62,8 @@ export default function Loader({ onComplete }) {
         fontFamily: '"Inter","Helvetica Neue",Arial,sans-serif',
       }}
     >
-      {/* Light Theme Background Grid & Orbs */}
+      {/* Light Theme Background Grid */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, backgroundImage: 'linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px)', backgroundSize: '50px 50px', maskImage: 'radial-gradient(circle at center, black 40%, transparent 80%)' }}></div>
-      <div style={{ position: 'absolute', top: '-200px', left: '-200px', width: '600px', height: '600px', background: '#4f46e5', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.3, pointerEvents: 'none', zIndex: 0 }}></div>
-      <div style={{ position: 'absolute', bottom: '-200px', right: '-200px', width: '600px', height: '600px', background: '#9333ea', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.3, pointerEvents: 'none', zIndex: 0 }}></div>
 
       {/* ─── Top progress bar ─── */}
       <div style={{
@@ -74,7 +72,7 @@ export default function Loader({ onComplete }) {
       }}>
         <motion.div style={{
           height: '100%',
-          background: 'linear-gradient(90deg, #a855f7, #111827 50%, #06b6d4)',
+          background: 'linear-gradient(90deg, #3b82f6, #111827 50%, #06b6d4)',
           transformOrigin: 'left',
           scaleX: progress / 100,
         }} />
@@ -135,7 +133,7 @@ export default function Loader({ onComplete }) {
             transition={{ duration: 1.8, delay: 0.5 }}
             style={{
               position: 'absolute', inset: '-50px -70px',
-              background: 'radial-gradient(ellipse at 50% 55%, rgba(168,85,247,0.15) 0%, rgba(6,182,212,0.1) 45%, transparent 68%)',
+              background: 'radial-gradient(ellipse at 50% 55%, rgba(59,130,246,0.15) 0%, rgba(6,182,212,0.1) 45%, transparent 68%)',
               filter: 'blur(36px)',
               zIndex: 0, pointerEvents: 'none',
             }}

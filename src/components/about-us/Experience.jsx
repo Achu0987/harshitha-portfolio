@@ -121,6 +121,21 @@ function InteractiveDashboardOverlay({ progress }) {
     [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, endRange - sectionSize * 0.15, endRange],
     [0, 1, 1, 0]
   );
+  const yOffset = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, endRange - sectionSize * 0.15, endRange],
+    [80, 0, 0, -80]
+  );
+  const scaleEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, endRange - sectionSize * 0.15, endRange],
+    [0.9, 1, 1, 0.95]
+  );
+  const blurEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, endRange - sectionSize * 0.15, endRange],
+    ["blur(15px)", "blur(0px)", "blur(0px)", "blur(15px)"]
+  );
 
   // Link laser scanner to scroll progress!
   const laserTop = useTransform(progress, [startRange, endRange - sectionSize * 0.25], ["0%", "100%"]);
@@ -186,7 +201,7 @@ function InteractiveDashboardOverlay({ progress }) {
 
   return (
     <motion.div
-      style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
+      style={{ opacity, y: yOffset, scale: scaleEffect, filter: blurEffect, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
       className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
       {/* Background cyber grid */}
@@ -413,6 +428,21 @@ function InteractiveMobileOverlay({ progress }) {
     [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, endRange - sectionSize * 0.15, endRange],
     [0, 1, 1, 0]
   );
+  const yOffset = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, endRange - sectionSize * 0.15, endRange],
+    [80, 0, 0, -80]
+  );
+  const scaleEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, endRange - sectionSize * 0.15, endRange],
+    [0.9, 1, 1, 0.95]
+  );
+  const blurEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, endRange - sectionSize * 0.15, endRange],
+    ["blur(15px)", "blur(0px)", "blur(0px)", "blur(15px)"]
+  );
 
   // Link laser scanner to scroll progress of Section 8!
   const laserTop = useTransform(progress, [startRange, endRange - sectionSize * 0.15], ["0%", "100%"]);
@@ -472,7 +502,7 @@ function InteractiveMobileOverlay({ progress }) {
 
   return (
     <motion.div
-      style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
+      style={{ opacity, y: yOffset, scale: scaleEffect, filter: blurEffect, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
       className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
       {/* Background cyber grid */}
@@ -685,6 +715,21 @@ function InteractiveHandoffOverlay({ progress }) {
     [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
     [0, 1, 1, 0]
   );
+  const yOffset = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    [80, 0, 0, -80]
+  );
+  const scaleEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    [0.9, 1, 1, 0.95]
+  );
+  const blurEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    ["blur(15px)", "blur(0px)", "blur(0px)", "blur(15px)"]
+  );
 
   const mouseX = useTransform(progress, [startRange, startRange + sectionSize * 0.4], [-40, 90]);
   const mouseY = useTransform(progress, [startRange, startRange + sectionSize * 0.4], [180, 60]);
@@ -744,7 +789,7 @@ function InteractiveHandoffOverlay({ progress }) {
 
   return (
     <motion.div
-      style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
+      style={{ opacity, y: yOffset, scale: scaleEffect, filter: blurEffect, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
       className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
       {/* Background cyber grid removed for light theme */}
@@ -943,6 +988,21 @@ function InteractiveCanvaOverlay({ progress }) {
     [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
     [0, 1, 1, 0]
   );
+  const yOffset = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    [80, 0, 0, -80]
+  );
+  const scaleEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    [0.9, 1, 1, 0.95]
+  );
+  const blurEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    ["blur(15px)", "blur(0px)", "blur(0px)", "blur(15px)"]
+  );
 
   const mouseX = useTransform(progress, [startRange, startRange + sectionSize * 0.4], [-40, 90]);
   const mouseY = useTransform(progress, [startRange, startRange + sectionSize * 0.4], [180, 60]);
@@ -1071,6 +1131,21 @@ function InteractiveTrainerOverlay({ progress }) {
     [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
     [0, 1, 1, 0]
   );
+  const yOffset = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    [80, 0, 0, -80]
+  );
+  const scaleEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    [0.9, 1, 1, 0.95]
+  );
+  const blurEffect = useTransform(
+    progress,
+    [startRange - sectionSize * 0.3, startRange + sectionSize * 0.1, startRange + sectionSize * 0.8, startRange + sectionSize * 0.95],
+    ["blur(15px)", "blur(0px)", "blur(0px)", "blur(15px)"]
+  );
 
   const slideOpacity = useTransform(progress, [startRange + sectionSize * 0.1, startRange + sectionSize * 0.3], [0, 1]);
   const chat1 = useTransform(progress, [startRange + sectionSize * 0.3, startRange + sectionSize * 0.4], [0, 1]);
@@ -1079,7 +1154,7 @@ function InteractiveTrainerOverlay({ progress }) {
 
   return (
     <motion.div
-      style={{ opacity, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
+      style={{ opacity, y: yOffset, scale: scaleEffect, filter: blurEffect, pointerEvents: opacity.get() > 0.1 ? 'auto' : 'none' }}
       className="absolute inset-0 z-20 flex flex-col justify-start md:justify-center items-center px-4 md:px-24 pt-20 pb-4 md:py-16 overflow-hidden pointer-events-none"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(236,72,153,0.05)_0%,transparent_70%)] z-0"></div>
@@ -1400,8 +1475,6 @@ export default function Experience() {
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           {/* Light Theme Background Grid & Orbs */}
           <div className="absolute inset-0 pointer-events-none z-[-2]" style={{ backgroundImage: 'linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px)', backgroundSize: '50px 50px', maskImage: 'radial-gradient(circle at center, black 40%, transparent 80%)' }}></div>
-          <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-[#4f46e5] rounded-full blur-[120px] opacity-30 pointer-events-none z-[-2]"></div>
-          <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] bg-[#9333ea] rounded-full blur-[120px] opacity-30 pointer-events-none z-[-2]"></div>
           <VideoBackground smoothProgress={smoothProgress} />
           <motion.div
             style={{

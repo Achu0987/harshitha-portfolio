@@ -692,7 +692,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
                 {/* Butterfly hovering above tree */}
                 <group ref={butterflyRef} position={[0.2, 1.2, 0.1]} rotation={[0, Math.PI / 4, 0]}>
                     <Html transform scale={0.7} wrapperClass="no-pointer" style={{ pointerEvents: 'none' }}>
-                        <img src="https://www.fnp.com/assets/images/custom/luxe/Butterfly%20fly%20Desktop%20(signature%20pieces).svg" alt="butterfly" style={{ width: '400px', pointerEvents: 'none' }} />
+                        <img src="https://www.fnp.com/assets/images/custom/luxe/Butterfly%20fly%20Desktop%20(signature%20pieces).svg" alt="Animated butterfly hovering over potted tree" style={{ width: '400px', pointerEvents: 'none' }} loading="lazy" aria-hidden="true" />
                     </Html>
                 </group>
             </group>

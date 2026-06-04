@@ -23,8 +23,6 @@ const ContactPage = () => {
   return (
     <div className="contact-page-wrapper">
       <div className="bg-grid"></div>
-      <div className="glow-orb top-left"></div>
-      <div className="glow-orb bottom-right"></div>
 
       <div className="nav-bar">
         <Link to="/" className="back-link">
@@ -114,8 +112,6 @@ const ContactPage = () => {
             className="md:col-span-7"
           >
             <div className="glass-panel p-6 sm:p-8 md:p-12 rounded-[1.5rem] md:rounded-[2rem] relative overflow-hidden border border-gray-200 shadow-xl">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-[80px] -mr-20 -mt-20 pointer-events-none"></div>
-              <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-500/20 to-cyan-500/20 rounded-full blur-[80px] -ml-20 -mb-20 pointer-events-none"></div>
 
               <form onSubmit={handleSubmit} className="contact-form relative z-10">
                 <div className="input-group">
