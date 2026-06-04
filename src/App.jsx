@@ -126,7 +126,6 @@ const PremiumLoader = ({ isLoaded }) => {
 
   return (
     <>
-      <link href="https://fonts.googleapis.com/css2?family=Rubik+Scribble&display=swap" rel="stylesheet" />
       <style>
         {`
           @keyframes spinSlow {
@@ -193,23 +192,31 @@ const PremiumLoader = ({ isLoaded }) => {
             HARSHITHA
           </h1>
 
-          {/* Foreground Solid Wipe Text */}
-          <h1 style={{
+          {/* Foreground Solid Wipe Text (Hardware Accelerated using Transform instead of Clip-Path) */}
+          <div style={{
             position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-            fontFamily: '"Rubik Scribble", system-ui',
-            fontSize: 'clamp(38px, 12vw, 120px)',
-            fontWeight: 400,
-            letterSpacing: 'clamp(1px, 0.5vw, 8px)',
-            color: '#1a1a1a',
-            margin: 0,
-            paddingLeft: 'clamp(1px, 0.5vw, 8px)',
-            textAlign: 'center',
-            clipPath: `polygon(0 0, ${progress}% 0, ${progress}% 100%, 0 100%)`,
-            transition: 'clip-path 0.2s linear',
-            willChange: 'clip-path'
+            overflow: 'hidden',
+            transform: `translateX(${progress - 100}%)`,
+            transition: 'transform 0.2s linear',
+            willChange: 'transform'
           }}>
-            HARSHITHA
-          </h1>
+            <h1 style={{
+              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+              fontFamily: '"Rubik Scribble", system-ui',
+              fontSize: 'clamp(38px, 12vw, 120px)',
+              fontWeight: 400,
+              letterSpacing: 'clamp(1px, 0.5vw, 8px)',
+              color: '#1a1a1a',
+              margin: 0,
+              paddingLeft: 'clamp(1px, 0.5vw, 8px)',
+              textAlign: 'center',
+              transform: `translateX(${100 - progress}%)`,
+              transition: 'transform 0.2s linear',
+              willChange: 'transform'
+            }}>
+              HARSHITHA
+            </h1>
+          </div>
         </div>
 
         {/* Minimal Progress Details */}
@@ -223,16 +230,18 @@ const PremiumLoader = ({ isLoaded }) => {
             Crafting Experience
           </div>
 
-          {/* Elegant Growing Line */}
+          {/* Elegant Growing Line (Hardware Accelerated) */}
           <div style={{
             width: '2px', height: '50px', background: 'rgba(0,0,0,0.05)', margin: '25px 0',
             position: 'relative', overflow: 'hidden', borderRadius: '2px'
           }}>
             <div style={{
-              position: 'absolute', top: 0, left: 0, width: '100%',
-              background: 'linear-gradient(to bottom, #1a1a1a, #444)', height: `${progress}%`,
-              transition: 'height 0.2s linear',
-              willChange: 'height'
+              position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+              background: 'linear-gradient(to bottom, #1a1a1a, #444)',
+              transform: `scaleY(${progress / 100})`,
+              transformOrigin: 'top',
+              transition: 'transform 0.2s linear',
+              willChange: 'transform'
             }} />
           </div>
 
