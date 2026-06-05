@@ -20,7 +20,7 @@
   <meta name="keywords"
     content="Harshitha Ganesan, Achu, frontend developer, web developer portfolio, React developer, 3D web development, Best Portfolio Website, Portfolio Website, Portfolio Website in India, Portfolio Website in Salem, Award Winning Portfolio Website, 3D Portfolio, 3D Portfolio Website, Three.js developer, GSAP animations, UI/UX engineer, freelance web developer, WebGL portfolio" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <link rel="canonical" href="https://harshitha-portfolio.com/" />
+  <link rel="canonical" href="https://harshitha-creativedeveloper-portfolio.netlify.app/" />
   <meta http-equiv="content-language" content="en" />
 
   <!-- Open Graph (Facebook, LinkedIn, Discord) -->
@@ -28,9 +28,9 @@
   <meta property="og:title" content="Harshitha Ganesan | Creative 3D Portfolio" />
   <meta property="og:description"
     content="Interactive 3D developer portfolio by Harshitha Ganesan. Explore WebGL experiments, React projects & GSAP animations in a hand-drawn gallery." />
-  <meta property="og:url" content="https://harshitha-portfolio.com/" />
+  <meta property="og:url" content="https://harshitha-creativedeveloper-portfolio.netlify.app/" />
   <meta property="og:site_name" content="Harshitha Ganesan Portfolio" />
-  <meta property="og:image" content="https://harshitha-portfolio.com/og-image.png" />
+  <meta property="og:image" content="https://harshitha-creativedeveloper-portfolio.netlify.app/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="en_US" />
@@ -40,7 +40,7 @@
   <meta name="twitter:title" content="Harshitha Ganesan | Frontend Web Developer & 3D Portfolio" />
   <meta name="twitter:description"
     content="Explore the interactive 3D developer portfolio by Harshitha Ganesan. Specializing in WebGL, React.js, and modern frontend engineering." />
-  <meta name="twitter:image" content="https://harshitha-portfolio.com/og-image.png" />
+  <meta name="twitter:image" content="https://harshitha-creativedeveloper-portfolio.netlify.app/og-image.png" />
   <meta name="twitter:creator" content="@harshitha" />
 
   <!-- Voice Search & FAQ Structured Data (JSON-LD) -->
@@ -95,9 +95,12 @@
   <!-- Google Fonts: Hand-drawn + Primary -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;500;600;700&family=Rubik+Scribble&display=swap"
-    rel="stylesheet">
+  <link rel="preload" href="https://fonts.gstatic.com/s/rubikscribble/v1/snfzs0Cp48d67SuHQOpjXLsQpYqcQDI.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;500;600;700&family=Rubik+Scribble&display=swap">
+  <link rel="stylesheet" media="print" onload="this.onload=null;this.media='all'" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;500;600;700&family=Rubik+Scribble&display=swap">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Gloria+Hallelujah&family=Inter:wght@300;400;500;600;700&family=Rubik+Scribble&display=swap">
+  </noscript>
 
   <!-- Preload bazowych tekstur używanych w preloaderze -->
 
@@ -113,6 +116,22 @@
       clip: rect(0, 0, 0, 0) !important;
       white-space: nowrap !important;
       border: 0 !important;
+    }
+    @keyframes spinSlow {
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .ultra-loader {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: #E8ECEF; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 9999;
+      pointer-events: none; overflow: hidden;
+      opacity: 1; transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1);
+      will-change: opacity, transform;
+    }
+    .ultra-loader.exit {
+      opacity: 0;
+      transform: scale(1.05);
+      transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1), transform 1s ease-out;
     }
   </style>
 </head>
@@ -313,6 +332,28 @@
   <noscript>
     Plese enable JavaScript to experience the interactive 3D portfolio of Harshitha Ganesan.
   </noscript>
+
+  <div id="native-loader" class="ultra-loader">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70vw; height: 70vw; background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 30%, rgba(232,236,239,0) 70%); border-radius: 50%; z-index: 0"></div>
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(700px, 90vw); height: min(700px, 90vw); border: 1px solid rgba(0,0,0,0.02); border-radius: 50%; z-index: 0; display: flex; justify-content: center; align-items: center; will-change: transform">
+      <div style="position: absolute; top: 8%; left: 8%; right: 8%; bottom: 8%; border: 1px dashed rgba(0,0,0,0.05); border-radius: 50%; animation: spinSlow 30s linear infinite; will-change: transform"></div>
+      <div style="position: absolute; top: -10%; left: 50%; transform: translateX(-50%); width: 1px; height: 120%; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0) 100%)"></div>
+      <div style="position: absolute; top: 50%; left: -10%; transform: translateY(-50%); width: 120%; height: 1px; background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0) 100%)"></div>
+    </div>
+    <div style="position: relative; display: flex; flex-direction: column; align-items: center; z-index: 2; min-height: clamp(38px, 12vw, 120px)">
+      <h1 style="font-family: 'Rubik Scribble', system-ui; font-size: clamp(38px, 12vw, 120px); line-height: 1; font-weight: 400; letter-spacing: clamp(1px, 0.5vw, 8px); color: rgba(0,0,0,0.06); margin: 0; padding-left: clamp(1px, 0.5vw, 8px); text-align: center; width: 100vw">HARSHITHA</h1>
+      <div id="native-wipe-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; transform: translateX(-100%); transition: transform 0.2s linear; will-change: transform">
+        <h1 id="native-wipe-text" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; font-family: 'Rubik Scribble', system-ui; font-size: clamp(38px, 12vw, 120px); line-height: 1; font-weight: 400; letter-spacing: clamp(1px, 0.5vw, 8px); color: #1a1a1a; margin: 0; padding-left: clamp(1px, 0.5vw, 8px); text-align: center; transform: translateX(100%); transition: transform 0.2s linear; will-change: transform">HARSHITHA</h1>
+      </div>
+    </div>
+    <div style="margin-top: 60px; display: flex; flex-direction: column; align-items: center; z-index: 2">
+      <div style="font-family: 'Inter', sans-serif; color: #1a1a1a; font-size: 0.75rem; letter-spacing: 6px; font-weight: 600; text-transform: uppercase; opacity: 0.6">Crafting Experience</div>
+      <div style="width: 2px; height: 50px; background: rgba(0,0,0,0.05); margin: 25px 0; position: relative; overflow: hidden; border-radius: 2px">
+        <div id="native-progress-bar" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #1a1a1a, #444); transform: scaleY(0); transform-origin: top; transition: transform 0.2s linear; will-change: transform"></div>
+      </div>
+      <div id="native-progress-text" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: 2px; color: #1a1a1a">00%</div>
+    </div>
+  </div>
 
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
