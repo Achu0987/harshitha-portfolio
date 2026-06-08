@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Experience from "./Experience";
 import Loader from "./Loader";
@@ -8,6 +8,14 @@ import SmoothScrolling from "./SmoothScrolling";
 
 export default function MainPage() {
     const [isLoaded, setIsLoaded] = useState(false);
+
+    useEffect(() => {
+        const nativeLoader = document.getElementById('native-loader');
+        if (nativeLoader) {
+            nativeLoader.style.display = 'none';
+            nativeLoader.remove();
+        }
+    }, []);
 
     return (
         <>

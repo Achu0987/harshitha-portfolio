@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Code2 } from 'lucide-react';
 import './ProjectsPage.scss';
 
 const ProjectsPage = () => {
+  useEffect(() => {
+    const nativeLoader = document.getElementById('native-loader');
+    if (nativeLoader) {
+      nativeLoader.style.display = 'none';
+      nativeLoader.remove();
+    }
+  }, []);
   return (
     <div className="projects-page-wrapper min-h-screen bg-[#E8ECEF] relative overflow-hidden font-['Inter'] flex flex-col items-center justify-center">
       <div className="bg-grid"></div>

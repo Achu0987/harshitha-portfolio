@@ -142,6 +142,14 @@
       transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1), transform 1s ease-out;
     }
   </style>
+  <script>
+    // Instantly hide the loader if not on the home page to prevent flash
+    if (window.location.pathname !== '/' && window.location.pathname !== '') {
+      const style = document.createElement('style');
+      style.innerHTML = '#native-loader { display: none !important; }';
+      document.head.appendChild(style);
+    }
+  </script>
 </head>
 
 <body>

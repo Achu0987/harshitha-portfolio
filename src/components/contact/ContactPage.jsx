@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import './ContactPage.scss';
 
 const ContactPage = () => {
+  useEffect(() => {
+    const nativeLoader = document.getElementById('native-loader');
+    if (nativeLoader) {
+      nativeLoader.style.display = 'none';
+      nativeLoader.remove();
+    }
+  }, []);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
