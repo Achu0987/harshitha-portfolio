@@ -23,15 +23,25 @@ if (typeof window !== 'undefined') {
 }
 
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/about" element={<MainPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/projects" element={<ProjectsPage />} />
-      </Routes>
-    </BrowserRouter>
-  </StrictMode>,
-)
+// --- Yield to Browser Paint before running heavy React/Three.js ---
+const initApp = () => {
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/about" element={<MainPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+        </Routes>
+      </BrowserRouter>
+    </StrictMode>
+  );
+};
+
+// Use requestIdleCallback to wait for the native HTML loader to paint (FCP/LCP)
+if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+  window.requestIdleCallback(initApp, { timeout: 1000 });
+} else {
+  setTimeout(initApp, 10);
+}
