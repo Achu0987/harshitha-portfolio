@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://harshitha.com/sitemap.xml
+Sitemap: https://harshitha-creativedeveloper-portfolio.netlify.app//sitemap.xml
