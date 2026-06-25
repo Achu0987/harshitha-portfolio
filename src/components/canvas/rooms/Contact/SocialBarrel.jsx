@@ -144,7 +144,7 @@ const SocialBarrel = ({ position, rotation = [0, 0, 0], texturePath, label, onCl
                     position={[0, scale[1] * 0.26, 0.05]} // Adjust Y position to hit the wooden board on top of the barrel
                     rotation={[0, 0, 0.03]} // Slight tilt to match a drawn wooden board
                     fontSize={scale[0] * 0.14}
-                    font="/fonts/CabinSketch-Bold.ttf"
+                    font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                     color="#111111"
                     fillOpacity={paintUniforms ? 0 : 1}
                     anchorX="center"

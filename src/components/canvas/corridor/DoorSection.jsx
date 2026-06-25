@@ -981,33 +981,33 @@ const DoorSection = ({
                 {/* === PORTFOLIO TECH STACK GRAFFITI === */}
                 {label === 'THE ABOUT' && (
                     <group position={[wallOffsetX, 0, 0.03]} ref={techStackRef}>
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.16} color="#222222" position={[-1.3, 0.8, 0]} rotation={[0, 0, 0.08]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.16} color="#222222" position={[-1.3, 0.8, 0]} rotation={[0, 0, 0.08]}>
                             JavaScript
                         </Text>
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.14} color="#444444" position={[-1.6, 0.4, 0]} rotation={[0, 0, -0.05]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.14} color="#444444" position={[-1.6, 0.4, 0]} rotation={[0, 0, -0.05]}>
                             React
                         </Text>
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.14} color="#333333" position={[-1.2, -0.4, 0]} rotation={[0, 0, 0.1]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.14} color="#333333" position={[-1.2, -0.4, 0]} rotation={[0, 0, 0.1]}>
                             Node.js
                         </Text>
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.12} color="#555555" position={[-1.5, -0.9, 0]} rotation={[0, 0, -0.04]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.12} color="#555555" position={[-1.5, -0.9, 0]} rotation={[0, 0, -0.04]}>
                             TailwindCSS
                         </Text>
 
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.16} color="#222222" position={[1.4, 0.7, 0]} rotation={[0, 0, -0.06]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.16} color="#222222" position={[1.4, 0.7, 0]} rotation={[0, 0, -0.06]}>
                             TypeScript
                         </Text>
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.14} color="#444444" position={[1.7, 0.2, 0]} rotation={[0, 0, 0.05]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.14} color="#444444" position={[1.7, 0.2, 0]} rotation={[0, 0, 0.05]}>
                             Three.js
                         </Text>
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.15} color="#333333" position={[1.3, -0.7, 0]} rotation={[0, 0, -0.09]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.15} color="#333333" position={[1.3, -0.7, 0]} rotation={[0, 0, -0.09]}>
                             Next.js
                         </Text>
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.12} color="#555555" position={[1.5, 1.1, 0]} rotation={[0, 0, 0.04]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.12} color="#555555" position={[1.5, 1.1, 0]} rotation={[0, 0, 0.04]}>
                             HTML / CSS
                         </Text>
 
-                        <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.12} color="#444444" position={[0, 1.55, 0]} rotation={[0, 0, 0.02]}>
+                        <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.12} color="#444444" position={[0, 1.55, 0]} rotation={[0, 0, 0.02]}>
                             FULL STACK DEVELOPER
                         </Text>
 
@@ -1052,16 +1052,16 @@ const DoorSection = ({
 
                             {/* Quote Text perfectly center-aligned and straightened inside the pot */}
                             <group position={[-0.04, -0.87, 0.02]}>
-                                <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.11} color="#f5f5f5" position={[0, 0.16, 0]} anchorX="center" rotation={[0, 0, 0]}>
+                                <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.11} color="#f5f5f5" position={[0, 0.16, 0]} anchorX="center" rotation={[0, 0, 0]}>
                                     {"Turning"}
                                 </Text>
-                                <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.17} color="#ffffff" position={[0, 0.04, 0]} anchorX="center" rotation={[0, 0, 0]}>
+                                <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.17} color="#ffffff" position={[0, 0.04, 0]} anchorX="center" rotation={[0, 0, 0]}>
                                     {"IDEAS"}
                                 </Text>
-                                <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.09} color="#e0e0e0" position={[0, -0.06, 0]} anchorX="center" rotation={[0, 0, 0]}>
+                                <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.09} color="#e0e0e0" position={[0, -0.06, 0]} anchorX="center" rotation={[0, 0, 0]}>
                                     {"into"}
                                 </Text>
-                                <Text font="/fonts/CabinSketch-Bold.ttf" fontSize={0.16} color="#ffffff" position={[0.04, -0.17, 0]} anchorX="center" rotation={[0, 0, 0]}>
+                                <Text font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} fontSize={0.16} color="#ffffff" position={[0.04, -0.17, 0]} anchorX="center" rotation={[0, 0, 0]}>
                                     {"REALITY"}
                                 </Text>
                             </group>
@@ -1149,7 +1149,7 @@ const DoorSection = ({
                         {label === 'THE GALLERY' && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
-                                    font="/fonts/CabinSketch-Bold.ttf"
+                                    font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1159,7 +1159,7 @@ const DoorSection = ({
                                     THE
                                 </Text>
                                 <Text
-                                    font="/fonts/CabinSketch-Bold.ttf"
+                                    font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1173,7 +1173,7 @@ const DoorSection = ({
                         {label === 'THE STUDIO' && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
-                                    font="/fonts/CabinSketch-Bold.ttf"
+                                    font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1183,7 +1183,7 @@ const DoorSection = ({
                                     THE
                                 </Text>
                                 <Text
-                                    font="/fonts/CabinSketch-Bold.ttf"
+                                    font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                                     fontSize={0.25}
                                     color="#111111"
                                     anchorX="center"
@@ -1196,7 +1196,7 @@ const DoorSection = ({
                         )}
                         {label === 'THE ABOUT' && (
                             <Text
-                                font="/fonts/CabinSketch-Bold.ttf"
+                                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                                 fontSize={0.22}
                                 color="#111111"
                                 anchorX="center"
@@ -1208,7 +1208,7 @@ const DoorSection = ({
                         )}
                         {label === "LET'S CONNECT" && (
                             <Text
-                                font="/fonts/CabinSketch-Bold.ttf"
+                                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                                 fontSize={0.25}
                                 color="#111111"
                                 anchorX="center"
@@ -1291,7 +1291,7 @@ const DoorSection = ({
                         {/* WELCOME Text perfectly centered in bottom panel */}
                         {label === 'THE ABOUT' && (
                             <Text
-                                font="/fonts/CabinSketch-Bold.ttf"
+                                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                                 fontSize={0.10}
                                 color="#222222"
                                 position={[doorMeshX, -0.85, 0.005]} // Moved down to Y=-0.85 to be perfectly centered vertically

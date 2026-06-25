@@ -4,8 +4,8 @@ import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Local fonts for sketch-style typography (TTF format required by troika)
-const RUBIK_SCRIBBLE_URL = '/fonts/RubikScribble-Regular.ttf';
-const CABIN_SKETCH_URL = '/fonts/CabinSketch-Regular.ttf';
+const RUBIK_SCRIBBLE_URL = import.meta.env.BASE_URL + 'fonts/RubikScribble-Regular.ttf';
+const CABIN_SKETCH_URL = import.meta.env.BASE_URL + 'fonts/CabinSketch-Regular.ttf';
 
 // Global flag - draw animation only happens ONCE per page load
 let hasPlayedDrawAnimation = false;

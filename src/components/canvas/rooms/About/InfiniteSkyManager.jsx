@@ -131,7 +131,7 @@ const AwardButton = ({ onClick, texture, paintedTexture, width, height, position
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Bold.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
             >
                 VIEW
             </Text>
@@ -360,7 +360,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/RubikScribble-Regular.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/RubikScribble-Regular.ttf'}
             >
                 Harshitha Ganesan
             </Text>
@@ -373,7 +373,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#4a4a4a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Regular.ttf'}
             >
                 (Achuu)
             </Text>
@@ -397,7 +397,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Regular.ttf'}
                 fontStyle="italic"
             >
                 "Creative Software Developer
@@ -411,7 +411,7 @@ const IntroMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Regular.ttf'}
                 fontStyle="italic"
             >
                 App Developer (Mobile Apps) "
@@ -510,7 +510,7 @@ const ServiceCard = ({ title, icon, x, y, delay, texture, paintedTexture, scroll
             <Text position={[0, 0.4, 0.05]} fontSize={0.6} color="#1a1a1a" anchorX="center" anchorY="middle">
                 {icon}
             </Text>
-            <Text position={[0, -0.2, 0.05]} fontSize={0.28} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/CabinSketch-Bold.ttf" textAlign="center" lineHeight={1.2}>
+            <Text position={[0, -0.2, 0.05]} fontSize={0.28} color="#1a1a1a" anchorX="center" anchorY="middle" font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'} textAlign="center" lineHeight={1.2}>
                 {title}
             </Text>
         </group>
@@ -549,7 +549,7 @@ const ServicesMilestone = ({ z, scrollProgressRef }) => {
 
     return (
         <group ref={groupRef} position={[0, 2, z]}>
-            <Text position={[0, 4.5, 0.5]} fontSize={1.2} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/RubikScribble-Regular.ttf">
+            <Text position={[0, 4.5, 0.5]} fontSize={1.2} color="#1a1a1a" anchorX="center" anchorY="middle" font={import.meta.env.BASE_URL + 'fonts/RubikScribble-Regular.ttf'}>
                 SERVICES
             </Text>
             {services.map((svc, i) => (
@@ -606,7 +606,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/RubikScribble-Regular.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/RubikScribble-Regular.ttf'}
             >
                 JOURNEY
             </Text>
@@ -618,7 +618,7 @@ const JourneyMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Regular.ttf'}
             >
                 My path so far...
             </Text>
@@ -713,7 +713,7 @@ const JourneyIsland = ({
                 color="#111111"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Bold.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                 textAlign="center"
                 maxWidth={patchW * 0.8}
                 lineHeight={1.1}
@@ -729,7 +729,7 @@ const JourneyIsland = ({
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Bold.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}
                 letterSpacing={0.06}
                 renderOrder={5}
             >
@@ -1080,7 +1080,7 @@ const SkillBalloon = ({ config, revealFactorRef, spreadFactorRef, timeRef }) => 
                         color="#1a1a1a"
                         anchorX="center"
                         anchorY="middle"
-                        font="/fonts/RubikScribble-Regular.ttf"
+                        font={import.meta.env.BASE_URL + 'fonts/RubikScribble-Regular.ttf'}
                         fillOpacity={0}
                         outlineWidth={0.02}
                         outlineColor="#fff"
@@ -1169,7 +1169,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
                 color="#1a1a1a"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/RubikScribble-Regular.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/RubikScribble-Regular.ttf'}
             >
                 SKILLS
             </Text>
@@ -1181,7 +1181,7 @@ const SkillsMilestone = ({ z, scrollProgressRef }) => {
                 color="#555555"
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/CabinSketch-Regular.ttf"
+                font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Regular.ttf'}
             >
                 Technologies I love working with
             </Text>
@@ -1224,10 +1224,10 @@ const DoorsMilestone = ({ z, scrollProgressRef }) => {
 
     return (
         <group ref={groupRef} position={[0, 0, z]}>
-            <Text position={[0, 5.5, 0.5]} fontSize={1.2} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/RubikScribble-Regular.ttf">
+            <Text position={[0, 5.5, 0.5]} fontSize={1.2} color="#1a1a1a" anchorX="center" anchorY="middle" font={import.meta.env.BASE_URL + 'fonts/RubikScribble-Regular.ttf'}>
                 EXPLORE
             </Text>
-            <Text position={[0, 4.5, 0.5]} fontSize={0.35} color="#555555" anchorX="center" anchorY="middle" font="/fonts/CabinSketch-Regular.ttf">
+            <Text position={[0, 4.5, 0.5]} fontSize={0.35} color="#555555" anchorX="center" anchorY="middle" font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Regular.ttf'}>
                 Where to next?
             </Text>
             {doors.map((door, i) => (
@@ -1357,7 +1357,7 @@ const FloatingDoor = ({ label, roomId, type, x, y, delay, z, scrollProgressRef }
                 <planeGeometry args={[label.length * 0.25 + 0.8, 1.2]} />
                 <meshBasicMaterial color="#f0f0f0" transparent opacity={0.85} />
             </mesh>
-            <Text position={[0, 0.1, 0.05]} fontSize={0.7} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/CabinSketch-Bold.ttf">
+            <Text position={[0, 0.1, 0.05]} fontSize={0.7} color="#1a1a1a" anchorX="center" anchorY="middle" font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}>
                 {label}
             </Text>
         </group>
@@ -1418,11 +1418,11 @@ const ThankYouMilestone = ({ z, scrollProgressRef }) => {
     return (
         <group ref={groupRef} position={[0, 0, z]}>
             <group ref={textRef}>
-                <Text position={[0, 0, 0.5]} fontSize={2.5} color="#1a1a1a" anchorX="center" anchorY="middle" font="/fonts/RubikScribble-Regular.ttf">
+                <Text position={[0, 0, 0.5]} fontSize={2.5} color="#1a1a1a" anchorX="center" anchorY="middle" font={import.meta.env.BASE_URL + 'fonts/RubikScribble-Regular.ttf'}>
                     THANK YOU
                 </Text>
 
-                <Text position={[0, -1.8, 0.5]} fontSize={0.6} color="#555555" anchorX="center" anchorY="middle" font="/fonts/CabinSketch-Bold.ttf">
+                <Text position={[0, -1.8, 0.5]} fontSize={0.6} color="#555555" anchorX="center" anchorY="middle" font={import.meta.env.BASE_URL + 'fonts/CabinSketch-Bold.ttf'}>
                     For exploring my journey
                 </Text>
 
