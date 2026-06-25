@@ -1,11 +1,21 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import App from './App.jsx'
 import MainPage from './components/about-us/page.jsx'
 import ContactPage from './components/contact/ContactPage.jsx'
 import ProjectsPage from './components/projects/ProjectsPage.jsx'
 import './styles/main.scss'
+import * as THREE from 'three'
+
+// Fix 3D asset paths for GitHub Pages sub-directory hosting
+THREE.DefaultLoadingManager.setURLModifier((url) => {
+  const baseUrl = import.meta.env.BASE_URL;
+  if (url.startsWith('/') && !url.startsWith(baseUrl)) {
+    return baseUrl + url.slice(1);
+  }
+  return url;
+});
 
 // --- Console Signature for Awwwards Judges ---
 if (typeof window !== 'undefined') {
@@ -27,14 +37,14 @@ if (typeof window !== 'undefined') {
 const initApp = () => {
   createRoot(document.getElementById('root')).render(
     <StrictMode>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/about" element={<MainPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </StrictMode>
   );
 };
