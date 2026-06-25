@@ -1,0 +1,33 @@
+https://harshitha-portfolio.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://harshitha.com/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Cache static assets for 1 year (Performance & SEO Server Score)
+https://harshitha.com/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+https://harshitha.com/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+https://harshitha.com/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+https://harshitha.com/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+https://harshitha.com/*.ktx2
+  Cache-Control: public, max-age=31536000, immutable
+
+https://harshitha.com/*.glb
+  Cache-Control: public, max-age=31536000, immutable
+
+https://harshitha.com/*.mp3
+  Cache-Control: public, max-age=31536000, immutable
+
+https://harshitha.com/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
