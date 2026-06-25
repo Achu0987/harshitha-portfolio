@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useScene } from '../../context/SceneContext';
 import { useAudio } from '../../context/AudioManager';
@@ -21,6 +22,7 @@ const ROOMS = [
 const PIN_START_POSITION = { x: 50.5, y: 97 };
 
 const NavigationUI = () => {
+    const navigate = useNavigate();
     const { currentRoom, isInRoom, requestExit, hasEntered, teleportTo, isTeleporting } = useScene();
     const { isMuted, toggleMute, globalVolume, setGlobalVolume } = useAudio();
     const { showTutorial, unlockAchievement } = useAchievements();
@@ -203,13 +205,13 @@ const NavigationUI = () => {
         setIsAudioMenuOpen(false);
         setIsAchievementsOpen(false);
 
-        // Navigate to the respective pages
+        // Navigate to the respective pages using React Router
         if (roomId === 'about') {
-            window.location.href = '/about';
+            navigate('/about');
         } else if (roomId === 'gallery') {
-            window.location.href = '/projects';
+            navigate('/projects');
         } else if (roomId === 'contact') {
-            window.location.href = '/contact';
+            navigate('/contact');
         } else if (roomId === 'studio') {
             // 'Explore' button clicked - do nothing else but close the map
             // so the user can explore the 3D corridor
@@ -390,13 +392,13 @@ const NavigationUI = () => {
                         </div>
                         <div className="map-container">
                             {/* Map background image */}
-                            <img src="/images/map.webp" alt="Portfolio Interactive Map" className="map-image" loading="lazy" />
+                            <img src={`${import.meta.env.BASE_URL}images/map.webp`} alt="Portfolio Interactive Map" className="map-image" loading="lazy" />
 
                             {/* Painted Map Overlays */}
-                            <img ref={paintedMapsRefs.about} src="/images/map_about_painted.webp" alt="About Studio Map Section" className="painted-map-layer" style={{ clipPath: 'polygon(10% 20%, 10% 20%, 10% 55%, 10% 55%)' }} loading="lazy" />
-                            <img ref={paintedMapsRefs.gallery} src="/images/map_gallery_painted.webp" alt="Projects Gallery Map Section" className="painted-map-layer" style={{ clipPath: 'polygon(10% 57%, 10% 57%, 10% 92%, 10% 92%)' }} loading="lazy" />
-                            <img ref={paintedMapsRefs.contact} src="/images/map_contact_painted.webp" alt="Contact Room Map Section" className="painted-map-layer" style={{ clipPath: 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)' }} loading="lazy" />
-                            <img ref={paintedMapsRefs.studio} src="/images/map_studio_painted.webp" alt="3D Corridor Map Section" className="painted-map-layer" style={{ clipPath: 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)' }} loading="lazy" />
+                            <img ref={paintedMapsRefs.about} src={`${import.meta.env.BASE_URL}images/map_about_painted.webp`} alt="About Studio Map Section" className="painted-map-layer" style={{ clipPath: 'polygon(10% 20%, 10% 20%, 10% 55%, 10% 55%)' }} loading="lazy" />
+                            <img ref={paintedMapsRefs.gallery} src={`${import.meta.env.BASE_URL}images/map_gallery_painted.webp`} alt="Projects Gallery Map Section" className="painted-map-layer" style={{ clipPath: 'polygon(10% 57%, 10% 57%, 10% 92%, 10% 92%)' }} loading="lazy" />
+                            <img ref={paintedMapsRefs.contact} src={`${import.meta.env.BASE_URL}images/map_contact_painted.webp`} alt="Contact Room Map Section" className="painted-map-layer" style={{ clipPath: 'polygon(95% 10%, 95% 10%, 95% 35%, 95% 35%)' }} loading="lazy" />
+                            <img ref={paintedMapsRefs.studio} src={`${import.meta.env.BASE_URL}images/map_studio_painted.webp`} alt="3D Corridor Map Section" className="painted-map-layer" style={{ clipPath: 'polygon(85% 41%, 85% 41%, 85% 81%, 85% 81%)' }} loading="lazy" />
 
                             {/* Hover Zones — covering the map */}
                             <button
@@ -457,7 +459,7 @@ const NavigationUI = () => {
                                     onMouseLeave={() => setHoveredRoom(null)}
                                     title={room.label}
                                 >
-                                    <img src="/images/pin-slot.webp" alt="" className="slot-image" aria-hidden="true" loading="lazy" />
+                                    <img src={`${import.meta.env.BASE_URL}images/pin-slot.webp`} alt="" className="slot-image" aria-hidden="true" loading="lazy" />
                                 </button>
                             ))}
 
@@ -479,7 +481,7 @@ const NavigationUI = () => {
                                         }%`
                                 }}
                             >
-                                <img src="/images/pin.webp" alt="You are here marker" className="pin-image" loading="lazy" />
+                                <img src={`${import.meta.env.BASE_URL}images/pin.webp`} alt="You are here marker" className="pin-image" loading="lazy" />
                             </div>
                         </div>
                     </div>

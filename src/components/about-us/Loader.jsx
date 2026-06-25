@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
-const DURATION_MS = 4500;
+const DURATION_MS = 1500;
 
 /* ── Scan line over image ── */
 function ScanLine({ go }) {
@@ -156,7 +156,7 @@ export default function Loader({ onComplete }) {
 
           {/* The image */}
           <motion.img
-            src="/handshake.png"
+            src={`${import.meta.env.BASE_URL}handshake.png`}
             alt="Human and AI handshake"
             initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
             animate={go ? { clipPath: 'inset(0% 0% 0% 0%)' } : {}}

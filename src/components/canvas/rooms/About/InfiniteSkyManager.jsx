@@ -1297,11 +1297,11 @@ const FloatingDoor = ({ label, roomId, type, x, y, delay, z, scrollProgressRef }
         e.stopPropagation();
         document.body.style.cursor = 'auto';
         if (roomId === 'AboutMain') {
-            window.location.href = '/about';
+            window.location.hash = '#/about';
         } else if (roomId === 'Contact') {
-            window.location.href = '/contact';
+            window.location.hash = '#/contact';
         } else if (roomId === 'Gallery') {
-            window.location.href = '/projects';
+            window.location.hash = '#/projects';
         } else if (roomId) {
             teleportToRoom(roomId);
         }
